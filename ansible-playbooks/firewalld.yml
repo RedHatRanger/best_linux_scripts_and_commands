@@ -1,0 +1,16 @@
+---
+- name: Add Torque Ports to the Firewall
+  hosts: nodes
+  become: true
+  tasks:
+    - name: Open multiple ports in the firewall
+      firewalld:
+        port: "{{ item }}"
+        permanent: yes
+        state: enabled
+      with_items:
+        - "15001/tcp"
+        - "15002/tcp"
+        - "15003/tcp"
+        - "15004/tcp"
+        - "15005/tcp"
