@@ -1,0 +1,12 @@
+---
+- name: Get CPU info
+  hosts: nodes
+  become: true
+  tasks:
+    - name: Run lscpu command and capture the output
+      command: lscpu
+      register: cpu_output
+
+    - name: Display CPU information
+      debug:
+        msg: "{{ cpu_output.stdout_lines | select('search', '^CPU|Model name') | list }}
