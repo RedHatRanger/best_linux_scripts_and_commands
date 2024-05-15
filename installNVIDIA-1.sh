@@ -1,4 +1,3 @@
-```
 #!/bin/bash
 
 # This script has several parts but it will install the NVIDIA driver from the share to the host
@@ -50,4 +49,3 @@ systemctl set-default multi-user.target
 
 # Reboot the system
 init 6
-```
