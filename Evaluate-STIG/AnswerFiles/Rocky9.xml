@@ -1,0 +1,14 @@
+<STIGComments Name="Rocky9">
+  <Vuln ID="V-230234">
+    <!-- RHEL 9 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the PPSM. -->
+    <AnswerKey Name="DEFAULT">
+      <ExpectedStatus>Open</ExpectedStatus>
+      <ValidationCode></ValidationCode>
+      <ValidTrueStatus>NotAFinding</ValidTrueStatus>
+      <ValidTrueComment>This is a Rocky Linux system, so the check text needs to be modified to get the correct output.</ValidTrueComment>
+      <ValidFalseStatus></ValidFalseStatus>
+      <ValidFalseComment></ValidFalseComment>
+    </AnswerKey>
+  </Vuln>
+  <Vuln ID="V-.....">
+  
