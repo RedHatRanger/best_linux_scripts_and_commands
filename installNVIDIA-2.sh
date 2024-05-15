@@ -38,7 +38,7 @@ else
 fi
 
 # Rebuild the initramfs file
-find /boot -nmae "*nouveau*" &>/dev/null
+find /boot -name "*nouveau*" &>/dev/null
 if [[ $? -ne 0 ]]; then
   mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r)-nouveau.img
   dracut /boot/initramfs-$(uname -r).img $(uname -r)
