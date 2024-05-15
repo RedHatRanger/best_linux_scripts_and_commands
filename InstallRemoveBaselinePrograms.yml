@@ -1,0 +1,24 @@
+---
+- name: Install and Remove Programs
+  hosts: nodes
+  become: true
+  tasks:
+    - name: Remove libgpod
+      yum:
+        name: libgpod
+        state: absent
+    - name: Remove Gnome Initial Setup
+      yum:
+        name: gnome-initial-setup
+        state: absent
+    .
+    .
+    .
+    - name: Install Python3
+      yum:
+        name: python3
+        state: present
+    - name: Install Chrony
+      yum:
+        name: chrony
+        state: present
