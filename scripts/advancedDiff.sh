@@ -17,7 +17,7 @@
 # apple
 
 for i in $(cat /path/to/file1); do 
-  grep -i $i /path/to/file2 &>/devnull
+  grep -i $i /path/to/file2 &>/dev/null
   if [[ $? -ne 0 ]]; then
     echo "$i"
   fi
