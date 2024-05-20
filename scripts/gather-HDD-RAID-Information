@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# This script will gather the serial #'s of hard drives which are in a RAID.  This will not work on all RAIDs!
+
+for i in {0..14}; do 
+  smartctl -a -d megaraid,$i; done > somefile.txt 
