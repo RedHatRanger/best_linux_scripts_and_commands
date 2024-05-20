@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script will gather HDD serial #'s for multiple machines and store them on a network share.
+# This script will gather HDD serial #'s for multiple machines using smartctl, and store them on a network share.
 
 mkdir -p /<some network share>/HDD-Info/$(hostname -s)
 echo "lsblk output:" > /<some network share>/HDD-Info/$(hostname -s)/HDD_information.txt
