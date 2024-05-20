@@ -5,11 +5,11 @@
 USER_NAME="<your username>"
 
 # Check if 28 days have elapsed since the last time the user logged in.
-if [ ! -f /home/$USER_NAME/last_login_reminder] || [[ `find ~/.last_login_reminder -mtime +28 -print` ]]; then
+if [ ! -f /home/$USER_NAME/.last_login_reminder ] || [[ $(find /home/$USER_NAME/.last_login_reminder -mtime +28 -print) ]]; then
   # Display the reminder
-  DISPLAY=:0 su $USER_NAME -c zenity --warning --text="Please be sure to log into your account soon to avoid lockout."
-  # Update the reminder file
-  touch ~/.last_login_reminder
+  DISPLAY=:0 su $USER_NAME -c 'zenity --warning --text="Please be sure to log into your account soon to avoid lockout."'
+  # Update the last reminder file
+  touch /home/$USER_NAME/.last_login_reminder
 fi
 
 
