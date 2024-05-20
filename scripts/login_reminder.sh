@@ -11,3 +11,9 @@ if [[ ! -f /home/$USER_NAME/last_login_reminder]] || [[ `find ~/.last_login_remi
   # Update the last reminder file
   touch ~/.last_login_reminder
 fi
+
+
+### Open the cron table for editing:
+# crontab -e
+# Add the following line to run the script daily at a specific time (e.g., 8:00 AM):
+# 0 8 * * * /path/to/login_reminder.sh
