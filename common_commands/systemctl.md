@@ -52,3 +52,22 @@ systemctl list-units --type socket
 systemctl list-units
 ```
 
+* To cat a service:
+```
+[root@ansible]# systemctl cat crond
+# /usr/lib/systemd/system/crond.service
+[Unit]
+Description=Command Scheduler
+After=auditd.service nss-user-lookup.target systemd-user-sessions.service time-sync.target ypbind.service autofs.service
+
+[Service]
+EnvironmentFile=/etc/sysconfig/crond
+ExecStart=/usr/sbin/crond -n $CRONDARGS
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target 
+```
