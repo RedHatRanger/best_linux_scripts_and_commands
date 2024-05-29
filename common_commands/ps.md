@@ -10,5 +10,7 @@ ps -ef
 [ansible@ctrl ~]$ ps -lp $(pgrep sleep)
 F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
 0 S  1001   30516    8973  0  80   0 - 55238 hrtime pts/0    00:00:00 sleep
-[ansible@ctrl ~]$ 
+
+[ansible@ctrl ~]$ sudo pkill sleep
+[1] 30516 Terminated       sleep 1000 
 ```
