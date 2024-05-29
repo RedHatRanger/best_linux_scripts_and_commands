@@ -23,7 +23,7 @@ set_password() {
 }
 
 for u in "$@"
-  do
+do
   create_user "$u"
   set_password "$u"
 done
