@@ -5,6 +5,7 @@
 
 load average: @ 1 minute / 5 minutes / 15 minutes
 
+With 4 CPU cores: \
 1.0 = 25% load on the system \
 2.0 = 50% load on the system \
 4.0 = 100% load on the system
