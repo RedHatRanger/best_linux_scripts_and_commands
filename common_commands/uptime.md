@@ -3,7 +3,7 @@
  16:24:39 up  8:07,  2 users,  load average: 0.35, 0.53, 0.50
 ```
 
-load average: @ 1 minute / 5 minutes / 15 minutes \
+load average: @ 1 minute / 5 minutes / 15 minutes
 
 1.0 = 25% load on the system \
 2.0 = 50% load on the system \
