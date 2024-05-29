@@ -5,10 +5,23 @@ systemctl stop chronyd.service
 systemctl start chronyd
 systemctl restart crond.service chronyd.service
 ```
+* To enable a service so that it starts automatically at boot:
+```
+systemctl enable crond
+```
 
 * To start and enable a service simultaneously:
 ```
 systemctl enable --now crond
+```
+
+* To mask or unmask a service so that it will not enable automatically after a system upgrade:
+```
+systemctl disable --now crond
+systemctl mask crond
+
+Reverting the mask:
+systemctl unmask crond
 ```
 
 * To check the status of a service, or multiple services:
