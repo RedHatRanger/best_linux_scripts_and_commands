@@ -3,6 +3,11 @@
 ps -elf
 ```
 
+* To list just the sleep process:
+```
+ps -elf | grep sleep
+```
+
 * A simple demo of creating a test process and then searching for it using pgrep:
 ```
 [ansible@ctrl ~]$ sleep 1000&
