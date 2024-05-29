@@ -1,2 +1,2 @@
-set bg=dark
+set bg=dark \
 abbr _sh #!/bin/bash
