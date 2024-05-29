@@ -29,6 +29,11 @@ systemctl status sshd
 systemctl status sshd crond chronyd
 ```
 
+* To reload the systemctl daemon:
+```
+systemctl daemon-reload
+```
+
 * To get a default or set a default target:
 ```
 systemctl get-default
