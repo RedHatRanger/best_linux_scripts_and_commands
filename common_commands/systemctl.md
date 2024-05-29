@@ -20,7 +20,7 @@ systemctl enable --now crond
 systemctl disable --now crond
 systemctl mask crond
 
-Reverting the mask:
+# Reverting the mask:
 systemctl unmask crond
 ```
 
