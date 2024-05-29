@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# This script will take a given username input to see if the user already exists on the system
+
 if [[ "$#" -lt 1 ]]; then
   echo "usage: $0 <username>"
   exit 1
