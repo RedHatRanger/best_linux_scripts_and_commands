@@ -12,3 +12,14 @@ dd or 15dd
 ```
 :1,$s/<target_to_be_replaced>/<new_target_name>/g
 ```
+
+* To undo an edit in vim:
+```
+:u
+```
+
+* To go to the top; To go to the bottom:
+```
+gg or G
+```
+
