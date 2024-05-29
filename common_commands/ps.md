@@ -1,11 +1,17 @@
 * To show all running processes on a system:
 ```
-ps -elf
+[ansible@ctrl ~]$ ps -elf
 ```
 
 * To list just the sleep process:
 ```
-ps -elf | grep sleep
+[ansible@ctrl ~]$ ps -elf | grep sleep
+```
+
+* To list the process number (PID) of the command:
+```
+[ansible@ctrl ~]$ pgrep sleep
+30516
 ```
 
 * A simple demo of creating a test process and then searching for it using pgrep:
