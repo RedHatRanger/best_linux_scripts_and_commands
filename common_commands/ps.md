@@ -12,6 +12,9 @@
 ```
 [ansible@ctrl ~]$ pgrep sleep
 30516
+
+# To get a little bit more detail:
+[ansible@ctrl ~]$ pgrep -l sleep
 ```
 
 * A simple demo of creating a test process and then searching for it using pgrep:
