@@ -1,6 +1,6 @@
 ### These commands must be ran as "sudo"
 
-* To shutdown a system 20 minutes from now and leave a logging message:
+* To shutdown a system 20 minutes from now and leave a logging message to users:
 ```
 shutdown -h +20 "Bye Bye Folks"
 ```
