@@ -1,6 +1,6 @@
 * To show all running processes on a system:
 ```
-ps -ef
+ps -elf
 ```
 
 * A simple demo of creating a test process and then searching for it using pgrep:
