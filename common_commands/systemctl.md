@@ -42,7 +42,7 @@ systemctl set-default graphical.target
 systemctl isolate multi-user.target
 ```
 
-* To list all services running on a system, with or without the given type (service/socket/timer):
+* To list all services running on a system, with or without the given type (service/socket/target/timer):
 ```
 systemctl list-units --type socket
 systemctl list-units
