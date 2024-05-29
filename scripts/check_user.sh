@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # This script will take a given username input to see if the user already exists on the system
+# You will need sudo permission to run this
 
 if [[ "$#" -lt 1 ]]; then
   echo "usage: $0 <username>"
@@ -11,3 +12,5 @@ elif getent passwd "$1"; then
 fi
 
 read -s -p "Enter a password for the new user $1: " USER_PASSWORD
+useradd -m "$1"
+echo "$USER_PASSWORD" | passwd --stdin "$1"
