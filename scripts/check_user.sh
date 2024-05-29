@@ -14,3 +14,4 @@ fi
 read -s -p "Enter a password for the new user $1: " USER_PASSWORD
 useradd -m "$1"
 echo "$USER_PASSWORD" | passwd --stdin "$1"
+getent passwd "$1"
