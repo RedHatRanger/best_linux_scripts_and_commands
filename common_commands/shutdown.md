@@ -13,3 +13,8 @@ OR
 ```
 init 6
 ```
+
+* To cancel a scheduled shutdown:
+```
+shutdown -c
+```
