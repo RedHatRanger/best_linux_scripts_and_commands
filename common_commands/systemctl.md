@@ -17,8 +17,7 @@ systemctl enable --now crond
 
 * To mask or unmask a service so that it will not enable automatically after a system upgrade:
 ```
-systemctl disable --now crond
-systemctl mask crond
+systemctl mask --now crond
 
 # Reverting the mask:
 systemctl unmask crond
