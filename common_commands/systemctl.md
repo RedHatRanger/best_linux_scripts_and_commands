@@ -44,7 +44,7 @@ systemctl isolate multi-user.target
 
 * To list all services running on a system, with or without the given type (service/socket/timer):
 ```
-systemctl list-units
 systemctl list-units --type socket
+systemctl list-units
 ```
 
