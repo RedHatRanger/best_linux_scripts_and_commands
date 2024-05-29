@@ -6,3 +6,5 @@ ps -f -p $1
 ```
 
 ![Screenshot from 2024-05-29 08-59-58](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/382901e4-fca7-4775-aedf-de1d9d427801)
+
+![Screenshot from 2024-05-29 08-52-12](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/bb0f3cb0-4459-47aa-8e98-6e8a6a7c2d73)
