@@ -1,4 +1,4 @@
-* To start or restart a service, or multiple services:
+* To start, stop, or restart a service, or multiple services:
 ```
 systemctl start chronyd
 systemctl stop chronyd.service
