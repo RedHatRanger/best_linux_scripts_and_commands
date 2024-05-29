@@ -1,8 +1,8 @@
 * To start or restart a service, or multiple services:
 ```
-systemctl restart crond
-systemctl stop chronyd.service
 systemctl start chronyd
+systemctl stop chronyd.service
+systemctl restart crond
 systemctl restart crond.service chronyd.service
 ```
 * To enable a service so that it starts automatically at boot:
