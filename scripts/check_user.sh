@@ -9,3 +9,5 @@ elif getent passwd "$1"; then
   echo "The user $1 already exists on the system"
   exit 2
 fi
+
+read -s -p "Enter a password for the new user $1: " USER_PASSWORD
