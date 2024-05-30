@@ -3,3 +3,12 @@
 man 3 rsyslog
 man 5 rsyslog.conf
 ```
+
+* Let's modify the /etc/rsyslog.conf configuration:
+```
+vim /etc/rsyslog.d/my.conf
+
+local1.warn /var/log/my.log
+
+:wq
+```
