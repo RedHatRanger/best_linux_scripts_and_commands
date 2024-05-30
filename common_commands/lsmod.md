@@ -3,3 +3,7 @@
 lsmod
 ```
 
+* To find out information about a particular module that's loaded:
+```
+modinfo sd_mod
+```
