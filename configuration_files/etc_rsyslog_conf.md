@@ -4,7 +4,7 @@ man 3 rsyslog
 man 5 rsyslog.conf
 ```
 
-* Let's modify the /etc/rsyslog.conf configuration:
+* Let's modify the /etc/rsyslog.conf configuration as a test:
 ```
 vim /etc/rsyslog.d/my.conf
 
