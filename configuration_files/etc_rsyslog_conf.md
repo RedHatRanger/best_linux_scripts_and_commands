@@ -10,5 +10,9 @@ vim /etc/rsyslog.d/my.conf
 
 local1.warn /var/log/my.log
 
+
 :wq
+
+
+systemctl restart rsyslogd
 ```
