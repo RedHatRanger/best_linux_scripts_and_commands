@@ -23,5 +23,3 @@ logrotate /etc/logrotate.conf
 ls -l /var/log/my*
 ```
 ![Screenshot from 2024-05-30 08-44-06](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/d4538a2b-18bb-4cea-8165-c24df9f4a964)
-![Screenshot from 2024-05-30 08-44-06](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/d4538a2b-18bb-4cea-8165-c24df9f4a964)
-
