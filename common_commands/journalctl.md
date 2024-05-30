@@ -16,6 +16,6 @@ journalctl --since 6h --unit sshd
 
 * To make journalctl persistent across reboots:
 ```
-sed -i 's/Storage=auto/Storage=persistent/' /etc/systemd/journald.conf
+sed -i 's/#Storage=auto/Storage=persistent/' /etc/systemd/journald.conf
 ```
 
