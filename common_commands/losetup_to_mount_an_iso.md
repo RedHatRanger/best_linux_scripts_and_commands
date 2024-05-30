@@ -28,7 +28,7 @@ losetup
 # Exit the directory in use:
 cd
 
-# Unmount:
+# Unmount and delete the loop device:
 umount -l /mnt
 losetup -d /dev/loop0
 losetup -d /dev/loop6
