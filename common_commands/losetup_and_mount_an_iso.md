@@ -1,3 +1,8 @@
+* To view the man pages:
+```
+man 4 loop
+```
+
 * Example download ISO:
 ```
 wget https://archive.org/download/tiny-iso-test/TinyIsoTest.iso
@@ -9,4 +14,17 @@ losetup -f TinyIsoTest.iso
 lsblk | grep loop
 mount /dev/loop0 /mnt
 cd /mnt
+```
+
+* To unmount the ISO:
+```
+# Exit the directory in use:
+cd
+
+# Unmount:
+umount -l /mnt
+losetup -d /dev/loop0
+
+# If that doesn't work:
+umount -l /dev/loop0
 ```
