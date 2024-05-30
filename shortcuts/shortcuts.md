@@ -28,3 +28,9 @@ abbr _sh #!/bin/bash
 
 :wq
 ```
+
+* If you forgot to run sudo in front of a command, you may use !!:
+```
+<previously failed command>
+sudo !!
+```
