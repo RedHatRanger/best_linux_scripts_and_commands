@@ -15,6 +15,10 @@ lsblk | grep loop
 mount /dev/loop0 /mnt
 cd /mnt
 ```
+* If you are sure that the loop device is available:
+```
+losetup /dev/loop6 TinyIsoTest.iso
+```
 
 * To unmount the ISO:
 ```
