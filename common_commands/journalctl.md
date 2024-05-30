@@ -12,6 +12,8 @@ tail -f /var/log/messages
 journalctl -n5
 journalctl --since yesterday
 journalctl --since 6h --unit sshd
+journalctl --list-boots
+journalctl -b -1
 ```
 
 * To make journalctl persistent across reboots:
