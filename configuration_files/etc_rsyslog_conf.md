@@ -15,4 +15,5 @@ local1.warn /var/log/my.log
 
 
 systemctl restart rsyslogd
+logger -p local1.warn "Hellllpppppppppp!"
 ```
