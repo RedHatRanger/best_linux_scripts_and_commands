@@ -8,7 +8,7 @@ man 4 loop
 wget https://archive.org/download/tiny-iso-test/TinyIsoTest.iso
 ```
 
-* Mount the ISO and view its contents:
+* Mount the ISO and view its contents (use -f will find the next available loop device):
 ```
 losetup -f TinyIsoTest.iso
 lsblk | grep loop
