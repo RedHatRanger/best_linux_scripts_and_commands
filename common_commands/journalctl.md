@@ -6,3 +6,10 @@ OR
 ```
 tail -f /var/log/messages
 ```
+
+* Other Journalctl commands:
+```
+journalctl -n5
+journalctl --since yesterday
+journalctl --since 6h --unit sshd
+```
