@@ -18,6 +18,9 @@ cd /mnt
 * If you are sure that the loop device is available:
 ```
 losetup /dev/loop6 TinyIsoTest.iso
+
+# Then run losetup to see the loop devices:
+losetup
 ```
 
 * To unmount the ISO:
