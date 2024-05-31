@@ -318,4 +318,11 @@ log      =internal log           bsize=4096   blocks=16384, version=2
          =                       sectsz=512   sunit=0 blks, lazy-count=1
 realtime =none                   extsz=4096   blocks=0, rtextents=0
 ```
+
+* To give assign a new label to the xfs partition:
+```
+[root@ctrl disks]# xfs_admin -L "DATA" /dev/VG1/LV1
+writing all SBs
+new label = "DATA"
+```
 ![Screenshot from 2024-05-31 10-35-35](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/1026aeb8-1b2a-489f-a735-eebb74e8b881)
