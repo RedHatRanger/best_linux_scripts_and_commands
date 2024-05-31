@@ -73,3 +73,24 @@ sr0                                            11:0    1  1024M  0 rom
 [root@ctrl disks]# blkid | grep loop3
 /dev/loop3p1: UUID="c1e7792a-cdfa-43bf-a322-6b5258fa201e" TYPE="ext4" PARTUUID="4302a9e0-01"
 ```
+
+* To print the metadata about the device:
+```
+[root@ctrl disks]# dumpe2fs /dev/loop3p1 | less
+dumpe2fs 1.46.5 (30-Dec-2021)
+Filesystem volume name:   <none>
+Last mounted on:          <not available>
+Filesystem UUID:          c1e7792a-cdfa-43bf-a322-6b5258fa201e
+.
+.
+.
+```
+
+* To change the label of the ext4 device (This could also be set during mkfs.ext4):
+```
+[root@ctrl disks]# tune2fs -L "DATA2" /dev/loop3p1
+
+# To validate the new label change:
+[root@ctrl disks]# blkid | grep loop3
+/dev/loop3p1: LABEL="DATA2" UUID="c1e7792a-cdfa-43bf-a322-6b5258fa201e" TYPE="ext4" PARTUUID="4302a9e0-01"
+```
