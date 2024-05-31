@@ -1,4 +1,4 @@
-* LAB for mkfs.ext4:
+* LAB for mkfs.ext4 and blkid:
 ```
 # First, let's create our virtual raw disk:
 [root@ctrl disks]# fallocate -l 3G /var/disks/disk3
