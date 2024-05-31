@@ -28,4 +28,4 @@ UUID=3cd17692-ba06-40a6-839f-637896ba3f51      /data     xfs      defaults 0 0
 systemctl daemon-reload
 mount -a
 ```
-![Screenshot from 2024-05-31 08-45-08](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/0a118e71-47de-4502-a3ff-5ca90e86a586)
+![Screenshot from 2024-05-31 08-46-10](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/38a75c86-2086-430e-8f5b-07a4dfd8282a)
