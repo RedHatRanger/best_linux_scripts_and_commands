@@ -33,6 +33,9 @@ umount -l /mnt
 losetup -d /dev/loop0
 losetup -d /dev/loop6
 
-# If that doesn't work:
-umount -l /dev/loop0
+# To clear a single instance:
+losetup -d /dev/loop0
+
+* To clear all loop instances:
+losetup -D
 ```
