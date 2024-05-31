@@ -168,3 +168,133 @@ WARNING: xfs signature detected on /dev/VG1/LV2 at offset 0. Wipe it? [y/n]: y
 # As you can see there are 90 Physical Extants (720MB) remaining after creating 2 logical partitions (2.28GB)
 ```
 ![Screenshot from 2024-05-31 09-32-42](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/6c100b49-6842-4786-9a2f-05c891c0096a)
+
+* But what if we want to extend these volumes?:
+```
+# Let's destroy and recreate VG1 using our loop1 and loop2 raw disks:
+[root@ctrl disks]# vgremove VG1
+  Volume group "VG1" successfully removed
+[root@ctrl disks]# vgcreate -v -s 8m VG1 /dev/loop1 /dev/loop2
+  Wiping signatures on new PV /dev/loop1.
+  Wiping signatures on new PV /dev/loop2.
+  Adding physical volume '/dev/loop1' to volume group 'VG1'
+  Adding physical volume '/dev/loop2' to volume group 'VG1'
+  Creating volume group backup "/etc/lvm/backup/VG1" (seqno 1).
+  Volume group "VG1" successfully created
+[root@ctrl disks]# vgdisplay VG1
+  --- Volume group ---
+  VG Name               VG1
+  System ID             
+  Format                lvm2
+  Metadata Areas        2
+  Metadata Sequence No  1
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                0
+  Open LV               0
+  Max PV                0
+  Cur PV                2
+  Act PV                2
+  VG Size               2.98 GiB
+  PE Size               8.00 MiB
+  Total PE              382
+  Alloc PE / Size       0 / 0   
+  Free  PE / Size       382 / 2.98 GiB
+  VG UUID               Ad7dR4-nU6c-z18z-SoeY-kv17-4iwd-ISVjTu
+
+# Now, let's create the logical volume LV1:
+[root@ctrl disks]# lvcreate -n LV1 -L +1G VG1
+  Logical volume "LV1" created.
+[root@ctrl disks]# lvdisplay /dev/VG1/LV1
+  --- Logical volume ---
+  LV Path                /dev/VG1/LV1
+  LV Name                LV1
+  VG Name                VG1
+  LV UUID                q2r8sW-TRAu-mStU-Ugh1-xEwA-fG21-7b1TRb
+  LV Write Access        read/write
+  LV Creation host, time ctrl.example.com, 2024-05-31 09:49:41 -0500
+  LV Status              available
+  # open                 0
+  LV Size                1.00 GiB
+  Current LE             128
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           253:9
+
+# Let's create a filesystem type XFS and extend it 1.5GB:
+[root@ctrl disks]# mkfs.xfs /dev/VG1/LV1
+meta-data=/dev/VG1/LV1           isize=512    agcount=4, agsize=65536 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=0
+         =                       reflink=1    bigtime=1 inobtcount=1 nrext64=0
+data     =                       bsize=4096   blocks=262144, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
+log      =internal log           bsize=4096   blocks=16384, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+Discarding blocks...Done.
+[root@ctrl disks]#
+[root@ctrl disks]# lvextend -r -L +1.5G LV1 VG1
+  Volume group "LV1" not found
+  Cannot process volume group LV1
+[root@ctrl disks]#
+[root@ctrl disks]# lvextend -r -L +1.5G /dev/VG1/LV1
+  Size of logical volume VG1/LV1 changed from 1.00 GiB (128 extents) to 2.50 GiB (320 extents).
+  File system xfs found on VG1/LV1.
+  File system mount is needed for extend.
+Continue with xfs file system extend steps: mount, xfs_growfs? [y/n]:y
+  Extending file system xfs to 2.50 GiB (2684354560 bytes) on VG1/LV1...
+mount /dev/VG1/LV1 /tmp/tmp.O1iaVXsfTY_lvresize_102695
+mount done
+xfs_growfs /dev/VG1/LV1
+meta-data=/dev/mapper/VG1-LV1    isize=512    agcount=4, agsize=65536 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=0
+         =                       reflink=1    bigtime=1 inobtcount=1 nrext64=0
+data     =                       bsize=4096   blocks=262144, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
+log      =internal log           bsize=4096   blocks=16384, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+data blocks changed from 262144 to 655360
+xfs_growfs done
+cleanup unmount /tmp/tmp.O1iaVXsfTY_lvresize_102695
+cleanup unmount done
+  Extended file system xfs on VG1/LV1.
+  Logical volume VG1/LV1 successfully resized.
+[root@ctrl disks]# lvdisplay /dev/VG1/LV1
+  --- Logical volume ---
+  LV Path                /dev/VG1/LV1
+  LV Name                LV1
+  VG Name                VG1
+  LV UUID                q2r8sW-TRAu-mStU-Ugh1-xEwA-fG21-7b1TRb
+  LV Write Access        read/write
+  LV Creation host, time ctrl.example.com, 2024-05-31 09:49:41 -0500
+  LV Status              available
+  # open                 0
+  LV Size                2.50 GiB
+  Current LE             320
+  Segments               2
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           253:9
+
+
+# To make /dev/VG1/LV1 mounted persistently:
+mkdir -p /lv/lv1
+vim /etc/fstab
+
+# Add this line
+/dev/VG1/LV1 /lv/lv1      xfs       defaults 0 0
+
+:wq
+
+systemctl daemon-reload
+mount -a
+```
