@@ -16,5 +16,7 @@ fdisk /dev/loop1
 # Hit Enter for Default on the next one
 # Type "+250M" for 250 megabytes
 # Type "p" to print the partition table
+# Hit "w" to write the new table
 
+partprobe /dev/loop1
 ```
