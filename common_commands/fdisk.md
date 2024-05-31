@@ -3,11 +3,12 @@
 
 * LAB for fdisk partitioning:
 ```
+# As the root user:
 mkdir -p /var/disks
 fallocate -l 1G /var/disks/disk1
 losetup
 
-# root user:
+# Now for the juicy part:
 losetup /dev/loop1 /var/disks/disk1
 fdisk /dev/loop1
 # Type "p" to print the partition table
