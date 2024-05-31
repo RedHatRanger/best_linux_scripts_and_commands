@@ -165,5 +165,5 @@ WARNING: xfs signature detected on /dev/VG1/LV2 at offset 0. Wipe it? [y/n]: y
   Alloc PE / Size       292 / 2.28 GiB
   Free  PE / Size       90 / 720.00 MiB
   VG UUID               BpdyAk-Rz3T-bJNc-hP3e-DR8i-JqvN-n6DMwI
-# As you can see there are 90 Physical Extants remaining after creating 2 logical partitions = 2.28GB
+# As you can see there are 90 Physical Extants (720MB) remaining after creating 2 logical partitions (2.28GB)
 ```
