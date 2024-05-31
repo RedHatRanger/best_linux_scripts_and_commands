@@ -167,3 +167,4 @@ WARNING: xfs signature detected on /dev/VG1/LV2 at offset 0. Wipe it? [y/n]: y
   VG UUID               BpdyAk-Rz3T-bJNc-hP3e-DR8i-JqvN-n6DMwI
 # As you can see there are 90 Physical Extants (720MB) remaining after creating 2 logical partitions (2.28GB)
 ```
+![Screenshot from 2024-05-31 09-32-42](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/6c100b49-6842-4786-9a2f-05c891c0096a)
