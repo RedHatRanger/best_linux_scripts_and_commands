@@ -318,6 +318,10 @@ log      =internal log           bsize=4096   blocks=16384, version=2
          =                       sectsz=512   sunit=0 blks, lazy-count=1
 realtime =none                   extsz=4096   blocks=0, rtextents=0
 ```
+* Optionally, you can extend an LVM to 100% of the VG1:
+```
+lvextend -r -l +100%FREE /dev/VG1/LV1
+```
 
 * To give assign a new label to the xfs partition:
 ```
