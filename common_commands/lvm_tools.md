@@ -324,5 +324,11 @@ realtime =none                   extsz=4096   blocks=0, rtextents=0
 [root@ctrl disks]# xfs_admin -L "DATA" /dev/VG1/LV1
 writing all SBs
 new label = "DATA"
+
+# We can validate this by:
+[root@ctrl disks]# xfs_admin -l /dev/VG1/LV1
+label = "DATA"
+[root@ctrl disks]# blkid | grep LV1
+/dev/mapper/VG1-LV1: LABEL="DATA" UUID="3ccb0a2d-fcd6-45a8-85f4-e94579499fe3" TYPE="xfs"
 ```
 ![Screenshot from 2024-05-31 10-35-35](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/1026aeb8-1b2a-489f-a735-eebb74e8b881)
