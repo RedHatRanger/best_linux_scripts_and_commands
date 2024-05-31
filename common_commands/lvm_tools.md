@@ -303,3 +303,4 @@ mount -a
 ```
 vgextend -v VG1 /dev/loop3
 ```
+![Screenshot from 2024-05-31 10-35-35](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/1026aeb8-1b2a-489f-a735-eebb74e8b881)
