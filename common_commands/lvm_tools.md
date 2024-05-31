@@ -298,3 +298,8 @@ vim /etc/fstab
 systemctl daemon-reload
 mount -a
 ```
+
+* If we needed to extend our volume group to a loop3 device:
+```
+vgextend -v VG1 /dev/loop3
+```
