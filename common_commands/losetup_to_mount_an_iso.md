@@ -39,3 +39,31 @@ losetup -d /dev/loop0
 * To delete all loop instances:
 losetup -D
 ```
+
+* To create a service which makes losetup persistent:
+```
+# As the root user:
+systemctl edit --full --force losetup.service
+
+[Unit]
+Description=Set up loop device
+DefaultDependencies=no
+Before=local-fs.target
+After=systemd-udevd.service
+Required=systemd-udevd.service
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/losetup /dev/loop1 /var/disks/disk1
+ExecStart=/sbin/partprobe /dev/loop1
+Timeout=60
+RemainAfterExit=no
+
+[Install]
+WantedBy=local-fs.target
+
+:wq
+
+systemctl daemon-reload
+systemctl enable --now losetup.service
+```
