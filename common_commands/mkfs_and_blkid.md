@@ -29,3 +29,5 @@ systemctl daemon-reload
 mount -a
 ```
 ![Screenshot from 2024-05-31 08-46-10](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/38a75c86-2086-430e-8f5b-07a4dfd8282a)
+
+![Screenshot from 2024-05-31 08-47-10](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/7d679927-782d-498c-a153-8afdbab42c72)
