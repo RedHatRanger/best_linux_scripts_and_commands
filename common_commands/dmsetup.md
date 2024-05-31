@@ -40,3 +40,12 @@ rl-var_tmp (253:3)
  └─luks-0c47695d-f0a2-491e-bb5b-b6f2295e84ef (253:0)
     └─ (8:3)
 ```
+
+* Turn on LVM on automatically and create partitions using parted:
+```
+parted /dev/loop1 mkpart primary 0% 25% set 1 lvm on
+parted /dev/loop1 mkpart primary 25% 50% set 2 lvm on
+parted /dev/loop1 mkpart primary 50% 75% set 3 lvm on
+parted /dev/loop1 mkpart primary 75% 100% set 4 lvm on
+parted /dev/loop1 print
+```
