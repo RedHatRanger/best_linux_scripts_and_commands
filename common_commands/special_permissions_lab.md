@@ -30,9 +30,20 @@ mode of '/perms/dir4' changed from 0755 (rwxr-xr-x) to 1770 (rwxrwx--T)
 
 * You can use the find command to locate files with special permissions:
 ```
+# Find either SGID or Sticky Bit set:
 [root@ctrl perms]# find /perms -type d -perm /g=s,o=t 
 /perms/dir1
 /perms/dir2
+/perms/dir3
+/perms/dir4
+
+# Find directories where both SGID and Sticky Bit are set:
+[root@ctrl perms]# find /perms -type d -perm -g=s,o=t 
+/perms/dir3
+
+# Find directories where only the Sticky Bit is set:
+[root@ctrl perms]# find /perms -type d -perm /o=t 
+/perms/dir1
 /perms/dir3
 /perms/dir4
 ```
