@@ -27,3 +27,12 @@ mode of '/perms/dir3' changed from 0755 (rwxr-xr-x) to 3777 (rwxrwsrwt)
 [root@ctrl perms]# chmod -v 1770 /perms/dir4
 mode of '/perms/dir4' changed from 0755 (rwxr-xr-x) to 1770 (rwxrwx--T)
 ```
+
+* You can use the find command to locate files with special permissions:
+```
+[root@ctrl perms]# find /perms -type d -perm /g=s,o=t 
+/perms/dir1
+/perms/dir2
+/perms/dir3
+/perms/dir4
+```
