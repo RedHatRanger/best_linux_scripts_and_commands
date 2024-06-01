@@ -15,4 +15,8 @@ Created symlink /etc/systemd/system/multi-user.target.wants/nfs-server.service â
 [root@ctrl ~]# nfsconf --set nfsd tcp y
 [root@ctrl ~]# nfsconf --set nfsd udp n
 [root@ctrl ~]# nfsconf --set nfsd vers3 n
+
+# Verify that Version 3 is turned off:
+[root@ctrl ~]# cat /proc/fs/nfsd/versions 
+-3 +4 +4.1 +4.2
 ```
