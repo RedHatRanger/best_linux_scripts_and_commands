@@ -63,3 +63,5 @@ mode of '/perms/dir4' changed from 0755 (rwxr-xr-x) to 1770 (rwxrwx--T)
 ![Screenshot from 2024-06-01 09-57-16](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/feae7fb5-ee2c-4542-904c-3f7ddfc37400)
 
 ![Screenshot from 2024-06-01 09-59-06](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/365a0b4b-167a-4b00-9e21-d71fa418b9ac)
+
+![Screenshot from 2024-06-01 09-59-51](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/798c541b-11f8-4633-81fa-3de762926638)
