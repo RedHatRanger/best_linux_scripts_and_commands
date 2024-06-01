@@ -1,4 +1,4 @@
-* LAB for NFS Server Setup:
+* LAB for NFS Server Setup (The port is 2049 for use with NFS):
 ```
 # Install the package and start the service:
 [root@ctrl ~]# yum -y install nfs-utils
