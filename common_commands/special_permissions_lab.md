@@ -50,8 +50,13 @@ mode of '/perms/dir4' changed from 0755 (rwxr-xr-x) to 1770 (rwxrwx--T)
 
 ![Screenshot from 2024-06-01 09-47-37](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/26c2e34c-c240-4929-a4fb-46d4f99dd8ab)
 
-* LAB for Groups and Collaboration (This next part is the demo of how this works):
+* LAB for Sticky Bit and Collaboration (This next part is the demo of how this works):
 
 ![Screenshot from 2024-06-01 09-51-29](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/369b72b4-d251-4d1f-99e6-8deb4506c791)
 
 ![Screenshot from 2024-06-01 09-52-30](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/b0074389-30ca-4b38-b05b-2732a88f15b3)
+
+
+* This next part is where we get to see how SGID works on Collaborative Directories (Demo):
+![Screenshot from 2024-06-01 09-55-20](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/a2c2a0b9-b385-4a40-b5c1-28ccffcf4ffc)
+
