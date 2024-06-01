@@ -60,3 +60,4 @@ mode of '/perms/dir4' changed from 0755 (rwxr-xr-x) to 1770 (rwxrwx--T)
 * This next part is where we get to see how SGID works on Collaborative Directories (Demo):
 ![Screenshot from 2024-06-01 09-55-20](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/a2c2a0b9-b385-4a40-b5c1-28ccffcf4ffc)
 
+![Screenshot from 2024-06-01 09-57-16](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/feae7fb5-ee2c-4542-904c-3f7ddfc37400)
