@@ -47,3 +47,10 @@ mode of '/perms/dir4' changed from 0755 (rwxr-xr-x) to 1770 (rwxrwx--T)
 /perms/dir3
 /perms/dir4
 ```
+
+![Screenshot from 2024-06-01 09-47-37](https://github.com/RedHatRanger/best_linux_scripts_and_commands/assets/90477448/26c2e34c-c240-4929-a4fb-46d4f99dd8ab)
+
+* LAB for Groups and Collaboration:
+```
+
+```
