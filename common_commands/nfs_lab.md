@@ -92,7 +92,7 @@ ls -l /mnt
 <IP Address of the NFS Server>:/opt/sales /mnt       nfs4       defaults 0 0
 ```
 
-* Now we could possibly use autofs to auto mount the share to the clients:
+* Now we could possibly use autofs ON EACH OF THE CLIENTS to auto mount the share:
 ```
 yum install -y autofs
 vim /etc/auto.master.d/data.autofs
