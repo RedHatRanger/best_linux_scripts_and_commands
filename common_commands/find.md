@@ -7,4 +7,7 @@
 /usr/share/doc/sil-padauk-fonts/documentation/Padauk-typesample.pdf
 /usr/share/doc/paktype-naskh-basic-fonts/PakTypeNaskhBasicFeatures.pdf
 /usr/share/doc/gutenprint-doc/gutenprint-users-manual.pdf
+
+# Now copy those files to /opt/sales:
+[root@ctrl ~]# mkdir -p /opt/sales; find /usr/share/doc -name "*pdf" -exec cp -rf {} /opt/sales \;
 ```
