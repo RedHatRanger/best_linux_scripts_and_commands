@@ -60,7 +60,7 @@ public (active)
   icmp-blocks: 
   rich rules:
 
-# Find all files in /usr/share/doc that are of the PDF type:
+# Find all files in /usr/share/doc that are of the PDF type (For Testing):
 [root@ctrl ~]# find /usr/share/doc -name "*pdf"
 /usr/share/doc/adobe-mappings-pdf
 /usr/share/doc/pigz/pigz.pdf
@@ -69,7 +69,7 @@ public (active)
 /usr/share/doc/paktype-naskh-basic-fonts/PakTypeNaskhBasicFeatures.pdf
 /usr/share/doc/gutenprint-doc/gutenprint-users-manual.pdf
 
-# Now copy those files to /opt/sales:
+# Now copy those "test" files to /opt/sales:
 [root@ctrl ~]# mkdir -p /opt/sales; find /usr/share/doc -name "*pdf" -exec cp -rf {} /opt/sales \;
 
 # Next, let's edit the /etc/exports file:
