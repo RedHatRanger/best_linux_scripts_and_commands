@@ -83,4 +83,8 @@ public (active)
 # Finally, let's export the NFS Share:
 [root@ctrl ~]# exportfs -avr
 exporting 192.168.122.0/24:/opt/sales
+
+# Now, from the other client computers:
+mount -t nfs4 <IP Address of the NFS Server>:/opt/sales /mnt
+ls -l /mnt
 ```
