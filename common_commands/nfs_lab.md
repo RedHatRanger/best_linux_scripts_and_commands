@@ -59,4 +59,28 @@ public (active)
   source-ports: 
   icmp-blocks: 
   rich rules:
+
+# Find all files in /usr/share/doc that are of the PDF type:
+[root@ctrl ~]# find /usr/share/doc -name "*pdf"
+/usr/share/doc/adobe-mappings-pdf
+/usr/share/doc/pigz/pigz.pdf
+/usr/share/doc/sil-padauk-fonts/documentation/Padauk-features.pdf
+/usr/share/doc/sil-padauk-fonts/documentation/Padauk-typesample.pdf
+/usr/share/doc/paktype-naskh-basic-fonts/PakTypeNaskhBasicFeatures.pdf
+/usr/share/doc/gutenprint-doc/gutenprint-users-manual.pdf
+
+# Now copy those files to /opt/sales:
+[root@ctrl ~]# mkdir -p /opt/sales; find /usr/share/doc -name "*pdf" -exec cp -rf {} /opt/sales \;
+
+# Next, let's edit the /etc/exports file:
+[root@ctrl ~]# vim /etc/exports.d/sales.exports
+
+/opt/sales 192.168.122.*(rw,sync,no_root_squash)
+
+:wq
+
+
+# Finally, let's export the NFS Share:
+[root@ctrl ~]# exportfs -avr
+exporting 192.168.122.0/24:/opt/sales
 ```
