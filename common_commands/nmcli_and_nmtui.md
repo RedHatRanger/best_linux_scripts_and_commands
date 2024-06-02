@@ -25,7 +25,7 @@ enp2s0               203037ce-37ee-4565-aa7a-790ebcfc49fe  ethernet  --
 Connection 'cafe' (3901da63-db82-4078-81a4-2e69505f5e2a) successfully deleted.     
 ```
 
-* You can optionally use NMTUI or nmtui for the graphical configuration to add, activate, and deactivate connections:
+* You can optionally use nmtui for the graphical configuration to add, activate, and deactivate connections:
 ```
 nmtui
 ```
