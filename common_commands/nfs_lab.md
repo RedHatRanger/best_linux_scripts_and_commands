@@ -87,4 +87,24 @@ exporting 192.168.122.0/24:/opt/sales
 # Now, from the other client computers:
 mount -t nfs4 <IP Address of the NFS Server>:/opt/sales /mnt
 ls -l /mnt
+
+# Optionally, you may add the proper line in /etc/fstab on the flient:
+<IP Address of the NFS Server>:/opt/sales /mnt       nfs4       defaults 0 0
+```
+
+* Now we could possibly use autofs to auto mount the share to the clients:
+```
+yum install -y autofs
+vim /etc/auto.master.d/data.autofs
+
+/data /etc/auto.data
+
+:wq
+
+
+vim /etc/auto.data
+
+sales -rw,soft,intr <IP Address of the NFS Server>:/opt/sales
+
+:wq
 ```
