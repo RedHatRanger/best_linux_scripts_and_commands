@@ -23,4 +23,40 @@ Created symlink /etc/systemd/system/multi-user.target.wants/nfs-server.service â
 # Verify that Version 3 is turned off:
 [root@ctrl ~]# cat /proc/fs/nfsd/versions 
 -3 +4 +4.1 +4.2
+
+# Setup the Firewall:
+[root@ctrl ~]# firewall-cmd --state
+running
+[root@ctrl ~]# firewall-cmd --list-all
+public (active)
+  target: default
+  icmp-block-inversion: no
+  interfaces: virbr0 virbr1 virbr2 wlp1s0
+  sources: 
+  services: cockpit ntp ssh
+  ports: 
+  protocols: 
+  forward: yes
+  masquerade: no
+  forward-ports: 
+  source-ports: 
+  icmp-blocks: 
+  rich rules: 
+[root@ctrl ~]# firewall-cmd --permanent --add-service=nfs; firewall-cmd --reload; firewall-cmd --list-all
+success
+success
+public (active)
+  target: default
+  icmp-block-inversion: no
+  interfaces: virbr0 virbr1 virbr2 wlp1s0
+  sources: 
+  services: cockpit nfs ntp ssh
+  ports: 
+  protocols: 
+  forward: yes
+  masquerade: no
+  forward-ports: 
+  source-ports: 
+  icmp-blocks: 
+  rich rules:
 ```
