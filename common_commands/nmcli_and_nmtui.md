@@ -18,7 +18,11 @@ Connection 'cafe' (9d337292-36ee-459e-b5da-2168477696ac) successfully added.
 NAME                 UUID                                  TYPE      DEVICE
 lo                   19dc588a-3360-4168-b581-bb1445d14fbf  loopback  lo  
 cafe                 9d337292-36ee-459e-b5da-2168477696ac  ethernet  --     
-enp2s0               203037ce-37ee-4565-aa7a-790ebcfc49fe  ethernet  --     
+enp2s0               203037ce-37ee-4565-aa7a-790ebcfc49fe  ethernet  --
+
+# You can delete a connection using nmcli:
+[root@ctrl ~]# nmcli con delete cafe
+Connection 'cafe' (3901da63-db82-4078-81a4-2e69505f5e2a) successfully deleted.     
 ```
 
 * You can optionally use NMTUI or nmtui for the graphical configuration to add, activate, and deactivate connections:
