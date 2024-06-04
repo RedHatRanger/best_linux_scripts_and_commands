@@ -1,0 +1,5 @@
+```
+ansible-doc -s <module name> 
+```
+
+The result of this command shows a sample playbook structure, with a list of the arguments that can be used and a short description for each argument.
