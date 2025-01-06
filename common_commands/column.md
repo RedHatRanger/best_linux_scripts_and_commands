@@ -5,5 +5,5 @@ cat /var/log/messages | column
 
 If you need to sort through a mess of an output, use the column command:
 ```
-cat /etc/passwd | column -t -s ":"
+cat /etc/passwd | column -t -s ":" -N USERNAME,PW,UID,GUID,COMMENT,HOME,INTERPRETER
 ```
