@@ -17,4 +17,15 @@ lvcreate -l 100%FREE -n data_migration data_vg
 lvs
 for i in {files,migration}; do lvdisplay /dev/data_vg/data_${i}; done
 
+## Format the LVMs with XFS
+for i in {files,migration}; do mkfs.xfs /dev/data_vg/data_${i}; done
+
+## Create the directories for mapping the LVMs
+mkdir -p /opt/data/files /opt/data/migration
+
+## Map the LVMs in /etc/fstab
+echo "/dev/data_vg/data_files     /opt/data/files      xfs       defaults 0 0" >> /etc/fstab
+echo "/dev/data_vg/data_migration     /opt/data/files      xfs       defaults 0 0" >> /etc/fstab
+systemctl daemon-reload
+mount -a
 ```
