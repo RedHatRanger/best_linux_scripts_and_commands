@@ -25,7 +25,7 @@ mkdir -p /opt/data/files /opt/data/migration
 
 ## Map the LVMs in /etc/fstab
 echo "/dev/data_vg/data_files     /opt/data/files      xfs       defaults 0 0" >> /etc/fstab
-echo "/dev/data_vg/data_migration     /opt/data/files      xfs       defaults 0 0" >> /etc/fstab
+echo "/dev/data_vg/data_migration     /opt/data/migration      xfs       defaults 0 0" >> /etc/fstab
 systemctl daemon-reload
 mount -a
 ```
