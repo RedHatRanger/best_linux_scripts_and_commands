@@ -4,7 +4,7 @@
 parted /dev/loop1 print
 
 # Next, lets wipe the previous stuff from the other lab using parted:
-parted /dev/loop1 mklabel msdos
+parted /dev/loop1 mklabel gpt
 # Type "yes"
 parted /dev/loop1 mkpart primary 0% 25%
 
