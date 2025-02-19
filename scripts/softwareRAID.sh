@@ -1,3 +1,4 @@
+```
 #!/bin/bash
 
 # This script will create a software raid using 12 other mounted hard drives. In this example the OS resides on /dev/sda.
@@ -8,5 +9,5 @@ mkfs.ext4 /dev/md0
 mkdir /mnt/raid
 echo "/dev/md0 /mnt/raid           ext4        defaults 0 0" >> /etc/fstab
 
-
 # To check: mdadm --details /dev/md0
+```
