@@ -32,7 +32,7 @@
 
 ## Format the LVMs with XFS
 - mkfs.xfs /dev/data_vg/data_files
-- mkfs.xfs /dev/data_vg/data_migration
+- mkfs.xfs /dev/data_vg/data_migration \
 OR
 - for i in {files,migration}; do mkfs.xfs /dev/data_vg/data_${i}; done
   
