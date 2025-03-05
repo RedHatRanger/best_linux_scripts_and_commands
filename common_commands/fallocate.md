@@ -22,7 +22,11 @@
 
 ## Create the Physical Volume for LVM
 - pvcreate /dev/loop1 /dev/loop2
+
+## Create the Volume Group
 - vgcreate data_vg /dev/loop1 /dev/loop2
+
+## Create the Logical Volumes for the `data_vg` Volume Group
 - lvcreate -L 1.5G -n data_files data_vg
 - lvcreate -l 100%FREE -n data_migration data_vg
 
