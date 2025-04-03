@@ -33,7 +33,9 @@ EOF
 # You can also review the nginx being added
 composer-cli blueprints show node-app-server
 
-# Use the composer-cli command to start a compose based on the node-app-server blueprint. For this lab, you will use the output format of qcow2. However, you could build many different types of images including:
+# Use the composer-cli command to start a compose based on the node-app-server blueprint. For this lab, you will use the output format of qcow2.
+# However, you could build many different types of images including:
+#
 # Output type	          Details:
 # ami	                  Amazon EC2
 # openstack	            OpenStack image
@@ -53,4 +55,9 @@ until $(composer-cli compose status | tail -1 | grep FINISHED &>/dev/null); do e
 
 # Now that the machine image compose is finished, download the completed machine image into your current directory.
 composer-cli compose image $(composer-cli compose status | tail -1 | cut -f1 -d" ")
+
+# Now that the machine image is available locally, mount the disk image into your directory tree at the /mnt mountpoint.
+# For this, we will mount the qcow2 image as a network block device (NBD).
+modprobe nbd
+qemu-nbd --connect=/dev/nbd0 $(composer-cli compose status | cut -f1 -d" " | tail -1)-disk.qcow2
 ```
