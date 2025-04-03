@@ -63,4 +63,9 @@ qemu-nbd --connect=/dev/nbd0 $(composer-cli compose status | cut -f1 -d" " | tai
 fdisk /dev/nbd0 -l
 mount /dev/nbd0p4 /mnt
 chroot /mnt
+rpm -q nodejs nginx
+exit
+umount /mnt
+qemu-nbd --disconnect /dev/nbd0
+rmmod nbd
 ```
