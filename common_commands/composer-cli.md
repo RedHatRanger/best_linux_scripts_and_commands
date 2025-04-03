@@ -24,7 +24,11 @@ composer-cli blueprints push node-app-server.toml
 # To verify that your update has been made, review the log of changes made to the node-app-server blueprint.
 composer-cli blueprints changes node-app-server
 
-printf '\n[[packages]]\nname = "nginx"\nversion = "*"' >> node-app-server.toml
+cat << EOF >> node-app-server.toml
+[[packages]]
+name = "nginx"
+version = "*"
+EOF
 
 # You can also review the nginx being added
 composer-cli blueprints show node-app-server
