@@ -60,4 +60,7 @@ composer-cli compose image $(composer-cli compose status | tail -1 | cut -f1 -d"
 # For this, we will mount the qcow2 image as a network block device (NBD).
 modprobe nbd
 qemu-nbd --connect=/dev/nbd0 $(composer-cli compose status | cut -f1 -d" " | tail -1)-disk.qcow2
+fdisk /dev/nbd0 -l
+mount /dev/nbd0p4 /mnt
+chroot /mnt
 ```
