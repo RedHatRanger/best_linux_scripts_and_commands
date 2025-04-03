@@ -32,4 +32,17 @@ EOF
 
 # You can also review the nginx being added
 composer-cli blueprints show node-app-server
+
+# Use the composer-cli command to start a compose based on the node-app-server blueprint. For this lab, you will use the output format of qcow2. However, you could build many different types of images including:
+# Output type	          Details:
+# ami	                  Amazon EC2
+# openstack	            OpenStack image
+# qcow2	                qcow2 image
+# rhel-edge-commit	    RHEL edge image
+# tar	                  tar archive
+# vhd	                  virtual hard disk
+# vmdk	                Virtual Machine disk
+
+composer-cli compose start node-app-server qcow2
+composer-cli compose status
 ```
