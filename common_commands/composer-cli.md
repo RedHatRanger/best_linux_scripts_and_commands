@@ -68,4 +68,11 @@ exit
 umount /mnt
 qemu-nbd --disconnect /dev/nbd0
 rmmod nbd
+
+
+
+## Troubleshooting:
+composer-cli compose log $(composer-cli compose status | cut -f1 -d" " | tail -1)
+composer-cli compose results $(composer-cli compose status | cut -f1 -d" " | tail -1)
+tar -tvf $(composer-cli compose status | cut -f1 -d" " | tail -1).tar
 ```
