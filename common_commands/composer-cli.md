@@ -50,5 +50,7 @@ composer-cli compose status
 # The below command is a small until shell script that will run until the completed machine image is created.
 
 until $(composer-cli compose status | tail -1 | grep FINISHED &>/dev/null); do echo "Compose not finished ... waiting 10 seconds"; sleep 10; done; echo "COMPOSE FINISHED"
+
+# Now that the machine image compose is finished, download the completed machine image into your current directory.
 composer-cli compose image $(composer-cli compose status | tail -1 | cut -f1 -d" ")
 ```
