@@ -14,7 +14,22 @@ parted /dev/loop1 print
 
 * LAB 2 using parted
 ```
+# partition the drive
 parted -s /dev/sdb mklabel gpt
 parted -s /dev/sdb mkpart primary 0% 100%
 parted -s /dev/sdb set 1 lvm on
+
+# Create the Physical Volume
+pvcreate /dev/sdb1
+
+# Create the Volume Group
+vgcreate data_vg /dev/sdb1
+
+# Create the Logical Volume
+lvcreate -L 200G -n <lvname> data_vg
+OR
+lvcreate -l 100%FREE -n <lvname> data_vg
+
+# Format the drive
+mkfs.xfs /dev/data_vg/<lvname>
 ```
