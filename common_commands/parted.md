@@ -11,3 +11,10 @@ parted /dev/loop1 mkpart primary 0% 25%
 # Print the newly created partition:
 parted /dev/loop1 print
 ```
+
+* LAB 2 using parted
+```
+parted -s /dev/sdb mklabel gpt
+parted -s /dev/sdb mkpart primary 0% 100%
+parted -s /dev/sdb set 1 lvm on
+```
