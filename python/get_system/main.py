@@ -5,6 +5,6 @@
 # uv run --with rich --python 3.8 main.py
 
 import sys
-import rich
+from rich import print
 print(sys.version)
 ```
