@@ -30,4 +30,3 @@
           - ansible
           - pandas
           - openpyxl
-          - paramiko
