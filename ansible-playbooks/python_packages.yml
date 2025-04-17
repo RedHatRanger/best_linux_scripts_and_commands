@@ -1,0 +1,33 @@
+---
+- name: Install Ansible and other python packages
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install Ansible and python3-pip
+      ansible.builtin.dnf:
+        name:
+          - python3-pip
+          - python3-ansible-pylibssh
+        state: latest
+        enablerepo: 'epel'
+
+    - name: Configure /etc/pip.conf
+      ansible.builtin.copy:
+        content: |
+          [global]
+          trusted-host = <fqdn of trusted host>
+          index = <https:// url>
+          index_url = <https:// url>
+        dest: /etc/pip.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Install python packages
+      ansible.builtin.pip:
+        name:
+          - ansible
+          - pandas
+          - openpyxl
+          - paramiko
