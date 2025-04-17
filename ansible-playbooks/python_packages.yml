@@ -10,7 +10,7 @@
           - python3-pip
           - python3-ansible-pylibssh
         state: latest
-        enablerepo: 'epel'
+        enablerepo: '<EPEL_repoid>'
 
     - name: Configure /etc/pip.conf
       ansible.builtin.copy:
