@@ -30,3 +30,4 @@
           - ansible
           - pandas
           - openpyxl
+        executable: pip3
