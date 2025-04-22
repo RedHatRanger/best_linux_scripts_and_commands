@@ -1,6 +1,9 @@
 To list all packages AND versions which are currently installed on the system:
 ```
 rpm -qa
+
+# To count the packages:
+rpm -qa | wc -l
 ```
 
 To list all packages (names only) and save them to a file:
