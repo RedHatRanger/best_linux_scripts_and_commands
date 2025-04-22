@@ -5,7 +5,7 @@ rpm -qa
 
 To list all packages (names only):
 ```
-rpm -qa --qf "%{NAME}\n"
+rpm -qa --qf "%{NAME}\n" | sort -u
 ```
 
 If you want to know the history of an installed package:
