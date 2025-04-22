@@ -1,6 +1,11 @@
-To list all packages which are currently installed on the system:
+To list all packages AND versions which are currently installed on the system:
 ```
 rpm -qa
+```
+
+To list all packages (names only):
+```
+rpm -qa --qf "%{NAME}\n"
 ```
 
 If you want to know the history of an installed package:
