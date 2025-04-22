@@ -3,9 +3,9 @@ To list all packages AND versions which are currently installed on the system:
 rpm -qa
 ```
 
-To list all packages (names only):
+To list all packages (names only) and save them to a file:
 ```
-rpm -qa --qf "%{NAME}\n" | sort -u
+rpm -qa --qf "%{NAME}\n" | sort -u | tee -a installed_packages.txt
 ```
 
 If you want to know the history of an installed package:
