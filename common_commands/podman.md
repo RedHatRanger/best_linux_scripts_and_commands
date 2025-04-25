@@ -41,3 +41,8 @@ podman ps  # fetch the CONTAINER ID
 # Export the container to a file:
 podman commit <CONTAINER_ID> > "rockylinux.tar"
 ```
+
+* To get back into the container:
+```
+podman attach <CONTAINER_ID>
+```
