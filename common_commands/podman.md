@@ -28,3 +28,16 @@ podman run -it --name rocky --hostname rockylinux <image_id>
 ```
 podman rm rocky
 ```
+
+* To add software to the pod and backup for exporting it:
+```
+podman rm rocky
+podman run -it --name rocky --hostname rockylinux <image_id>
+yum install ansible-core -y
+
+# HIT CTRL+p then CTRL+q to exit the container but keep it running in the background
+podman ps  # fetch the CONTAINER ID
+
+# Export the container to a file:
+podman commit <CONTAINER_ID> > "rockylinux.tar"
+```
