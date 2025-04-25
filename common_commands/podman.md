@@ -1,6 +1,6 @@
 * First install the required packages:
 ```bash
-yum install podman skopeo container-tools -y
+yum install @"Container Management"
 ```
 
 * TO ALLOW ROOTLESS PODMAN:
