@@ -1,9 +1,9 @@
-* First install the required packages:
+* First install the required packages (as root):
 ```bash
 yum install @"Container Management"
 ```
 
-* TO ALLOW ROOTLESS PODMAN:
+* TO ALLOW ROOTLESS PODMAN (as root):
 ```bash
 # Create the file if it doesn't exist, then add the information
 touch /etc/sysctl.d/99-sysctl.conf
@@ -14,9 +14,12 @@ sysctl -a
 
 # Add the user (in this case it is `testuser`) to /etc/subuid and /etc/subgid
 usermod --add-subuids 100000-165535 --add-subgids 100000-165535 testuser
+
+# Enable linger:
+loginctl enable-linger testuser
 ```
 
-* Then, try to podman pull rockylinux for example:
+* Then, try to podman pull rockylinux for example (as the testuser):
 ```
 ssh testuser@localhost
 podman pull rockylinux:latest
@@ -24,12 +27,12 @@ podman images  # fetches the image_id
 podman run -it --name rocky --hostname rockylinux <image_id>
 ```
 
-* To remove the container:
+* To remove the container (as the testuser):
 ```
 podman rm rocky
 ```
 
-* To add software to the pod and backup for exporting it:
+* To add software to the pod and backup for exporting it (as the testuser):
 ```
 podman rm rocky
 podman run -it --name rocky --hostname rockylinux <image_id>
@@ -42,7 +45,7 @@ podman ps  # fetch the CONTAINER ID
 podman commit <CONTAINER_ID> > "rockylinux.tar"
 ```
 
-* To get back into the container:
+* To get back into the container (as the testuser):
 ```
 podman attach <CONTAINER_ID>
 ```
