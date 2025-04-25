@@ -1,3 +1,5 @@
+[See this other lab for more practice](https://github.com/RedHatRanger/rhcsa9vagrant/blob/main/rhcsa-practice-questions/21_container_service.md)
+
 * First install the required packages (as root):
 ```bash
 yum install @"Container Management"
