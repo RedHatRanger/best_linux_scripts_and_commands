@@ -204,3 +204,15 @@ ExecStart=/usr/sbin/sysctl -w net.ipv4.ip_unprivileged_port_start=443
 [Install]
 WantedBy=multi-user.target
 ```
+OR
+```
+cat << EOF > /etc/sysctl.d/100-custom.conf
+# allow more user namespaces
+user.max_user_namespaces = 28633
+
+# let unprivileged processes bind ports ≥ 443
+net.ipv4.ip_unprivileged_port_start = 443
+EOF
+
+sed -i 's/user.max_user_namespaces = 28633/#user.max_user_namespaces = 28633/g' /etc/sysctl.d/99-sysctl.conf
+```
