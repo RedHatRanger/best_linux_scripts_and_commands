@@ -188,3 +188,19 @@ This confirms that Podman is using subordinate user IDs without root.
 - **Security best practice**: Fewer privileges on the host reduce the attack surface in multi‑user environments.
 
 Enjoy experimenting with rootless containers using Podman!
+
+* If you need to create a persistent service for the sysctl settings:
+```
+[Unit]
+Description=Custom sysctl overrides (after sysctl loads its config)
+After=sysctl.service
+Wants=sysctl.service
+ 
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/sysctl -w user.max_user_namespaces=28633
+ExecStart=/usr/sbin/sysctl -w net.ipv4.ip_unprivileged_port_start=443
+ 
+[Install]
+WantedBy=multi-user.target
+```
