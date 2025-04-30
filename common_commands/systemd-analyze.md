@@ -2,3 +2,8 @@
 ```
 systemd-analyze
 ```
+
+* If you want to see exactly what is kinda slowing down your system:
+```
+systemd-analyze blame
+```
