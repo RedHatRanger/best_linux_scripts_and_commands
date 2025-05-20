@@ -1,0 +1,11 @@
+---
+- name: Linux Reboot Demo
+  hosts: all
+  gather_facts: no
+  remote_user: rhel
+  become: true
+ 
+  tasks:
+    - name: Reboot the machine (Wait for 5 min)
+      reboot:
+        reboot_timeout: 300
