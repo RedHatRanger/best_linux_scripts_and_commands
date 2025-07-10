@@ -36,7 +36,7 @@ mkfs.xfs /dev/data_vg/<lvname>
 
 * LAB 3 added physical storage, but need to extend partitions
 ```
-# /dev/sdX is the new drive, where 'X' represents the drive letter the OS assigns it.
+# (/dev/sdX is the new drive, where 'X' represents the drive letter the OS assigns it.)
 # Need to rescan the physical drives for changes:
 echo 1 > /sys/block/sdX/device/rescan
 parted /dev/sdX resizepart 1 100%
