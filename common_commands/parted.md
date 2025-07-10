@@ -33,3 +33,18 @@ lvcreate -l 100%FREE -n <lvname> data_vg
 # Format the drive
 mkfs.xfs /dev/data_vg/<lvname>
 ```
+
+* LAB 3 added physical storage, but need to extend partitions
+```
+# /dev/sdX is the new drive, where 'X' represents the drive letter the OS assigns it.
+# Need to rescan the physical drives for changes:
+echo 1 > /sys/block/sdX/device/rescan
+parted /dev/sdX resizepart 1 100%
+# Need to refresh the changes for lsblk:
+partprobe
+lsblk
+pvresize /dev/sdX
+# Extend the partition:
+lvextend -r -l +100%FREE /dev/<Volume_Group_Name>/<LV_Name>
+# Example: lvextend -r -l +100%FREE /dev/VG1/LV1
+```
