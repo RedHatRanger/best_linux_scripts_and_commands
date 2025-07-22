@@ -1,0 +1,18 @@
+```yaml
+---
+ansible-navigator:
+  ansible:
+    inventories:
+    - /home/rhel/hosts
+  execution-environment:
+    container-engine: podman
+    image: ee-supported-rhel8
+    enabled: True
+    pull-policy: never
+
+  playbook-artifact:
+    save-as: /home/rhel/playbook-artifacts/{playbook_name}-artifact-{ts_utc}.json
+
+  logging:
+    level: debug
+    ```
