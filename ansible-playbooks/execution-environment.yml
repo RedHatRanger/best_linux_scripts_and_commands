@@ -4,6 +4,7 @@
 # podman tag localhost/ansible-execution-env localhost/netcommon-ee
 # podman run -it localhost/ansible-execution-env bash
 # ansible-galaxy collection list
+
 ---
 version: 3
 
@@ -15,7 +16,15 @@ dependencies:
   galaxy:
     collections:
     - ansible.netcommon
-    - cisco.ios
 
 options:
   package_manager_path: /usr/bin/microdnf
+
+additional_build_files:
+  # copy arbitary files next to this EE Definition into the build context - we can refer to them later
+  - src: files
+    dest: configs
+
+additional_build_steps:
+  prepend_galaxy:
+    - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
