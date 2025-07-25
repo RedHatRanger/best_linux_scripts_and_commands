@@ -1,3 +1,5 @@
+# ansible-builder build -v 3
+
 ---
 version: 3
 
