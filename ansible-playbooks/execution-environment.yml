@@ -1,5 +1,7 @@
 # ansible-builder build -v 3
-
+# podman images
+# ansible-builder build -t local/netcommon-ee
+# podman tag localhost/ansible-execution-env localhost/netcommon-ee
 ---
 version: 3
 
