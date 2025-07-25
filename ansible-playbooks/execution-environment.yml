@@ -5,6 +5,7 @@
 # podman run -it localhost/ansible-execution-env bash
 # ansible-galaxy collection list
 # podman tag localhost/ansible-execution-env localhost/netcommon-hub-ee
+# podman login privatehub-01.$INSTRUQT_PARTICIPANT_ID.instruqt.io --tls-verify=false
 
 ---
 version: 3
