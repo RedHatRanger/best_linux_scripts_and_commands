@@ -4,6 +4,7 @@
 # podman tag localhost/ansible-execution-env localhost/netcommon-ee
 # podman run -it localhost/ansible-execution-env bash
 # ansible-galaxy collection list
+# podman tag localhost/ansible-execution-env localhost/netcommon-hub-ee
 
 ---
 version: 3
