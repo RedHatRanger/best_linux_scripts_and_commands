@@ -75,7 +75,7 @@ public (active)
 # Next, let's edit the /etc/exports file:
 [root@ctrl ~]# vim /etc/exports.d/sales.exports
 
-/opt/sales 192.168.122.*(rw,sync,no_root_squash)
+/opt/sales 192.168.122.0/24(rw,sync,no_root_squash)
 
 :wq
 
