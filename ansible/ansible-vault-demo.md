@@ -67,8 +67,8 @@ Create another YAML file named `zabbix.yml` with content specific to a Zabbix mo
 # zabbix.yml (unencrypted)
 
 zabbix_api_key: "ZBX-API-KEY-PURPLE-PENGUIN-9876"
-switch_service_account: "fluffy_switch_admin"
-switch_service_password: "R@bbitsRul3!"
+cisco_service_account: "Penguin_admin"
+cisco_service_password: "P3ngu1nsRul3!"
 ```
 
 ### 2.4. Create the Vault Password File
