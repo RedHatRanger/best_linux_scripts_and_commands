@@ -76,7 +76,6 @@ cisco_service_password: "P3ngu1nsRul3!"
 Create a file named `keyfile.txt` in the `ansible_vault_lab` directory. This file will contain the password for the vault.
 
 ```
----
 super_secret_vault_password_123
 ```
 
