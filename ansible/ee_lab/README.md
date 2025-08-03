@@ -31,5 +31,6 @@ ee_lab/
 ├── playbooks/
 │   └── site.yml        # Sample playbook
 └── execution-environment.yml  
-```
 # ansible-builder definition (optional)
+```
+
