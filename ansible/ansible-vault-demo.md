@@ -52,7 +52,7 @@ Create a YAML file named `nunya.yml` inside the `encrypted_vars/` directory with
 # nunya.yml (unencrypted)
 
 api_key: "GOOGLE-API-1234-ZEBRA-LOL-5678"
-username: "sir_snorts_a_lot"
+username: "cisco_admin"
 crypto_wallet_passports: "moose-unicorn-dragon@zebrabank"
 cc_info:
   number: "4111 1111 1111 1111"
