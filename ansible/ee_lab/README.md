@@ -39,3 +39,20 @@ mkdir -p ee_lab/{inventories,playbooks}
 
 cd ee_lab
 ```
+
+---
+
+3. Directory Structure
+
+Create a project directory:
+```
+[defaults]
+inventory = ./inventories/hosts
+# If using Ansible CLI directly (not Navigator):
+# stdout_callback = yaml
+
+[execution_environment]
+# Use Podman as container engine
+container_engine = podman
+eei = pah.example.com/ansible-automation-platform/ee-supported-rhel8:latest
+```
