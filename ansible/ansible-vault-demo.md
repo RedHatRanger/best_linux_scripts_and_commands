@@ -82,7 +82,7 @@ super_secret_vault_password_123
 **Note:** In a real-world scenario, you should restrict the permissions of this file to prevent unauthorized access.
 
 ```bash
-chmod 600 ansible_vault_lab/keyfile.txt
+chmod 660 ansible_vault_lab/keyfile.txt
 ```
 
 ### 2.5. Configure `ansible.cfg` for Vault Password File
