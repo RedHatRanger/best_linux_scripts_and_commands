@@ -23,3 +23,13 @@ RHEL 9 introduces stricter OpenSSH defaults which can break legacy network devic
 ## 3. Directory Structure
 
 Create a project directory:
+```
+ee_lab/
+├── ansible.cfg         # Ansible config pointing to inventory and EE
+├── inventories/
+│   └── hosts           # Inventory file
+├── playbooks/
+│   └── site.yml        # Sample playbook
+└── execution-environment.yml  
+```
+# ansible-builder definition (optional)
