@@ -42,9 +42,9 @@ cd ee_lab
 
 ---
 
-3. Directory Structure
+4. Configure Ansible
 
-Create a project directory:
+Create an `ansible.cfg` file:
 ```
 [defaults]
 inventory = ./inventories/hosts
