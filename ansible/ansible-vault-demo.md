@@ -50,15 +50,15 @@ Create a YAML file named `nunya.yml` inside the `encrypted_vars/` directory with
 
 ```yaml
 # nunya.yml (unencrypted)
-
+---
 api_key: "GOOGLE-API-1234-ZEBRA-LOL-5678"
 username: "cisco_admin"
 crypto_wallet_passports: "moose-unicorn-dragon@zebrabank"
-cc_info:
+credit_card:
   number: "4111 1111 1111 1111"
   expiry: "12/34"
   cvv: "123"
-  name_on_card: "Sir Laughsalot"
+  name_on_card: "John Doe"
 ```
 
 Create another YAML file named `zabbix.yml` with content specific to a Zabbix monitoring environment:
