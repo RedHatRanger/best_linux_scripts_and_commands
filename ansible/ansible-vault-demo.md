@@ -182,6 +182,4 @@ ansible-vault rekey ansible_vault_lab/encrypted_vars/zabbix.yml --new-vault-pass
 
 This lab has demonstrated the basic workflow of using Ansible Vault to secure sensitive data. By using a vault password file and `ansible.cfg`, you can streamline secret management securely and repeatably.
 
-## Expected Outputs for Vault Operations (Simulated)
-
-See above sections for command expectations and outputs.
+## 6. [Link](https://docs.ansible.com/ansible/2.8/user_guide/vault.html) to the Official Ansible-Vault Documentation.
