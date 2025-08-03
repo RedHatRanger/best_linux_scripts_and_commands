@@ -34,3 +34,8 @@ ee_lab/
 # ansible-builder definition (optional)
 ```
 
+```
+mkdir -p ee_lab/{inventories,playbooks}
+
+cd ee_lab
+```
