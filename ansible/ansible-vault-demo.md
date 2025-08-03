@@ -65,7 +65,7 @@ Create another YAML file named `zabbix.yml` with content specific to a Zabbix mo
 
 ```yaml
 # zabbix.yml (unencrypted)
-
+---
 zabbix_api_key: "ZBX-API-KEY-PURPLE-PENGUIN-9876"
 cisco_service_account: "Penguin_admin"
 cisco_service_password: "P3ngu1nsRul3!"
@@ -76,6 +76,7 @@ cisco_service_password: "P3ngu1nsRul3!"
 Create a file named `keyfile.txt` in the `ansible_vault_lab` directory. This file will contain the password for the vault.
 
 ```
+---
 super_secret_vault_password_123
 ```
 
