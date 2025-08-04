@@ -28,14 +28,20 @@ ansible --version
 
 For this lab, we will use the following directory structure:
 
-```
+```bash
 ansible_vault_lab/
 ├── ansible.cfg
 ├── encrypted_vars/
 │   ├── nunya.yml
 │   └── zabbix.yml
 ├── keyfile.txt
-└── vault_test.yml
+├── vault_test.yml
+└── roles/
+    └── vault_role/
+        ├── tasks/
+        │   └── main.yml
+        └── templates/
+            └── template.j2
 ```
 
 Create the directories with the following commands:
@@ -92,7 +98,7 @@ EOF
 **Note:** In a real-world scenario, you should restrict the permissions of this file to prevent unauthorized access.
 
 ```bash
-# For this demonstration we will give 660 permission so the owner and the group will have Read and Write Access to the File
+# For this demonstration, we will give 660 permission so the owner and the group will have Read and Write Access to the File
 chmod 660 keyfile.txt
 ```
 
@@ -150,11 +156,15 @@ Create a playbook named `vault_test.yml` in the root of the lab directory:
 Now, we will encrypt the `nunya.yml` and `zabbix.yml` files using `ansible-vault encrypt`.
 
 ```bash
-ansible-vault encrypt ansible_vault_lab/encrypted_vars/nunya.yml
-ansible-vault encrypt ansible_vault_lab/encrypted_vars/zabbix.yml
+ansible-vault encrypt nunya.yml
+ansible-vault encrypt zabbix.yml
 ```
 
 After running these commands, the content of both files will be encrypted.
+
+* Done!
+
+---
 
 ## 4. Working with Encrypted Files
 
@@ -163,37 +173,96 @@ Ansible Vault provides several commands to work with encrypted files.
 ### 4.1. Viewing Encrypted Files
 
 ```bash
-ansible-vault view ansible_vault_lab/encrypted_vars/nunya.yml
-ansible-vault view ansible_vault_lab/encrypted_vars/zabbix.yml
+ansible-vault view nunya.yml
 ```
 
 ### 4.2. Editing Encrypted Files
 
 ```bash
-ansible-vault edit ansible_vault_lab/encrypted_vars/nunya.yml
-ansible-vault edit ansible_vault_lab/encrypted_vars/zabbix.yml
+ansible-vault edit nunya.yml
 ```
 
 ### 4.3. Decrypting Files
 
 ```bash
-ansible-vault decrypt ansible_vault_lab/encrypted_vars/nunya.yml
-ansible-vault decrypt ansible_vault_lab/encrypted_vars/zabbix.yml
+ansible-vault decrypt nunya.yml
 ```
 
-### 4.4. Changing the Vault Password (Rekey)
+---
+
+# 5. Create the Role to Render Encrypted Data (BEST OPTION)
+
+### 5.1. Create the Role Directory Structure
 
 ```bash
-echo "another_super_secret_password_456" > new_keyfile.txt
-ansible-vault rekey ansible_vault_lab/encrypted_vars/nunya.yml --new-vault-password-file new_keyfile.txt
-ansible-vault rekey ansible_vault_lab/encrypted_vars/zabbix.yml --new-vault-password-file new_keyfile.txt
+ansible_vault_lab/
+└── roles/
+    └── vault_role/
+        ├── tasks/
+        │   └── main.yml
+        └── templates/
+            └── template.j2
 ```
 
-## 5. Conclusion
+### 5.2. `roles/vault_role/tasks/main.yml`
 
-This lab has demonstrated the basic workflow of using Ansible Vault to secure sensitive data. By using a vault password file and `ansible.cfg`, you can streamline secret management securely and repeatably.
+```yaml
+---
+- name: Render sensitive data template
+  template:
+    src: template.j2
+    dest: "/tmp/sensitive_data_output.txt"
+  vars:
+    api_key: "{{ api_key }}"
+    username: "{{ username }}"
+    crypto_wallet_passports: "{{ crypto_wallet_passports }}"
+    cc_info: "{{ cc_info }}"
+    zabbix_api_key: "{{ zabbix_api_key }}"
+    switch_service_account: "{{ switch_service_account }}"
+    switch_service_password: "{{ switch_service_password }}"
+```
 
-## 6. [Link](https://docs.ansible.com/ansible/2.8/user_guide/vault.html) to the Official Ansible-Vault Documentation.\
+### 5.3. `roles/vault_role/templates/template.j2`
 
-[Rootless Podman](https://developers.redhat.com/blog/2020/09/25/rootless-containers-with-podman-the-basics#)
+```jinja
+# Template for rendering encrypted variables
 
+API Key: {{ api_key }}
+Username: {{ username }}
+Crypto Wallet Passports: {{ crypto_wallet_passports }}
+Card ending in: **** **** **** {{ cc_info.number[-4:] }}
+Zabbix API Key: {{ zabbix_api_key }}
+Switch SA: {{ switch_service_account }} / {{ switch_service_password }}
+```
+
+## 6. Create the Final Playbook
+
+### 6.1. `vault_test.yml`
+
+```yaml
+---
+- name: Test encrypted variables with role
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - encrypted_vars/nunya.yml
+    - encrypted_vars/zabbix.yml
+
+  roles:
+    - vault_role
+```
+
+## 7. Run the Playbook
+
+Now you can run the playbook with:
+
+```bash
+ansible-playbook vault_test.yml
+```
+
+Ansible will decrypt the variables from the `nunya.yml` and `zabbix.yml` files and pass them to the Jinja2 template in the `vault_role` to render the output to `/tmp/sensitive_data_output.txt`.
+
+## 8. Review the Output
+
+After the playbook runs successfully, you can review the rendered file at `/tmp/sensitive_data_output.txt` to ensure that everything is processed correctly.
