@@ -88,8 +88,10 @@ credit_card:
 EOF
 
 cat << EOF > zabbix.yml
+# zabbix.yml (unencrypted)
 ---
-zabbix_api_key: "ZBX-API-KEY-PURPLE-PENGUIN-9876"
+zabbix:
+  api_key: "ZBX-API-KEY-PURPLE-PENGUIN-9876"
 cisco_service_account: "Penguin_admin"
 cisco_service_password: "P3ngu1nsRul3!"
 EOF
