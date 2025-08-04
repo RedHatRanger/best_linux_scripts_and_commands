@@ -237,7 +237,7 @@ Switch SA: {{ switch_service_account }} / {{ switch_service_password }}
 
 ## 6. Create the Final Playbook
 
-### 6.1. `vault_test.yml`
+### 6.1. `vault_test_roles.yml`
 
 ```yaml
 ---
@@ -258,7 +258,7 @@ Switch SA: {{ switch_service_account }} / {{ switch_service_password }}
 Now you can run the playbook with:
 
 ```bash
-ansible-playbook vault_test.yml
+ansible-playbook vault_test_roles.yml
 ```
 
 Ansible will decrypt the variables from the `nunya.yml` and `zabbix.yml` files and pass them to the Jinja2 template in the `vault_role` to render the output to `/tmp/sensitive_data_output.txt`.
