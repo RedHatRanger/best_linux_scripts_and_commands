@@ -122,6 +122,7 @@ EOF
 
 ```bash
 cat << EOF > vault_test.yml
+# vault_test.yml
 ---
 - name: Test encrypted variables
   hosts: localhost
@@ -134,7 +135,7 @@ cat << EOF > vault_test.yml
   tasks:
     - name: Print funny Google API key
       debug:
-        msg: "API Key: {{ api_key }}"
+        msg: "API Key: {{ google.api_key }}"
 
     - name: Print crypto_wallet_passports
       debug:
@@ -142,19 +143,20 @@ cat << EOF > vault_test.yml
 
     - name: Print masked credit card info
       debug:
-        msg: |
-          FAKE Credit Card #: {{ credit_card.number }}
-          Cardholder: {{ credit_card.name_on_card }}
+        msg:
+          - "Cardholder: {{ credit_card.name_on_card }}"
+          - "Credit Card#: {{ credit_card.number }}"
+          - "Expiration: {{ credit_card.expire_date }}"
 
     - name: Print Zabbix API key
       debug:
-        msg: "Zabbix API Key: {{ zabbix_api_key }}"
+        msg: "Zabbix API Key: {{ zabbix.api_key }}"
 
     - name: Print switch service account
       debug:
-        msg: |
-          Switch Service Account: {{ cisco_service_account }}
-          Service Account Password: {{ cisco_service_password }}
+        msg:
+          - "Switch Service Account: {{ cisco_service_account }}"
+          - "Service Account Password: {{ cisco_service_password }}"
 EOF
 ```
 
@@ -168,7 +170,7 @@ ansible-vault encrypt encrypted_vars/nunya.yml encrypted_vars/zabbix.yml
 
 ---
 
-## 4. Vault File Management
+## 4. Vault File Management (OPTIONAL)
 
 ### View:
 
@@ -240,7 +242,7 @@ Switch SA: {{ cisco_service_account }} / {{ cisco_service_password }}
 
 ---
 
-## 7. Run the Playbook
+## 7. Run the `vault_roles.yml` Playbook
 
 ```bash
 ansible-playbook vault_roles.yml
