@@ -121,6 +121,8 @@ This configuration tells Ansible to look for the vault password in `keyfile.txt`
 Create a playbook named `vault_test.yml` in the root of the lab directory:
 
 ```yaml
+cat << EOF > vault_test.yml
+# vault_test.yml
 ---
 - name: Test encrypted variables
   hosts: localhost
@@ -133,7 +135,7 @@ Create a playbook named `vault_test.yml` in the root of the lab directory:
   tasks:
     - name: Print funny Google API key
       debug:
-        msg: "API Key: {{ api_key }} | Username: {{ username }}"
+        msg: "API Key: {{ api_key }}"
 
     - name: Print crypto_wallet_passports
       debug:
@@ -141,7 +143,9 @@ Create a playbook named `vault_test.yml` in the root of the lab directory:
 
     - name: Print masked credit card info
       debug:
-        msg: "Card ending in: **** **** **** {{ cc_info.number[-4:] }}"
+        msg: |
+          FAKE Credit Card \#: {{ credit_card.number }}
+          Cardholder: {{ credit_card.name_on_card }}
 
     - name: Print Zabbix API key
       debug:
@@ -149,7 +153,10 @@ Create a playbook named `vault_test.yml` in the root of the lab directory:
 
     - name: Print switch service account
       debug:
-        msg: "Switch SA: {{ switch_service_account }} / {{ switch_service_password }}"
+        msg: |
+          Switch Service Account: {{ cisco_service_account }}
+          Service Account Password: {{ cisco_service_password }}
+EOF
 ```
 
 ## 3. Encrypting Data with Ansible Vault
