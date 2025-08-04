@@ -178,6 +178,8 @@ After running these commands, the content of both files will be encrypted.
 
 ---
 
+
+<br><br><br><br>
 ## 4. Working with Encrypted Files
 
 Ansible Vault provides several commands to work with encrypted files.
