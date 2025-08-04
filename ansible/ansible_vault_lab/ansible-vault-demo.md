@@ -42,6 +42,7 @@ Create the directories with the following commands:
 
 ```bash
 mkdir -p ansible_vault_lab/encrypted_vars
+cd encrypted_vars
 ```
 
 ### 2.3. Create the Unencrypted Data Files
@@ -49,26 +50,32 @@ mkdir -p ansible_vault_lab/encrypted_vars
 Create a YAML file named `nunya.yml` inside the `encrypted_vars/` directory with the following content. This file contains the sensitive data that we want to encrypt.
 
 ```yaml
+cat << EOF > nunya.yml
 # nunya.yml (unencrypted)
 ---
 api_key: "GOOGLE-API-1234-ZEBRA-LOL-5678"
-username: "cisco_admin"
+cisco:
+  username: "cisco_admin"
+  password: "RoleTide1"
 crypto_wallet_passports: "moose-unicorn-dragon@zebrabank"
 credit_card:
   number: "4111 1111 1111 1111"
-  expiry: "12/34"
+  expire_date: "12/34"
   cvv: "123"
   name_on_card: "John Doe"
+EOF
 ```
 
 Create another YAML file named `zabbix.yml` with content specific to a Zabbix monitoring environment:
 
 ```yaml
+cat << EOF > zabbix.yml
 # zabbix.yml (unencrypted)
 ---
 zabbix_api_key: "ZBX-API-KEY-PURPLE-PENGUIN-9876"
 cisco_service_account: "Penguin_admin"
 cisco_service_password: "P3ngu1nsRul3!"
+EOF
 ```
 
 ### 2.4. Create the Vault Password File
