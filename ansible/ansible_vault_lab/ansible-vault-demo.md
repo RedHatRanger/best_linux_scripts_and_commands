@@ -214,12 +214,14 @@ mkdir -p roles/vault_role/{tasks,templates}
 ```jinja
 # Rendered Secrets Output
 
-API Key: {{ api_key }}
-Username: {{ cisco.username }}
-Crypto Wallet Passports: {{ crypto_wallet_passports }}
-Card ending in: **** **** **** {{ credit_card.number[-4:] }}
-Zabbix API Key: {{ zabbix_api_key }}
-Switch SA: {{ cisco_service_account }} / {{ cisco_service_password }}
+Google API Key: {{ google.api_key }}
+Zabbix API Key: {{ zabbix.api_key }}
+Cisco Standard User: Username: {{ cisco.username }} / Password: {{ cisco.password }}
+Switch Service Account: Username: {{ cisco_service_account }} / Password: {{ cisco_service_password }}
+Crypto Wallet Passport: {{ crypto_wallet_passports }}
+Credit Cardholder: {{ credit_card.name_on_card }}
+Last 4 of Credit Card: {{ credit_card.number[-4:] }}
+Credit Card CVV: {{ credit_card.cvv }}
 ```
 
 ---
