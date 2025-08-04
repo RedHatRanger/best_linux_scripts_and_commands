@@ -42,7 +42,7 @@ Create the directories with the following commands:
 
 ```bash
 mkdir -p ansible_vault_lab/encrypted_vars
-cd encrypted_vars
+cd ansible_vault_lab/encrypted_vars
 ```
 
 ### 2.3. Create the Unencrypted Data Files
@@ -83,7 +83,7 @@ EOF
 Create a file named `keyfile.txt` in the `ansible_vault_lab` directory. This file will contain the password for the vault.
 
 ```
-super_secret_vault_password_123
+WhenYouWishUponAStar3!
 ```
 
 **Note:** In a real-world scenario, you should restrict the permissions of this file to prevent unauthorized access.
