@@ -162,15 +162,15 @@ EOF
 
 ---
 
-## 3. Encrypt the Data Files
+## 3. Encrypt All of the Data Files in `encrypted_vars`:
 
 ```bash
-ansible-vault encrypt encrypted_vars/nunya.yml encrypted_vars/zabbix.yml
+ansible-vault encrypt encrypted_vars/*
 ```
 
 ---
 
-## 4. Vault File Management (OPTIONAL)
+## 4. Vault File Management (OPTIONAL for testing)
 
 ### View:
 
