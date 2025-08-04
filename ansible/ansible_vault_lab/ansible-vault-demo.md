@@ -216,7 +216,7 @@ cat << EOF > roles/vault_role/tasks/main.yml
 
 - name: Display rendered secrets
   debug:
-    msg: "{{ rendered_output.stdout }}"
+    msg: "{{ rendered_output.stdout_lines }}"
 
 - name: Remove temporary file
   file:
