@@ -72,8 +72,10 @@ ansible_vault_lab/
 
 ```bash
 cat << EOF > nunya.yml
+# nunya.yml (unencrypted)
 ---
-api_key: "GOOGLE-API-1234-ZEBRA-LOL-5678"
+google:
+  api_key: "GOOGLE-API-1234-ZEBRA-LOL-5678"
 cisco:
   username: "cisco_admin"
   password: "RoleTide1"
