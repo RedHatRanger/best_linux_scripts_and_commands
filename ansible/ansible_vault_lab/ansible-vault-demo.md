@@ -110,8 +110,13 @@ To avoid repeatedly specifying the `--vault-password-file` option with every `an
 Create a file named `ansible.cfg` in the `ansible_vault_lab` directory with the following content:
 
 ```ini
+
+cat << EOF > ansible.cfg
+# ansible.cfg - Global config for Ansible
+
 [defaults]
 vault_password_file = ./keyfile.txt
+EOF
 ```
 
 This configuration tells Ansible to look for the vault password in `keyfile.txt` located in the same directory as the `ansible.cfg` file.
