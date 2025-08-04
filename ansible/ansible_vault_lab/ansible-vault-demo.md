@@ -157,8 +157,7 @@ Create a playbook named `vault_test.yml` in the root of the lab directory:
 Now, we will encrypt the `nunya.yml` and `zabbix.yml` files using `ansible-vault encrypt`.
 
 ```bash
-ansible-vault encrypt nunya.yml
-ansible-vault encrypt zabbix.yml
+ansible-vault encrypt encrypted_vars/nunya.yml encrypted_vars/zabbix.yml
 ```
 
 After running these commands, the content of both files will be encrypted.
