@@ -83,13 +83,17 @@ EOF
 Create a file named `keyfile.txt` in the `ansible_vault_lab` directory. This file will contain the password for the vault.
 
 ```
+cd ../
+cat << EOF > keyfile.txt
 WhenYouWishUponAStar3!
+EOF
 ```
 
 **Note:** In a real-world scenario, you should restrict the permissions of this file to prevent unauthorized access.
 
 ```bash
-chmod 660 ansible_vault_lab/keyfile.txt
+# For this demonstration we will give 660 permission so the owner and the group will have Read and Write Access to the File
+chmod 660 keyfile.txt
 ```
 
 ### 2.5. Configure `ansible.cfg` for Vault Password File
