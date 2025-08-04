@@ -203,10 +203,24 @@ mkdir -p roles/vault_role/{tasks,templates}
 ### 5.2. Role Task File: `roles/vault_role/tasks/main.yml`
 
 ```yaml
-- name: Render sensitive data template
+# tasks file for vault_role
+- name: Render sensitive data template to file
   template:
     src: template.j2
     dest: "/tmp/sensitive_data_output.txt"
+
+- name: Read rendered content and print
+  command: cat /tmp/sensitive_data_output.txt
+  register: rendered_output
+
+- name: Display rendered secrets
+  debug:
+    msg: "{{ rendered_output.stdout }}"
+
+- name: Remove temporary file
+  file:
+    path: "/tmp/sensitive_data_output.txt"
+    state: absent
 ```
 
 ### 5.3. Template File: `roles/vault_role/templates/template.j2`
