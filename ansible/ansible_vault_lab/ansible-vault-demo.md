@@ -203,6 +203,7 @@ mkdir -p roles/vault_role/{tasks,templates}
 ### 5.2. Role Task File: `roles/vault_role/tasks/main.yml`
 
 ```yaml
+cat << EOF > roles/vault_role/tasks/main.yml
 # tasks file for vault_role
 - name: Render sensitive data template to file
   template:
@@ -221,11 +222,13 @@ mkdir -p roles/vault_role/{tasks,templates}
   file:
     path: "/tmp/sensitive_data_output.txt"
     state: absent
+EOF
 ```
 
 ### 5.3. Template File: `roles/vault_role/templates/template.j2`
 
 ```jinja
+cat << EOF > roles/vault_role/templates/template.j2
 # Rendered Secrets Output
 
 Google API Key: {{ google.api_key }}
@@ -236,6 +239,7 @@ Crypto Wallet Passport: {{ crypto_wallet_passports }}
 Credit Cardholder: {{ credit_card.name_on_card }}
 Last 4 of Credit Card: {{ credit_card.number[-4:] }}
 Credit Card CVV: {{ credit_card.cvv }}
+EOF
 ```
 
 ---
