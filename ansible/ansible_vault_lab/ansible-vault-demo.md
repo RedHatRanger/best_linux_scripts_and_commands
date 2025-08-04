@@ -31,17 +31,18 @@ For this lab, we will use the following directory structure:
 ```bash
 ansible_vault_lab/
 ├── ansible.cfg
-├── encrypted_vars/
-│   ├── nunya.yml
-│   └── zabbix.yml
+├── encrypted_vars
+│   ├── nunya.yml
+│   └── zabbix.yml
 ├── keyfile.txt
-├── vault_test.yml
-└── roles/
-    └── vault_role/
-        ├── tasks/
-        │   └── main.yml
-        └── templates/
-            └── template.j2
+├── roles
+│   └── vault_role
+│       ├── tasks
+│       │   └── main.yml
+│       └── templates
+│           └── template.j2
+├── vault_test_roles.yml
+└── vault_test.yml
 ```
 
 Create the directories with the following commands:
