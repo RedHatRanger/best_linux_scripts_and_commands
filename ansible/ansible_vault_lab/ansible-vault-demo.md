@@ -227,7 +227,7 @@ EOF
 
 ### 5.3. Template File: `roles/vault_role/templates/template.j2`
 
-```jinja
+```yaml
 cat << EOF > roles/vault_role/templates/template.j2
 # Rendered Secrets Output
 
