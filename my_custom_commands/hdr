@@ -2,7 +2,7 @@
 
 ### SAVE TO /usr/local/bin/hdr #####################################
 # Behavior summary (written by Claude Sonnet):
-# - If Author exists: preserved as-is.
+# - If Author exists: preserved as-is, or override with --force-author.
 # - If Author missing: added with the provided or current user.
 # - Modified By: always set to the provided or current user on updates; added on new headers.
 # - Created On: preserved if present; otherwise set once.
