@@ -9,7 +9,7 @@
 # - Last Modified: always updated.
 # - Description: preserved unless you pass --desc "-" to force preserving
 # - Version: starts at v1.0 and increments by 0.1 on each modification
-############################################################################
+###############################################################################
 
 set -euo pipefail
 
@@ -90,12 +90,12 @@ while [[ $# -gt 0 ]]; do
       force_author="1"; shift ;;
     -h|--help)
       usage; exit 0 ;;
-    -*)
+    -* )
       echo "Unknown option: $1" >&2; usage; exit 1 ;;
-    *)
+    * )
       files+=("$1"); shift ;;
   esac
-done
+ done
 
 [[ ${#files[@]} -eq 0 ]] && { usage; exit 1; }
 
@@ -144,7 +144,8 @@ process_file() {
         -v update_desc="$update_desc" \
         -v now="$now" \
         -v created_now="$now" \
-        -v force_author="$force_author" '
+        -v force_author="$force_author" \
+        '
       function inc_version(v,    major, minor, new_minor, new_version) {
         # v expected format: vX.Y
         if (match(v, /^v([0-9]+)\.([0-9]+)$/, arr)) {
@@ -166,8 +167,7 @@ process_file() {
       {
         if (in_hdr) {
           if ($0 ~ /^#\s*$/) {
-            if (!seen_version) { print "# Version: v1.0" }
-            else { print "# Version: " version }
+            # Version line already printed when matched, do nothing here
             if (!seen_created) { print "# Created On: " created_now }
             if (!seen_lastmod) { print "# Last Modified: " now }
             if (!seen_modby)   { print "# Modified By: " modified_by }
