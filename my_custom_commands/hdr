@@ -18,7 +18,7 @@ Usage: header [OPTIONS] FILE [FILE2 ...]
 Adds or updates a standardized header at the top of the given files.
 
 Header fields:
-  - File: <basename>
+  - File: <name of the file>
   - Author: <preserved if exists; otherwise set to provided or current user; use --force-author to overwrite>
   - Created On: <preserved if exists; otherwise set once (YYYY-MM-DD HH:MM:SS)>
   - Last Modified: <always updated (YYYY-MM-DD HH:MM:SS)>
