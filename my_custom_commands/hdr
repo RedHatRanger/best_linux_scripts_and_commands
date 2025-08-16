@@ -1,0 +1,192 @@
+```bash
+#!/usr/bin/env bash
+
+### SAVE TO /usr/local/bin/hdr #####################################
+# Behavior summary:
+# - If Author exists: preserved as-is.
+# - If Author missing: added with the provided or current user.
+# - Modified By: always set to the provided or current user on updates; added on new headers.
+# - Created On: preserved if present; otherwise set once.
+# - Last Modified: always updated.
+# - Description: preserved unless you pass --desc "-" to force preserving
+####################################################################
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: hdr [--author NAME] [--desc TEXT] FILE [FILE2 ...]
+Adds or updates a standardized header at the top of the given files.
+
+Header fields:
+  - File: <basename>
+  - Author: <preserved if exists; otherwise set to provided or current user>
+  - Created On: <preserved if exists; otherwise set once (YYYY-MM-DD HH:MM:SS)>
+  - Last Modified: <always updated (YYYY-MM-DD HH:MM:SS)>
+  - Modified By: <author of the last modification>
+  - Description: <set if provided, preserved if "-", otherwise "TODO: Add description">
+
+Options:
+  --author NAME      Author name to use (default: $(whoami))
+  --desc TEXT        Description to set. Use "-" to preserve existing Description.
+  -h, --help         Show this help and exit.
+
+Examples:
+  # Add a new header to a file without one
+  hdr --author alice --desc "Production config" sample.yaml
+
+  # Update an existing header, preserve existing Description
+  hdr --desc "-" sample_with_header.yaml
+
+  # Update multiple files at once
+  hdr --author devops --desc "Infra configs" config1.yaml config2.yaml
+
+Notes:
+  - Preserves shebang (#!) on the first line if present.
+  - Preserves original file permissions (Linux/macOS).
+EOF
+}
+
+author="$(whoami)"
+desc=""
+update_desc="0"
+files=()
+
+# Parse args
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --author)
+      [[ $# -lt 2 ]] && { echo "Missing value for --author" >&2; exit 1; }
+      author="$2"; shift 2 ;;
+    --desc)
+      [[ $# -lt 2 ]] && { echo "Missing value for --desc" >&2; exit 1; }
+      desc="$2"; shift 2 ;;
+    -h|--help)
+      usage; exit 0 ;;
+    -*)
+      echo "Unknown option: $1" >&2; usage; exit 1 ;;
+    *)
+      files+=("$1"); shift ;;
+  esac
+done
+
+[[ ${#files[@]} -eq 0 ]] && { usage; exit 1; }
+
+# Description update behavior
+if [[ -n "$desc" && "$desc" != "-" ]]; then
+  update_desc="1"
+fi
+
+# Portable perms (Linux/macOS)
+get_perms() {
+  local f="$1"
+  stat -c '%a' "$f" 2>/dev/null || stat -f '%Lp' "$f" 2>/dev/null || echo ""
+}
+
+now="$(date '+%Y-%m-%d %H:%M:%S')"
+
+process_file() {
+  local file="$1"
+
+  # Ensure file exists
+  [[ -f "$file" ]] || : > "$file"
+
+  local perms tmp body shebang firstline
+  perms="$(get_perms "$file")"
+  tmp="$(mktemp)" || exit 1
+  body="$(mktemp)" || { rm -f "$tmp"; exit 1; }
+  trap 'rm -f "$tmp" "$body"' EXIT
+
+  if [[ -s "$file" ]]; then
+    read -r firstline < "$file" || true
+    if [[ "${firstline:-}" =~ ^#! ]]; then
+      shebang="$firstline"
+      tail -n +2 "$file" > "$body"
+    else
+      cat "$file" > "$body"
+    fi
+  else
+    : > "$body"
+  fi
+
+  if grep -q "^# File: $(basename "$file")$" "$file" 2>/dev/null; then
+    # Update existing header
+    awk -v author="$author" \
+        -v desc="$desc" \
+        -v update_desc="$update_desc" \
+        -v now="$now" \
+        -v created_now="$now" '
+      BEGIN { in_hdr=1; seen_created=0; seen_lastmod=0; seen_desc=0; seen_modby=0; seen_author=0 }
+      NR==1 && $0 ~ /^#!/ { print; next }
+      {
+        if (in_hdr) {
+          if ($0 ~ /^#\s*$/) {
+            if (!seen_created) { print "# Created On: " created_now }
+            if (!seen_lastmod) { print "# Last Modified: " now }
+            if (!seen_modby)   { print "# Modified By: " author }
+            if (!seen_author)  { print "# Author: " author }
+            if (update_desc=="1" && !seen_desc) { print "# Description: " desc }
+            print
+            in_hdr=0
+            next
+          }
+
+          # Created On normalization
+          if ($0 ~ /^# *Created On:/) { seen_created=1; print; next }
+          if ($0 ~ /^# *Date Created:/) {
+            line=$0; sub(/^# *Date Created: */, "", line)
+            print "# Created On: " line
+            seen_created=1; next
+          }
+          if ($0 ~ /^# *Date:/) {
+            line=$0; sub(/^# *Date: */, "", line)
+            print "# Created On: " line
+            seen_created=1; next
+          }
+
+          # Author: preserve existing value (do not overwrite)
+          if ($0 ~ /^# *Author:/) { seen_author=1; print; next }
+
+          # Last Modified: always update to now
+          if ($0 ~ /^# *Last Modified:/) { print "# Last Modified: " now; seen_lastmod=1; next }
+
+          # Modified By: always set to current author
+          if ($0 ~ /^# *Modified By:/) { print "# Modified By: " author; seen_modby=1; next }
+
+          # Description
+          if ($0 ~ /^# *Description:/) {
+            if (update_desc=="1") { print "# Description: " desc } else { print }
+            seen_desc=1; next
+          }
+
+          print; next
+        }
+        print
+      }
+    ' "$file" > "$tmp"
+  else
+    # Create new header
+    {
+      [[ -n "${shebang:-}" ]] && echo "$shebang"
+      echo "# File: $(basename "$file")"
+      echo "# Author: $author"
+      echo "# Created On: $now"
+      echo "# Last Modified: $now"
+      echo "# Modified By: $author"
+      echo "# Description: ${desc:-TODO: Add description}"
+      echo "#"
+      echo
+      cat "$body"
+    } > "$tmp"
+  fi
+
+  mv "$tmp" "$file"
+  rm -f "$body"
+  trap - EXIT
+  [[ -n "$perms" ]] && chmod "$perms" "$file"
+}
+
+for f in "${files[@]}"; do
+  process_file "$f"
+done
+```
