@@ -14,12 +14,12 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: hdr [--author NAME] [--desc TEXT] FILE [FILE2 ...]
+Usage: hdr [--author NAME] [--desc TEXT] [--force-author] FILE [FILE2 ...]
 Adds or updates a standardized header at the top of the given files.
 
 Header fields:
   - File: <basename>
-  - Author: <preserved if exists; otherwise set to provided or current user>
+  - Author: <preserved if exists; otherwise set to provided or current user; use --force-author to overwrite>
   - Created On: <preserved if exists; otherwise set once (YYYY-MM-DD HH:MM:SS)>
   - Last Modified: <always updated (YYYY-MM-DD HH:MM:SS)>
   - Modified By: <author of the last modification>
@@ -28,6 +28,7 @@ Header fields:
 Options:
   --author NAME      Author name to use (default: $(whoami))
   --desc TEXT        Description to set. Use "-" to preserve existing Description.
+  --force-author     Overwrite existing Author with the provided name.
   -h, --help         Show this help and exit.
 
 Examples:
@@ -36,6 +37,9 @@ Examples:
 
   # Update an existing header, preserve existing Description
   hdr --desc "-" sample_with_header.yaml
+
+  # Force replace the Author on an existing header
+  hdr --author ops --force-author app.yaml
 
   # Update multiple files at once
   hdr --author devops --desc "Infra configs" config1.yaml config2.yaml
@@ -48,6 +52,7 @@ EOF
 
 author="$(whoami)"
 desc=""
+force_author="0"
 update_desc="0"
 files=()
 
@@ -60,6 +65,8 @@ while [[ $# -gt 0 ]]; do
     --desc)
       [[ $# -lt 2 ]] && { echo "Missing value for --desc" >&2; exit 1; }
       desc="$2"; shift 2 ;;
+    --force-author)
+      force_author="1"; shift ;;
     -h|--help)
       usage; exit 0 ;;
     -*)
@@ -114,7 +121,8 @@ process_file() {
         -v desc="$desc" \
         -v update_desc="$update_desc" \
         -v now="$now" \
-        -v created_now="$now" '
+        -v created_now="$now" \
+        -v force_author="$force_author" '
       BEGIN { in_hdr=1; seen_created=0; seen_lastmod=0; seen_desc=0; seen_modby=0; seen_author=0 }
       NR==1 && $0 ~ /^#!/ { print; next }
       {
@@ -143,8 +151,12 @@ process_file() {
             seen_created=1; next
           }
 
-          # Author: preserve existing value (do not overwrite)
-          if ($0 ~ /^# *Author:/) { seen_author=1; print; next }
+          # Author: preserve existing value unless --force-author is set
+          if ($0 ~ /^# *Author:/) {
+            seen_author=1
+            if (force_author=="1") { print "# Author: " author } else { print }
+            next
+          }
 
           # Last Modified: always update to now
           if ($0 ~ /^# *Last Modified:/) { print "# Last Modified: " now; seen_lastmod=1; next }
