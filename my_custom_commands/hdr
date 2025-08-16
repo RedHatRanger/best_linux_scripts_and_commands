@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-### SAVE TO /usr/local/bin/hdr #####################################
-# Behavior summary (by Brian MacFarlane):
+### SAVE TO /usr/local/bin/hdr #############################################
+# Behavior summary (authored by Brian MacFarlane, written in Claude Sonnet):
 # - If Author exists: preserved as-is.
 # - If Author missing: added with the provided or current user.
 # - Modified By: always set to the provided or current user on updates; added on new headers.
 # - Created On: preserved if present; otherwise set once.
 # - Last Modified: always updated.
 # - Description: preserved unless you pass --desc "-" to force preserving
-####################################################################
+############################################################################
 
 set -euo pipefail
 
