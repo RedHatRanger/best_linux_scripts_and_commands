@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-### SAVE TO /usr/local/bin/hdr #############################################
-# Behavior summary (authored by Brian MacFarlane, written in Claude Sonnet):
+### SAVE TO /usr/local/bin/header #############################################
+# Behavior summary (Created by Brian MacFarlane, written in Claude Sonnet):
 # - If Author exists: preserved as-is.
 # - If Author missing: added with the provided or current user.
 # - Modified By: always set to the provided or current user on updates; added on new headers.
@@ -14,7 +14,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF' | less
-Usage: hdr [OPTIONS] FILE [FILE2 ...]
+Usage: header [OPTIONS] FILE [FILE2 ...]
 Adds or updates a standardized header at the top of the given files.
 
 Header fields:
@@ -33,24 +33,35 @@ Options:
   -h, --help               Show this help and exit.
 
 Examples:
-  # Add a new header to a file without one
-  hdr --author alice --desc "Production config" sample.yaml
+- ADDING A NEW HEADER TO A FILE:
+  # Add a new header to a file without one (verbose)
+  header --author "Alice" --desc "Production Configuration Template" sample.yaml
+  OR
+  # Add a new header to a file without one (short)
+  header -a "Alice" -d "Production Configuration Template" sample.yaml
 
-  # Update an existing header, preserve existing Description
-  hdr --desc "-" sample_with_header.yaml
-
-  # Force replace the Author on an existing header
-  hdr --author ops --force-author app.yaml
-
-  # Update multiple files at once
-  hdr --author devops --desc "Infra configs" config1.yaml config2.yaml
-
+- UPDATE AN EXISTING HEADER:
   # Set different Author and Modified By (useful for team edits)
-  hdr -a alice -m bob -d "Alice's code, modified by Bob" script.sh
+  header -m "Bob" -d "Alice's code, modified by Bob" sample_with_header.yaml
+
+- REPLACE THE AUTHOR BY FORCE:
+  # Force replace the Author on an existing header (must be used with --author)
+  header --author "Bob" --force-author app.yaml
+  OR
+  # Force replace the Author on an existing header (must be used with -a)
+  header -a "Bob" -f -m "Charlie" app.yaml
+
+- ADJUST HEADERS ON MULTIPLE FILES:
+  # Update multiple files at once
+  header --author devops --desc "Infra configs" config1.yaml config2.yaml
 
 Notes:
-  - Preserves shebang (#!) on the first line if present.
-  - Preserves original file permissions (Linux/macOS).
+  - Preserves shebang (#!) on the first line if present (useful for Bash and Python scripts)
+  - Preserves original file permissions.
+
+Credits:
+Created by Brian MacFarlane
+Written in Claude Opus 4.1
 EOF
 }
 
