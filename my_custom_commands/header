@@ -2,7 +2,7 @@
 
 #################################################################
 # SAVE TO /usr/local/bin/header
-# THEN SET THIS IN YOUR ~/.vimrc: autocmd BufRead,BufNewFile *.yml,*.yaml ! usr/local/bin/header %
+# THEN SET THIS IN YOUR ~/.vimrc: autocmd BufRead,BufNewFile *.yml,*.yaml !/usr/local/bin/header %
 #################################################################
 # Behavior summary (Created by Brian MacFarlane):
 # - If Author exists: preserved as-is.
