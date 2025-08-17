@@ -2,7 +2,7 @@
 
 #################################################################
 # SAVE AS /usr/local/bin/header & chmod 755 the file.
-# THEN SET THIS IN YOUR ~/.vimrc: 
+# THEN SET THIS IN YOUR ~/.vimrc or globally in /etc/vim/vimrc: 
 # autocmd BufRead,BufNewFile *.yml,*.yaml !header %
 # autocmd FileType yaml setlocal et ai ts=2 sw=2 sts=2 
 #################################################################
