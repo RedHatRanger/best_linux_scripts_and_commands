@@ -351,3 +351,36 @@ ansible-builder build -t my-custom-ee:latest
 ```bash
 ansible-navigator run playbook.yml --ee-image my-custom-ee:latest
 ```
+
+---
+
+### Do you need to `podman login` to build or run the EE?
+
+- **No login required for public images:**  
+  Since the base image `registry.access.redhat.com/ubi8/ubi` is a **public Red Hat UBI image**, you do **not** need to log in to pull it.
+
+- **If you push to a private registry:**  
+  You would need to `podman login` (or `docker login`) if you want to push your custom EE image to a private or authenticated container registry.
+
+---
+
+### Do you need Podman installed?
+
+- **Yes, you need a container runtime** like Podman or Docker installed on your build machine to build and run the EE image.
+
+- `ansible-builder` uses Podman or Docker under the hood to build the container image.
+
+- If you don’t have Podman or Docker installed, the build will fail.
+
+---
+
+### Summary
+
+| Action                      | Podman/Docker Needed? | Login Needed?                  |
+|-----------------------------|----------------------|-------------------------------|
+| Pulling public base image    | Yes                  | No                            |
+| Building EE image locally    | Yes                  | No                            |
+| Running EE image locally     | Yes                  | No                            |
+| Pushing image to private repo| Yes                  | Yes (login required)          |
+
+---
