@@ -6,7 +6,7 @@
 # autocmd BufRead,BufNewFile *.yml,*.yaml !header %
 # autocmd FileType yaml setlocal et ai ts=2 sw=2 sts=2 
 #################################################################
-# Behavior summary (Created by Brian MacFarlane):
+# Behavior summary
 # - If Author exists: preserved as-is.
 # - If Author missing: added with the provided or current user.
 # - Modified By: always set to the provided or current user on updates; added on new headers.
