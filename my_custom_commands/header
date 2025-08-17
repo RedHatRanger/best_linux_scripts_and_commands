@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #################################################################
-# SAVE TO /usr/local/bin/header
+# SAVE TO /usr/local/bin/header & chmod 755 the file.
 # THEN SET THIS IN YOUR ~/.vimrc: autocmd BufRead,BufNewFile *.yml,*.yaml !header %
 #################################################################
 # Behavior summary (Created by Brian MacFarlane):
