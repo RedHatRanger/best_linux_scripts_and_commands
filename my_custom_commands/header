@@ -65,9 +65,6 @@ Examples:
 Notes:
   - Preserves shebang (#!) on the first line if present (useful for Bash and Python scripts)
   - Preserves original file permissions.
-
-CREDITS:
-Created by Brian MacFarlane
 EOF
 }
 
