@@ -69,3 +69,108 @@ Run it instead of calling `ansible-galaxy` directly:
 - The token is **only decrypted in memory** during the script execution.
 - You can safely commit `ansible.cfg` and `requirements.yml` to version control without exposing secrets.
 - You can extend this pattern for multiple Galaxy servers by adding more tokens and environment variables.
+
+# Controlling where the collections are installed
+You can control where Ansible installs collections by specifying the **collections path**. There are a few ways to do this:
+
+---
+
+### 1. Set `collections_paths` in `ansible.cfg`
+
+Add this under the `[defaults]` section in your `ansible.cfg`:
+
+```ini
+[defaults]
+collections_paths = /path/to/custom/collections:/another/path
+```
+
+- Ansible will look for collections in these directories in order.
+- When installing collections with `ansible-galaxy collection install`, it will install into the **first writable path** listed here.
+- If the directory doesn’t exist, Ansible will create it.
+
+# Using Ansible-Navigator to containerize collections:
+To get collections and Python libraries installed **inside your Execution Environment (container image)** for use with `ansible-navigator` or Ansible Automation Platform, you typically build a custom EE image using **`ansible-builder`**.
+
+Here’s how to do it step-by-step:
+
+---
+
+### 1. Create a `requirements.yml` for your Ansible collections
+
+Example `requirements.yml`:
+
+```yaml
+---
+collections:
+  - name: ansible.posix
+  - name: community.general
+  - name: cisco.ios
+```
+
+---
+
+### 2. Create a `requirements.txt` for your Python libraries (if any)
+
+Example `requirements.txt`:
+
+```
+netaddr
+pyyaml
+requests
+```
+
+---
+
+### 3. Create an `execution-environment.yml` file to define your EE build
+
+Example `execution-environment.yml`:
+
+```yaml
+version: 1
+
+dependencies:
+  galaxy: requirements.yml
+  python: requirements.txt
+```
+
+This tells `ansible-builder` to install the listed collections and Python packages inside the EE.
+
+---
+
+### 4. Build the Execution Environment image
+
+Run this command in the directory with your files:
+
+```bash
+ansible-builder build -t my-custom-ee:latest
+```
+
+This will create a container image named `my-custom-ee:latest` with your collections and Python libraries installed.
+
+---
+
+### 5. Use your custom EE with `ansible-navigator`
+
+In your `ansible-navigator.yml` or via CLI, specify your custom EE image:
+
+```yaml
+execution-environment:
+  enabled: true
+  image: my-custom-ee:latest
+```
+
+Or run directly:
+
+```bash
+ansible-navigator run playbook.yml --ee-image my-custom-ee:latest
+```
+
+---
+
+### Summary
+
+- Use `requirements.yml` for collections.
+- Use `requirements.txt` for Python packages.
+- Define both in `execution-environment.yml`.
+- Build with `ansible-builder`.
+- Use the resulting image with `ansible-navigator` or AAP.
