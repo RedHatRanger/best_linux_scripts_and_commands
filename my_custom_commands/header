@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-### SAVE TO /usr/local/bin/header #############################################
-# Behavior summary (Created by Brian MacFarlane, written in Claude Sonnet):
+#################################################################
+# SAVE TO /usr/local/bin/header
+# THEN SET THIS IN YOUR ~/.vimrc: autocmd BufRead,BufNewFile *.yml,*.yaml ! usr/local/bin/header %
+#################################################################
+# Behavior summary (Created by Brian MacFarlane):
 # - If Author exists: preserved as-is.
 # - If Author missing: added with the provided or current user.
 # - Modified By: always set to the provided or current user on updates; added on new headers.
@@ -61,9 +64,8 @@ Notes:
   - Preserves shebang (#!) on the first line if present (useful for Bash and Python scripts)
   - Preserves original file permissions.
 
-Credits:
+CREDITS:
 Created by Brian MacFarlane
-Written in Claude Opus 4.1
 EOF
 }
 
