@@ -1,0 +1,18 @@
+# Set this in your inventory file first:
+# [local]
+# localhost ansible_connection=local
+# 
+# Then run:
+# ansible-playbook get_collection_version.yml
+
+---
+- name: Get a collection version
+  hosts: localhost
+  gather_facts: false
+  vars:
+    # Default namespace if not passed via -e
+    my_namespace: "ansible.posix"
+  tasks:
+    - name: Get the version of the collection dynamically
+      ansible.builtin.debug:
+        msg: "The {{ my_namespace }} collection version is {{ lookup('community.general.collection_version', my_namespace) }}"
