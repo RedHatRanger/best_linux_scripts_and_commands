@@ -12,6 +12,7 @@
   vars:
     # Default namespace if not passed via -e
     my_namespace: "ansible.posix"
+  
   tasks:
     - name: Get the version of the collection dynamically
       ansible.builtin.debug:
