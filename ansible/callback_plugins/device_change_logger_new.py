@@ -9,9 +9,10 @@ import tempfile
 
 class CallbackModule(CallbackBase):
     """
-    Logs changed tasks and ensures the CSV header contains 'Invoked By'.
+    Logs changed tasks to a CSV file and ensures the CSV header contains 'Invoked By'.
     If an older CSV exists without that column, it is migrated automatically.
     Outputs a readable summary of changes made to the CSV file and device changes in a human-readable format.
+    Supports a custom CSV path via the ANSIBLE_CHANGE_LOG_FILE environment variable, with a '_check' suffix in check mode if not specified.
     """
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = 'notification'
@@ -24,18 +25,20 @@ class CallbackModule(CallbackBase):
         super(CallbackModule, self).__init__()
         self.playbook = None
         self.log_dir = os.path.expanduser('~/.ansible/changes')
-        self.log_file = os.path.join(self.log_dir, 'change_logs.csv')
+        # Default log file path
+        default_log_file = os.path.join(self.log_dir, 'change_logs.csv')
+        # Check for custom log file path from environment variable
+        self.log_file = os.environ.get('ANSIBLE_CHANGE_LOG_FILE', default_log_file)
 
-        if not os.path.exists(self.log_dir):
-            os.makedirs(self.log_dir)
+        # Ensure the log directory exists
+        os.makedirs(os.path.dirname(self.log_file), exist_ok=True)
 
+        # Create or migrate the CSV file
         if not os.path.exists(self.log_file):
-            # Create a fresh file with the expected header
             with open(self.log_file, 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(self.EXPECTED_HEADER)
         else:
-            # Ensure existing file header contains "Invoked By" and migrate if needed
             self._ensure_invoked_by_column()
 
     def v2_playbook_on_start(self, playbook):
@@ -86,11 +89,26 @@ class CallbackModule(CallbackBase):
         timestamp = datetime.now().isoformat()
         invoked_by = self._get_invoking_user()
 
+        # Use a different log file in check mode if no custom path is specified
+        log_file = self.log_file
+        if result._result.get('check_mode', False) and log_file == os.path.join(self.log_dir, 'change_logs.csv'):
+            log_file = os.path.join(self.log_dir, 'change_logs_check.csv')
+            # Ensure the check mode CSV exists with the correct header
+            if not os.path.exists(log_file):
+                os.makedirs(os.path.dirname(log_file), exist_ok=True)
+                with open(log_file, 'w', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(self.EXPECTED_HEADER)
+            else:
+                self._ensure_invoked_by_column(log_file)
+
         # Extract and format change details in a readable way
         details = self._format_change_details(result._result)
+        if result._result.get('check_mode', False):
+            details = f"Check mode: {details}"
 
         # Append a row matching EXPECTED_HEADER order
-        with open(self.log_file, 'a', newline='') as f:
+        with open(log_file, 'a', newline='') as f:
             writer = csv.writer(f)
             writer.writerow([timestamp, host, task, self.playbook, invoked_by, details])
 
@@ -145,18 +163,20 @@ class CallbackModule(CallbackBase):
             # Fallback to string representation if parsing fails
             return f"Error formatting changes: {str(e)}; Raw result: {str(result_dict)[:100]}"
 
-    def _ensure_invoked_by_column(self):
+    def _ensure_invoked_by_column(self, log_file=None):
+        # Use the specified log file or the default
+        log_file = log_file or self.log_file
         # Read existing CSV
-        with open(self.log_file, 'r', newline='') as f:
+        with open(log_file, 'r', newline='') as f:
             reader = csv.reader(f)
             rows = list(reader)
 
         # If the file is empty, write the expected header
         if not rows:
-            with open(self.log_file, 'w', newline='') as f:
+            with open(log_file, 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(self.EXPECTED_HEADER)
-            print(f"Created new CSV file {self.log_file} with header: {', '.join(self.EXPECTED_HEADER)}")
+            print(f"Created new CSV file {log_file} with header: {', '.join(self.EXPECTED_HEADER)}")
             return
 
         header = rows[0]
@@ -185,17 +205,17 @@ class CallbackModule(CallbackBase):
             new_rows.append(new_r)
 
         # Write to a temp file then atomically replace the original file
-        fd, temp_path = tempfile.mkstemp(dir=self.log_dir)
+        fd, temp_path = tempfile.mkstemp(dir=os.path.dirname(log_file))
         os.close(fd)
         try:
             with open(temp_path, 'w', newline='') as tf:
                 writer = csv.writer(tf)
                 writer.writerows(new_rows)
-            os.replace(temp_path, self.log_file)
+            os.replace(temp_path, log_file)
             
             # Output readable summary of changes
             change_summary = [
-                f"Modified CSV file: {self.log_file}",
+                f"Modified CSV file: {log_file}",
                 f"Added column: 'Invoked By' at position {idx + 1}",
                 f"Updated header: {', '.join(new_header)}",
                 f"Rows modified (padded): {modified_rows}",
