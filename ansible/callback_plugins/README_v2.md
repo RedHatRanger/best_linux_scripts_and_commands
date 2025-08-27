@@ -1,4 +1,4 @@
-- Ansible Device Change Logger Callback Plugin
+# Ansible Device Change Logger Callback Plugin
 
 ## Overview
 
