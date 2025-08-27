@@ -204,4 +204,4 @@ To contribute improvements (e.g., support for additional modules, better diff ha
 
 ## License
 
-MIT License. See `LICENSE` for details.
+Apache Free Software License. See `LICENSE` for details.
