@@ -170,4 +170,4 @@ To contribute improvements (e.g., support for additional modules, better diff ha
 
 ## License
 
-MIT License. See `LICENSE` for details.
+Apache2 Free Licence. See `LICENSE` for details.
