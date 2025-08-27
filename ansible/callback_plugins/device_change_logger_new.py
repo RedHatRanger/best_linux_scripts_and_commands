@@ -97,10 +97,10 @@ class CallbackModule(CallbackBase):
     def _format_change_details(self, result_dict):
         """
         Format the changes from result_dict into a human-readable string.
-        Focuses on 'before' and 'after' states if available, otherwise falls back to JSON.
+        Focuses on 'before' and 'after' states, 'diff', or 'commands' for cisco.ios.ios_config.
         """
         try:
-            # Check for 'before' and 'after' keys (common in modules like copy, template)
+            # Check for 'before' and 'after' keys (common in some modules)
             before = result_dict.get('before')
             after = result_dict.get('after')
             if before is not None and after is not None:
@@ -115,17 +115,13 @@ class CallbackModule(CallbackBase):
                     if changes:
                         return "; ".join(changes)
                     return "No attribute changes detected"
-                # Handle string-based before/after (e.g., file content)
+                # Handle string-based before/after (e.g., config snippets)
                 elif isinstance(before, str) and isinstance(after, str):
-                    # Simple diff-like summary for text changes
                     if before == after:
                         return "No content changes detected"
-                    return f"Content changed (before: {len(before)} chars, after: {len(after)} chars)"
-                else:
-                    # Fallback for other types
-                    return f"Before: {str(before)[:100]}; After: {str(after)[:100]}"
+                    return f"Config changed (before: {len(before)} chars, after: {len(after)} chars)"
 
-            # Handle cases where 'diff' key is present (e.g., ansible.builtin.lineinfile)
+            # Handle 'diff' key (common in lineinfile or ios_config with diff mode)
             diff = result_dict.get('diff')
             if diff and isinstance(diff, list):
                 changes = []
@@ -138,7 +134,12 @@ class CallbackModule(CallbackBase):
                     return "; ".join(changes)
                 return "No diff changes detected"
 
-            # Fallback to JSON if no specific before/after or diff structure
+            # Handle 'commands' key (common in cisco.ios.ios_config)
+            commands = result_dict.get('commands')
+            if commands and isinstance(commands, list):
+                return "Applied commands: " + "; ".join(str(cmd) for cmd in commands)
+
+            # Fallback to JSON if no specific structure is found
             return json.dumps(result_dict, sort_keys=True)
         except Exception as e:
             # Fallback to string representation if parsing fails
