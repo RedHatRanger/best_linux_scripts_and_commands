@@ -1,1 +1,45 @@
-hdkdjd
+# Description: This removes the self-signed and non-self-signed crypto pki trustpoints on CISCO IOS devices
+
+---
+# tasks/main.yml
+
+# Phase 1 - Grep the running config for 'crypto pki trustpoint'
+# Get the role and save the lines for Line VTY
+- name: Import disc_line role for handlers
+  import_role:
+    name: disc_line
+
+- name: Get running config for crypto pki trustpoint
+  cisco.ios.ios_command:
+    commands:
+      - show running-config | include pki trustpoint
+  environment:
+    ANSIBLE_COMMAND_TIMEOUT: 60
+  register: trustpoint_config
+
+# Phase 2 - Extract the Self-Signed Trustpoint Names
+- name: Extract self-signed trustpoint names
+  set_fact:
+    self_signed_trustpoints: >-
+      {{ trustpoint_config.stdout[0]
+         | regex_findall(trustpoint_regex, multiline=True) }}
+  when: trustpoint_config.stdout[0] is defined
+
+# Phase 3 - Remove the Self-Signed Trustpoints
+- name: Remove trustpoints with prompt handling (ios_command version)
+  cisco.ios.ios_command:
+    commands:
+      - command: "configure terminal"
+      - command: "no crypto pki trustpoint {{ item }}"
+        prompt: "Are you sure.*"
+        answer: "yes"
+      - command: "end"
+  loop: "{{ self_signed_trustpoints }}"
+  ignore_errors: true
+  changed_when: true
+  notify:
+    - Open VTY
+    - Zeroize Keys
+    - RSA Keys 2048
+    - Harden VTY
+    - Save Configuration
