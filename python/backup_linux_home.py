@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# File: manual_backup.py
+# File: backup_linux_home.py
 # Created On: 2025-10-03 14:46:26
 # Version: v1.2
 # Description: This script runs from Windows, creates a backup of the user's Linux /home folder, then copies it to their 'C:\...\Documents\Backups' directory
