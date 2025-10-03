@@ -63,15 +63,15 @@ def create_remote_archive():
 
     # Common excludes to keep archives clean/small and avoid transient files
     excludes = [
-        "--exclude='.X11-unix'",
-        "--exclude='.dbus'",
-        "--exclude='.cache'",
-        "--exclude='.local/share/Trash'",
-        "--exclude='.gvfs'",
-        "--exclude='*.tmp'",
-        "--exclude='*.swp'",
-        "--exclude='*.lock'",
-        "--exclude='*.sock'",
+        "--exclude=.X11-unix",
+        "--exclude=.dbus",
+        "--exclude=.cache",
+        "--exclude=.local/share/Trash",
+        "--exclude=.gvfs",
+        "--exclude=*.tmp",
+        "--exclude=*.swp",
+        "--exclude=*.lock",
+        "--exclude=*.sock",
     ]
 
     tar_cmd = (
