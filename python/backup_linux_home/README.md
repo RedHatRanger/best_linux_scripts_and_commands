@@ -21,6 +21,15 @@ The script connects via SSH, creates a compressed `.tar.gz` archive of `/home`, 
 
 - On Windows:
   - Python 3.x installed (e.g., `C:\\Python311\\python.exe`)
+    - Anaconda/PowerShell setup on Windows:
+      1. Use Windows Search to find and open `Anaconda Prompt`.
+      2. Initialize Conda for PowerShell by running this:
+        ```
+        conda init
+        Setx PYTHONUTF8 1
+        ```
+      3. Restart PowerShell (close all PowerShell windows, then open a new one). Now you should see (base) automatically.
+  
   - OpenSSH client (available on modern Windows)
   - In the example, I downloaeded the python script and saved it to `C:\Users\Public\Public Documents` for ease
       with the `Weekly_Linux_Home_Backup.xml` Task Scheduler.  It can be tailored to meet the needs of the user.
