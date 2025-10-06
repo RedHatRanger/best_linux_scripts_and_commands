@@ -87,12 +87,16 @@ python backup_linux_home.py
 6. Save (enter Windows account password if prompted)
 
 ### Using an existing Task Scheduler Template XML File ( Option #2)
-1. Download the [Weekly Linux Home Backup XML File](https://gitlab.ems.nixapps.fbi/ncm-team/workstation_scripts/-/blob/main/backup_linux_home/Weekly_Linux_Home_Backup.xml)
-2. Save to `C:\Users\Public\Documents` (in this example).
+1. Download the `Weekly_Linux_Home_Backup.xml`
+2. Save to `C:\Users\Public\Documents\Python Scripts` (in this example both the XML and python script live here).
 3. Open `Task Scheduler` in `Windows`, and click `Import Task`.
-4. Browse for the XML file you downloaded in step #1. 
-5. Click on the `Trigger` tab to adjust the `date/time` and the frequency of the backups.
-6. Then click `Ok` to save the configuration.
+4. Browse for the XML file you saved step #1. 
+5. General tab:
+   - Click `Change User` and enter YOUR Domain or local Username.
+6. Trigger tab:
+   - Adjust the `date/time` and the frequency of the backups.
+7. Then click `Ok` to save the configuration.
+
 
 ---
 
