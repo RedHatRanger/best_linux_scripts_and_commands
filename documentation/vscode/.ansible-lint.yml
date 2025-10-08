@@ -1,0 +1,7 @@
+### This will force the ansible extension's linting feature to skip checking for hosts.
+### EXAMPLE ###
+# hosts: "{{ target }}"   # however, the `target: localhost` variable needs to be added to inventory/group_vars/all.yml
+
+---
+skip_list:
+  - host-pattern
