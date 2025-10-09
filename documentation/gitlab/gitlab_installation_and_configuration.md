@@ -92,7 +92,7 @@ sudo gitlab-rake gitlab:backup:create
 sudo gitlab-ctl backup-etc
 
 # GitLab Backup Schedule (6pm EST daily):
-0 18 * * * /usr/bin/gitlab-rake gitlab:backup:create CRON=1
+0 18 * * * /usr/bin/gitlab-rake gitlab:backup:create CRON=1 > /dev/null 2>&1
 ```
 
 ## Reconfigure GitLab: Anytime the /etc/gitlab/gitlab.rb file is changed:
@@ -100,3 +100,4 @@ sudo gitlab-ctl backup-etc
 sudo gitlab-ctl reconfigure
 sudo gitlab-ctl status
 ```
+
