@@ -54,7 +54,7 @@ openssl req -new -newkey rsa:2048 -nodes -keyout <fqdn>.key -out newcsrrequest.c
 # <your_state>
 # <your_city>
 # <organization>
-# NMU
+# <your_team_name>
 # <fqdn>
 # PRESS ENTER
 # PRESS ENTER
@@ -100,4 +100,3 @@ sudo gitlab-ctl backup-etc
 sudo gitlab-ctl reconfigure
 sudo gitlab-ctl status
 ```
-
