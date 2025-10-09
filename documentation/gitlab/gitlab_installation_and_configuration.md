@@ -100,4 +100,3 @@ sudo gitlab-ctl backup-etc
 sudo gitlab-ctl reconfigure
 sudo gitlab-ctl status
 ```
-
