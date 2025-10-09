@@ -24,7 +24,7 @@ gitlab_rails['gitlab_email_from'] = 'teamgitlab@<domain>'
 gitlab_rails['gitlab_email_display_name'] = 'GitLab'
 gitlab_rails['impersonation_enabled'] = false
 gitlab_rails['manage_backup_path'] = true
-gitlab_rails['backup_path'] = "/var/log/gitlab/backups"
+gitlab_rails['backup_path'] = "/var/opt/gitlab/backups"
 gitlab_rails['backup_keep_time'] = 604800
 prometheus['enable'] = false
 node_exporter['enable'] = false
@@ -100,3 +100,4 @@ sudo gitlab-ctl backup-etc
 sudo gitlab-ctl reconfigure
 sudo gitlab-ctl status
 ```
+
