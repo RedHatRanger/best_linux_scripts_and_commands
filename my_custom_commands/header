@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 
-#################################################################
-# SAVE AS /usr/local/bin/header & chmod 755 the file.
-# THEN SET THIS IN YOUR ~/.vimrc or globally in /etc/vim/vimrc: autocmd FileType yaml setlocal et ai ts=2 sw=2 sts=2 
-#################################################################
-# Behavior summary
-# - If Author exists: preserved as-is.
-# - If Author missing: added with the provided or current user.
-# - Modified By: always set to the provided or current user on updates; added on new headers.
-# - Created On: preserved if present; otherwise set once.
-# - Last Modified: always updated.
-# - Description: preserved unless you pass --desc "-" to force preserving
-# - Version: starts at v1.0 and increments by 0.1 on each modification
-###############################################################################
+##############################################################################################
+# SAVE AS /usr/local/bin/header & chmod 755 the file.                                        #
+# THEN SET THIS IN YOUR ~/.vimrc or globally in /etc/vim/vimrc:                              #
+#                           autocmd FileType yaml setlocal et ai ts=2 sw=2 sts=2             #
+##############################################################################################
+# Behavior summary                                                                           #
+# - If Author exists: preserved as-is.                                                       #
+# - If Author missing: added with the provided or current user.                              #
+# - Modified By: always set to the provided or current user on updates; added on new headers.#
+# - Created On: preserved if present; otherwise set once.                                    #
+# - Last Modified: always updated.                                                           #
+# - Description: preserved unless you pass --desc "-" to force preserving                    #
+# - Version: starts at v1.0 and increments by 0.1 on each modification                       #
+##############################################################################################
 
 set -euo pipefail
 
