@@ -86,7 +86,16 @@ sudo chmod -R 600 /etc/gitlab/ssl
 sudo sed -i 's/http/https/g' /etc/gitlab/gitlab.rb  # Changes this line to: external_url 'https://<cname_fqdn>'
 ```
 
-## Reconfigure GitLab:
+## Backups:
+```bash
+sudo gitlab-rake gitlab:backup:create
+sudo gitlab-ctl backup-etc
+
+# GitLab Backup Schedule (6pm EST daily):
+0 18 * * * /usr/bin/gitlab-rake gitlab:backup:create CRON=1
+```
+
+## Reconfigure GitLab: Anytime the /etc/gitlab/gitlab.rb file is changed:
 ```bash
 sudo gitlab-ctl reconfigure
 sudo gitlab-ctl status
