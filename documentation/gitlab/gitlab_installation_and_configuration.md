@@ -100,3 +100,12 @@ sudo gitlab-ctl backup-etc
 sudo gitlab-ctl reconfigure
 sudo gitlab-ctl status
 ```
+
+---
+
+## Restoration (only if necessary for Recovery):
+```bash
+# SAMPLE
+sudo gitlab-rake gitlab:backup:restore BACKUP=1699999999_2024_10_01_16.11.2
+```
+
