@@ -1,0 +1,74 @@
+---
+- name: System Reconnaissance Playbook
+  hosts: all
+  gather_facts: yes
+  become: yes
+
+  tasks:
+    - name: Get kernel version (running)
+      command: uname -r
+      register: kernel_version
+      changed_when: false
+
+    - name: Get RHEL OS version
+      command: cat /etc/redhat-release
+      register: rhel_version
+      changed_when: false
+
+    - name: Check available kernel package version (latest in repos)
+      shell: yum -q list available kernel --showduplicates | awk '/^kernel\./{ver=$$2} END{print ver}'
+      register: available_kernel
+      changed_when: false
+      failed_when: false
+
+    - name: Normalize versions for comparison
+      set_fact:
+        running_kernel_pkgver: "{{ (kernel_version.stdout | regex_replace('\\.x86_64$$', '')) | trim }}"
+        available_kernel_pkgver: "{{ (available_kernel.stdout | regex_replace('\\.x86_64$$', '')) | trim }}"
+
+    - name: Determine available kernel display text
+      set_fact:
+        available_kernel_display: >-
+          {{
+            'No new kernel update available'
+            if (available_kernel_pkgver | length == 0) or
+               (available_kernel_pkgver in running_kernel_pkgver) or
+               (running_kernel_pkgver in available_kernel_pkgver)
+            else available_kernel_pkgver
+          }}
+
+    - name: Check number of available yum updates
+      shell: yum -q check-update || true
+      register: check_update_output
+      changed_when: false
+
+    - name: Derive count of available updates
+      set_fact:
+        yum_updates_count: >-
+          {{ (check_update_output.stdout_lines
+              | select('match', '^[^\\s].*')            # non-empty, non-header lines
+              | reject('search', '^Last metadata')
+              | reject('search', '^Loaded plugins')
+              | reject('search', '^Security:')
+              | reject('search', '^Obsoleting Packages')
+              | list) | length }}
+
+    - name: Get last system patch date from yum history
+      shell: yum history | awk 'NF && $$1 ~ /^[0-9]+$$/ {print $$0; exit}' | awk '{print $$(NF-2), $$(NF-1), $NF}'
+      register: last_patch_date
+      changed_when: false
+      failed_when: false
+
+    - name: Display system reconnaissance information
+      debug:
+        msg:
+          - "=========================================="
+          - "System Reconnaissance Report"
+          - "=========================================="
+          - "Hostname: {{ ansible_hostname }}"
+          - "Current Kernel Version: {{ kernel_version.stdout }}"
+          - "Available Kernel Version: {{ available_kernel_display }}"
+          - "RHEL OS Version: {{ rhel_version.stdout }}"
+          - "Available Yum Updates: {{ yum_updates_count }}"
+          - "Last Patch Date: {{ last_patch_date.stdout | default('Unknown') }}"
+          - "=========================================="
