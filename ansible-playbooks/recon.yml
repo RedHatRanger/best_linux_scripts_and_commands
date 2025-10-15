@@ -8,21 +8,11 @@
     target: localhost
 
   tasks:
-    - name: Get Current Kernel Version
-      command: uname -r
-      register: kernel_version
-      changed_when: false
-
-    - name: Get Current RHEL OS Version
-      command: cat /etc/redhat-release
-      register: rhel_version
-      changed_when: false
-
     - name: Refresh package metadata
       shell: yum -q makecache || true
       changed_when: false
 
-    - name: Check for the Latest Available Kernel Version
+    - name: Determine latest available kernel package version
       shell: >
         yum -q list --showduplicates kernel 2>/dev/null |
         awk '/^kernel(\.|[[:space:]])/{ver=$2} END{print ver}'
@@ -30,20 +20,7 @@
       changed_when: false
       failed_when: false
 
-    - name: Normalize and compare kernel versions
-      set_fact:
-        running_kernel_pkgver: "{{ kernel_version.stdout | regex_replace('\\.x86_64$', '') | trim }}"
-        available_kernel_pkgver: "{{ available_kernel.stdout | regex_replace('\\.x86_64$', '') | trim }}"
-        available_kernel_display: >-
-          {{
-            'No new kernel update available'
-            if (available_kernel_pkgver | length == 0) or
-               (running_kernel_pkgver in available_kernel_pkgver) or
-               (available_kernel_pkgver in running_kernel_pkgver)
-            else available_kernel_pkgver
-          }}
-
-    - name: Get available update list (quiet)
+    - name: Get available updates list (quiet)
       shell: yum -q check-update || true
       register: check_update_output
       changed_when: false
@@ -62,22 +39,37 @@
             | list) | length
           }}
 
-    - name: Get last system patch date from yum history (using cut and awk)
+    - name: Get last patch date from yum history (pipe-delimited parse)
       shell: yum -q history list | cut -d "|" -f3 | awk 'NR==3{print $1, $2, $3}'
       register: last_patch_date
       changed_when: false
       failed_when: false
 
-    - name: Display system reconnaissance information
+    - name: Normalize kernel comparison values using facts
+      set_fact:
+        current_kernel: "{{ ansible_facts.kernel | default(ansible_kernel) }}"
+        os_version: "{{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}"
+        available_kernel_pkgver: "{{ available_kernel.stdout | regex_replace('\\.x86_64$', '') | trim }}"
+        running_kernel_pkgver: "{{ (ansible_facts.kernel | default(ansible_kernel)) | regex_replace('\\.x86_64$', '') | trim }}"
+        available_kernel_display: >-
+          {{
+            'No new kernel update available'
+            if (available_kernel_pkgver | length == 0) or
+               (running_kernel_pkgver in available_kernel_pkgver) or
+               (available_kernel_pkgver in running_kernel_pkgver)
+            else available_kernel_pkgver
+          }}
+
+    - name: Display system reconnaissance information (facts-first)
       debug:
         msg:
           - "=========================================="
           - "System Reconnaissance Report"
           - "=========================================="
-          - "Hostname: {{ ansible_hostname }}"
-          - "Current Kernel Version: {{ kernel_version.stdout }}"
+          - "Hostname: {{ ansible_facts.hostname }}"
+          - "Current Kernel Version: {{ current_kernel }}"
           - "Available Kernel Version: {{ available_kernel_display }}"
-          - "RHEL OS Version: {{ rhel_version.stdout }}"
+          - "RHEL OS Version: {{ os_version }}"
           - "Available Yum Updates: {{ available_updates_count }}"
           - "Last Patch Date: {{ last_patch_date.stdout | trim | default('Unknown', true) }}"
           - "=========================================="
