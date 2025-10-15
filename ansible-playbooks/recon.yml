@@ -2,8 +2,8 @@
 ---
 - name: System Reconnaissance Playbook (RHEL 8/9 with yum)
   hosts: "{{ target }}"
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   vars:
     target: localhost
 
