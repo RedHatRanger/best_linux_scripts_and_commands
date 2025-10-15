@@ -1,61 +1,69 @@
 # 2025-10-14
 ---
-- name: System Reconnaissance Playbook
-  hosts: all
+- name: System Reconnaissance Playbook (RHEL 8/9 with yum)
+  hosts: "{{ target }}"
   gather_facts: yes
   become: yes
+  vars:
+    target: localhost
 
   tasks:
-    - name: Get kernel version (running)
+    - name: Get Current Kernel Version
       command: uname -r
       register: kernel_version
       changed_when: false
 
-    - name: Get RHEL OS version
+    - name: Get Current RHEL OS Version
       command: cat /etc/redhat-release
       register: rhel_version
       changed_when: false
 
-    - name: Check available kernel package version (latest in repos)
-      shell: yum -q list available kernel --showduplicates | awk '/^kernel\./{ver=$$2} END{print ver}'
+    - name: Refresh package metadata (best effort)
+      shell: yum -q makecache || true
+      changed_when: false
+
+    - name: Check latest available kernel package version
+      shell: >
+        yum -q list --showduplicates kernel 2>/dev/null |
+        awk '/^kernel(\.|[[:space:]])/{ver=$2} END{print ver}'
       register: available_kernel
       changed_when: false
       failed_when: false
 
-    - name: Normalize versions for comparison
+    - name: Normalize and compare kernel versions
       set_fact:
-        running_kernel_pkgver: "{{ (kernel_version.stdout | regex_replace('\\.x86_64$$', '')) | trim }}"
-        available_kernel_pkgver: "{{ (available_kernel.stdout | regex_replace('\\.x86_64$$', '')) | trim }}"
-
-    - name: Determine available kernel display text
-      set_fact:
+        running_kernel_pkgver: "{{ kernel_version.stdout | regex_replace('\\.x86_64$', '') | trim }}"
+        available_kernel_pkgver: "{{ available_kernel.stdout | regex_replace('\\.x86_64$', '') | trim }}"
         available_kernel_display: >-
           {{
             'No new kernel update available'
             if (available_kernel_pkgver | length == 0) or
-               (available_kernel_pkgver in running_kernel_pkgver) or
-               (running_kernel_pkgver in available_kernel_pkgver)
+               (running_kernel_pkgver in available_kernel_pkgver) or
+               (available_kernel_pkgver in running_kernel_pkgver)
             else available_kernel_pkgver
           }}
 
-    - name: Check number of available yum updates
+    - name: Get available update list (quiet)
       shell: yum -q check-update || true
       register: check_update_output
       changed_when: false
 
-    - name: Derive count of available updates
+    - name: Count available updates (filter headers/sections)
       set_fact:
-        yum_updates_count: >-
-          {{ (check_update_output.stdout_lines
-              | select('match', '^[^\\s].*')            # non-empty, non-header lines
-              | reject('search', '^Last metadata')
-              | reject('search', '^Loaded plugins')
-              | reject('search', '^Security:')
-              | reject('search', '^Obsoleting Packages')
-              | list) | length }}
+        available_updates_count: >-
+          {{
+            (check_update_output.stdout_lines
+            | select('match', '^[^[:space:]].*')
+            | reject('search', '^Last metadata')
+            | reject('search', '^Loaded plugins')
+            | reject('search', '^Security:')
+            | reject('search', '^Obsoleting Packages')
+            | reject('search', '^Available Packages')
+            | list) | length
+          }}
 
-    - name: Get last system patch date from yum history
-      shell: yum history | awk 'NF && $$1 ~ /^[0-9]+$$/ {print $$0; exit}' | awk '{print $$(NF-2), $$(NF-1), $NF}'
+    - name: Get last system patch date from yum history (using cut and awk)
+      shell: yum -q history list | cut -d "|" -f3 | awk 'NR==3{print $1, $2, $3}'
       register: last_patch_date
       changed_when: false
       failed_when: false
@@ -70,6 +78,6 @@
           - "Current Kernel Version: {{ kernel_version.stdout }}"
           - "Available Kernel Version: {{ available_kernel_display }}"
           - "RHEL OS Version: {{ rhel_version.stdout }}"
-          - "Available Yum Updates: {{ yum_updates_count }}"
-          - "Last Patch Date: {{ last_patch_date.stdout | default('Unknown') }}"
+          - "Available Yum Updates: {{ available_updates_count }}"
+          - "Last Patch Date: {{ last_patch_date.stdout | trim | default('Unknown', true) }}"
           - "=========================================="
