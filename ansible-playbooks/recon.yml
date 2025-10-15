@@ -18,11 +18,11 @@
       register: rhel_version
       changed_when: false
 
-    - name: Refresh package metadata (best effort)
+    - name: Refresh package metadata
       shell: yum -q makecache || true
       changed_when: false
 
-    - name: Check latest available kernel package version
+    - name: Check for the Latest Available Kernel Version
       shell: >
         yum -q list --showduplicates kernel 2>/dev/null |
         awk '/^kernel(\.|[[:space:]])/{ver=$2} END{print ver}'
