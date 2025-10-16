@@ -1,11 +1,9 @@
 # 2025-10-14
 ---
-- name: System Reconnaissance Playbook (RHEL 8/9 with yum)
+- name: System Reconnaissance Playbook
   hosts: "{{ target }}"
   gather_facts: true
   become: true
-  vars:
-    target: localhost
 
   tasks:
     - name: Refresh package metadata
@@ -14,13 +12,12 @@
 
     - name: Determine latest available kernel package version
       shell: >
-        yum -q list --showduplicates kernel 2>/dev/null |
-        awk '/^kernel(\.|[[:space:]])/{ver=$2} END{print ver}'
+        yum -q list --showduplicates kernel 2>/dev/null | awk '/^kernel(\.|[[:space:]])/{ver=$2} END{print ver}'
       register: available_kernel
       changed_when: false
       failed_when: false
 
-    - name: Get available updates list (quiet)
+    - name: Check number of available yum updates
       shell: yum -q check-update || true
       register: check_update_output
       changed_when: false
@@ -51,16 +48,19 @@
         os_version: "{{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}"
         available_kernel_pkgver: "{{ available_kernel.stdout | regex_replace('\\.x86_64$', '') | trim }}"
         running_kernel_pkgver: "{{ (ansible_facts.kernel | default(ansible_kernel)) | regex_replace('\\.x86_64$', '') | trim }}"
+
+    - name: Compute available kernel to display
+      set_fact:
         available_kernel_display: >-
           {{
             'No new kernel update available'
-            if (available_kernel_pkgver | length == 0) or
-               (running_kernel_pkgver in available_kernel_pkgver) or
-               (available_kernel_pkgver in running_kernel_pkgver)
+            if (available_kernel_pkgver | length == 0)
+               or (running_kernel_pkgver in available_kernel_pkgver)
+               or (available_kernel_pkgver in running_kernel_pkgver)
             else available_kernel_pkgver
           }}
 
-    - name: Display system reconnaissance information (facts-first)
+    - name: Display system reconnaissance information
       debug:
         msg:
           - "=========================================="
