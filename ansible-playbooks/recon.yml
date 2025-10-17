@@ -18,31 +18,17 @@
       failed_when: false
 
     - name: Check number of available yum updates
-      shell: yum -q check-update || true
-      register: check_update_output
+      shell: yum check-update | grep .el | wc -l
+      register: available_updates_count
       changed_when: false
 
-    - name: Count available updates (filter headers/sections)
-      set_fact:
-        available_updates_count: >-
-          {{
-            (check_update_output.stdout_lines
-            | select('match', '^[^[:space:]].*')
-            | reject('search', '^Last metadata')
-            | reject('search', '^Loaded plugins')
-            | reject('search', '^Security:')
-            | reject('search', '^Obsoleting Packages')
-            | reject('search', '^Available Packages')
-            | list) | length
-          }}
-
-    - name: Get last patch date from yum history (pipe-delimited parse)
+    - name: Get last patch date from yum history
       shell: yum -q history list | cut -d "|" -f3 | awk 'NR==3{print $1, $2, $3}'
       register: last_patch_date
       changed_when: false
       failed_when: false
 
-    - name: Normalize kernel comparison values using facts
+    - name: Normalize kernel comparison values using ansible_facts
       set_fact:
         current_kernel: "{{ ansible_facts.kernel | default(ansible_kernel) }}"
         os_version: "{{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}"
@@ -60,7 +46,7 @@
             else available_kernel_pkgver
           }}
 
-    - name: Display system reconnaissance information
+    - name: Display System Reconnaissance Information
       debug:
         msg:
           - "=========================================="
@@ -70,6 +56,6 @@
           - "Current Kernel Version: {{ current_kernel }}"
           - "Available Kernel Version: {{ available_kernel_display }}"
           - "RHEL OS Version: {{ os_version }}"
-          - "Available Yum Updates: {{ available_updates_count }}"
+          - "Available Yum Updates: {{ available_updates_count.stdout }}"
           - "Last Patch Date: {{ last_patch_date.stdout | trim | default('Unknown', true) }}"
           - "=========================================="
