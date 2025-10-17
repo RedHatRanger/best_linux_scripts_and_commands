@@ -65,7 +65,7 @@
     - name: Saving the 'recon_report' to '/tmp' directory
       template:
         src: ../templates/recon_report.j2
-        dest: /tmp/recon_report-{{ ansible_date_time.iso8601_basic_short }}.txt
+        dest: /tmp/recon_report.txt
         mode: 755
         owner: root
         group: ems
