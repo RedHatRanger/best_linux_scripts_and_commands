@@ -59,3 +59,17 @@
           - "Available Yum Updates: {{ available_updates_count.stdout }}"
           - "Last Patch Date: {{ last_patch_date.stdout | trim | default('Unknown', true) }}"
           - "=========================================="
+      tags:
+        - never
+    
+    - name: Saving the 'recon_report' to '/tmp' directory
+      template:
+        src: ../templates/recon_report.j2
+        dest: /tmp/recon_report-{{ ansible_date_time.iso8601_basic_short }}.txt
+        mode: 755
+        owner: root
+        group: ems
+
+    - name: Inform the user of the report's location
+      debug:
+        msg: "Please check the '/tmp' directory for the saved file results"
