@@ -1,0 +1,16 @@
+---
+# recon_report-{{ ansible_date_time.iso8601_basic_short }}.txt
+
+{% for host_name in groups['linux'] %}
+
+
+===============================================================
+System Reconnaissance Report for {{ hostvars[host_name]['ansible_facts']['fqdn'] }}
+===============================================================
+Current Kernel Version:.....{{ hostvars[host_name]['current_kernel'] }}
+Available Kernel Version:...{{ hostvars[host_name]['available_kernel_display'] }}
+RHEL OS Version:............{{ hostvars[host_name]['os_version'] }}
+Available Yum Updates:......{{ hostvars[host_name].available_updates_count.stdout }}
+Last Patch Date:............{{ hostvars[host_name].last_patch_date.stdout | trim }}
+===============================================================
+{% endfor %}
