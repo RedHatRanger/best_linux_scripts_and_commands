@@ -1,0 +1,22 @@
+---
+- name: Ensure assigned_group is initialized
+  ansible.builtin.set_fact:
+    assigned_group: "{{ default_group }}"
+  vars:
+    default_group: "{{ hostname_patterns | map(attribute='group') | first | default('ungrouped') }}"
+
+- name: Match hostname against patterns (case-insensitive)
+  ansible.builtin.set_fact:
+    assigned_group: "{{ item.group }}"
+  loop: "{{ hostname_patterns }}"
+  loop_control:
+    label: "{{ item.group }}"
+  when: inventory_hostname is regex(item.pattern, ignorecase=True)
+
+- name: Debug final group assignment
+  ansible.builtin.debug:
+    msg: "Host {{ inventory_hostname }} → dynamic group: {{ assigned_group }}"
+
+- name: Add host to dynamic group
+  ansible.builtin.group_by:
+    key: "{{ assigned_group }}"

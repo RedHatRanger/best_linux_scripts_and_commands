@@ -1,0 +1,16 @@
+---
+# Hostname pattern to group mapping
+# Order matters: later matches override earlier ones
+hostname_patterns:
+  - pattern: '-jim-'          # High-priority (e.g. special admin devices)
+    group: 'group_b'
+  - pattern: '-(a|ben)-'      # Standard group A
+    group: 'group_a'
+  # Add more patterns below:
+  # - pattern: '-john-'
+  #   group: 'group_c'
+  # - pattern: '-(prod|staging)-'
+  #   group: 'environment_{{ match.0 }}'
+
+# Optional: Default group for unmatched hosts
+default_group: ungrouped
