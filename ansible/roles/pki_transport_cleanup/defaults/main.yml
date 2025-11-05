@@ -1,3 +1,0 @@
----
-# defaults/main.yml
-trustpoint_regex: '^crypto pki trustpoint(\S+)'
