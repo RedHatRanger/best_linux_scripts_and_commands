@@ -112,17 +112,35 @@ LESSONS_DATA = [
         "hint": "Remember that data types matter! An integer is not the same as a string.",
         "type": "exact_match"
     },
-    # --- LESSON 13 ---
     {
         "concept": "Comparison Operators: Greater Than/Less Than (<, >) ⬆️⬇️",
-        "instruction": "The **Greater Than** (`>`) and **Less Than** (`<`) operators are used to check the size relationship between two numbers. They form the basis of most conditional checks in programming.",
-        "example": '`is_small = 5 < 10`\n# Output: True\n`is_large = 20 > 50`\n# Output: False',
+        "instruction": "The **Greater Than** (`>`) and **Less Than** (`<`) operators are used to check the size relationship between two numbers.",
+        "example": '`is_small = 5 < 10`\n# Output: True',
         "challenge": "Challenge: Create a variable named **`is_valid_score`** and assign it the result of checking if the number **75** is greater than the number **50**.",
         "answer": "is_valid_score = 75 > 50",
-        "hint": "Use the correct operator to compare the two numbers. The resulting Boolean should reflect the truth of the statement.",
+        "hint": "Use the correct operator to compare the two numbers.",
         "type": "exact_match"
+    },
+    {
+        "concept": "Comparison Operators: Greater Than/Less Than or Equal To (<=, >=) 💯",
+        "instruction": "These combined operators are used when the boundary condition itself is acceptable. The order matters: the sign (>, <) must come before the equals sign (=).",
+        "example": '`passing = score >= 70`\n# True if 70 or higher',
+        "challenge": "Challenge: Create a variable named **`is_passing`** and assign it the result of checking if a score of **85** is greater than or equal to **70**.",
+        "answer": "is_passing = 85 >= 70",
+        "hint": "Ensure the comparison operator is written correctly: the greater-than sign comes before the equals sign.",
+        "type": "exact_match"
+    },
+    # --- LESSON 15 ---
+    {
+        "concept": "Control Flow: The `if` Statement and Indentation ✅",
+        "instruction": "The `if` statement executes a block of code only if its condition is `True`. It must end with a colon (`:`). The code block that executes if the condition is true MUST be indented by 4 spaces or one tab.",
+        "example": '`score = 90`\n`if score > 80:`\n`    print("Great job!")`\n# Output: Great job!',
+        "challenge": "Challenge: Write a complete `if` statement that checks if the variable **`is_rainy`** is equal to **`True`**. If it is, print the string **'Bring an umbrella.'** (Remember the colon and the 4-space indentation for the print line!)",
+        "answer": "if is_rainy == True:\n    print('Bring an umbrella.')",
+        "hint": "The first line needs `if` and a condition ending in a colon. The second line must start with 4 spaces.",
+        "type": "if_statement"
     }
-    # --- END LESSON 13 ---
+    # --- END LESSON 15 ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -176,34 +194,65 @@ def unlock_all_lessons():
 
 # --- 3. Core Logic ---
 
+def normalize_code(code: str) -> str:
+    """Normalizes whitespace and quotes for comparison."""
+    # Replace common quote variations with single quotes for consistent comparison
+    normalized = code.replace('"', "'").strip()
+    
+    # Normalize indentation to 4 spaces
+    lines = normalized.split('\n')
+    normalized_lines = []
+    for line in lines:
+        if line.lstrip() != line: # If line is indented
+            # Replace any leading tabs or mixed spaces/tabs with 4 spaces
+            line = '    ' + line.lstrip()
+        normalized_lines.append(line)
+        
+    return '\n'.join(normalized_lines).strip()
+
 def check_code_submission(user_code: str):
     """Checks the submitted code."""
     st.session_state.attempts += 1
     
     current_lesson = LESSONS_DATA[st.session_state.q_index]
-    required_answer = current_lesson["answer"].strip()
-    user_code_stripped = user_code.strip()
+    required_answer = normalize_code(current_lesson["answer"])
+    user_code_normalized = normalize_code(user_code)
     
     is_correct = False
     match_type = current_lesson.get("type")
 
-    if match_type == "concatenation_flexible":
+    if match_type == "if_statement":
+        # Specific check for multi-line if statement (Lesson 15)
+        # Allows flexible quoting on the print string and flexible spacing/tabs, 
+        # as long as normalization results in the correct structure.
+        
+        # We'll rely on the robust normalization above, which handles whitespace and tabs.
+        # Check against the normalized required answer.
+        is_correct = (user_code_normalized == required_answer)
+        
+        # Allow simplified 'if is_rainy:' which is the Pythonic way for checking True
+        if not is_correct:
+            simplified_required = normalize_code("if is_rainy:\n    print('Bring an umbrella.')")
+            is_correct = (user_code_normalized == simplified_required)
+            
+    elif match_type == "concatenation_flexible":
+        # Logic for L7: full_city = city + ' Bridge'
         pattern = re.compile(
             r"^full_city\s*=\s*city\s*\+\s*['\"] Bridge['\"]\s*$", 
             re.IGNORECASE 
         )
-        is_correct = bool(pattern.match(user_code_stripped))
+        is_correct = bool(pattern.match(user_code.strip()))
         
     elif match_type == "quote_flexible":
-        # Check for Lesson 11 (index 10) comparison: result_match = 'Python' == 'python'
+        # Logic for L11 (Comparison)
         if st.session_state.q_index == 10:
             p = re.compile(
                 r"^result_match\s*=\s*['\"]Python['\"]\s*==\s*['\"]python['\"]\s*$", 
                 re.IGNORECASE 
             )
-            is_correct = bool(p.match(user_code_stripped))
+            is_correct = bool(p.match(user_code.strip()))
         
-        # Check for Lesson 2 (index 1) assignment: city = 'London'
+        # Logic for L2 (Variable Assignment)
         elif st.session_state.q_index == 1: 
              var_name, var_value_quoted = required_answer.split('=', 1)
              var_value = var_value_quoted.strip().strip("'\"") 
@@ -212,13 +261,13 @@ def check_code_submission(user_code: str):
                 rf"^{re.escape(var_name)}\s*=\s*['\"]{re.escape(var_value)}['\"]$", 
                 re.IGNORECASE 
              )
-             is_correct = bool(pattern.match(user_code_stripped))
+             is_correct = bool(pattern.match(user_code.strip()))
         else:
-             is_correct = (user_code_stripped == required_answer)
+             is_correct = (user_code_normalized == required_answer)
                 
     else:
-        # Exact Match Logic (L12 and L13 fall here)
-        is_correct = (user_code_stripped == required_answer)
+        # Exact Match Logic (L1, L3, L4, L5, L6, L8, L9, L10, L12, L13, L14)
+        is_correct = (user_code_normalized == required_answer)
 
     if is_correct:
         current_index = st.session_state.q_index
@@ -232,7 +281,15 @@ def check_code_submission(user_code: str):
         
     else:
         st.session_state.correct = False
-        st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
+        
+        # Provide a specific warning for the indentation lesson
+        if match_type == "if_statement":
+             st.error(
+                f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
+                "Double-check your **COLON** (`:`) and the **4-space indentation** before the `print` line!"
+            )
+        else:
+            st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
 
 
 # --- 4. Display Functions ---
@@ -256,11 +313,19 @@ def display_lesson(lesson_data):
     
     # 2. User Input Area (Code Editor)
     input_key = f"code_input_{st.session_state.q_index}" 
+    
+    # Pre-fill with answer if passed, otherwise empty
+    prefill_value = LESSONS_DATA[st.session_state.q_index]["answer"] if is_permanently_passed else ""
+    
+    # Provide a placeholder for the multi-line input
+    if st.session_state.q_index == 14 and not is_permanently_passed:
+        prefill_value = "if is_rainy == True:\n    "
+
     user_code = st.text_area(
-        "Type your Python command below and click 'Submit' (Case and syntax matter for non-string parts!)",
-        height=100,
+        "Type your Python command(s) below and click 'Submit'. Be precise with indentation!",
+        height=150 if st.session_state.q_index == 14 else 100,
         key=input_key,
-        value=lesson_data["answer"] if is_permanently_passed else ""
+        value=prefill_value
     )
     
     # 3. Submission Logic
@@ -287,11 +352,17 @@ def display_lesson(lesson_data):
         st.button("Next Lesson >>", on_click=next_lesson)
         
     elif st.session_state.attempts > 0:
-        st.error(
-            f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
-            "Please check your capitalization, quotes, and spacing, and type the command again."
-        )
-        if st.session_state.attempts >= 2:
+        if st.session_state.attempts < 2:
+            st.error(
+                f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
+                "Please check your capitalization, quotes, and spacing, and type the command again."
+            )
+        else:
+            # Display retry/error message with hint option
+            st.error(
+                f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
+                "The command didn't match the required syntax."
+            )
             with st.expander("💡 Show Hint"):
                 st.info(lesson_data["hint"])
 
