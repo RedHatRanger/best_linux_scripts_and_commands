@@ -1,8 +1,9 @@
 import streamlit as st
 import random
 import re
+import pandas as pd # <-- Note: Included for completeness, though not strictly needed for the syntax checker
 
-# --- 1. Question/Lesson Data (The Content - Now 51 Lessons) ---
+# --- 1. Question/Lesson Data (The Content - Now 54 Lessons) ---
 LESSONS_DATA = [
     {
         "concept": "Hello World - The Print Statement 🌎",
@@ -436,7 +437,7 @@ LESSONS_DATA = [
         "hint": "Use curly braces `{}` and only list the unique values you want to be included.",
         "type": "set_creation"
     },
-    { # L49 (Index 48)
+    { 
         "concept": "Set Operations: Union (`|`) 🤝",
         "instruction": "The **Union** operation combines all unique elements from two or more sets. It is performed using the pipe character (`|`) operator or the `.union()` method.",
         "example": '`A = {1, 2}`\n`B = {2, 3}`\n`C = A | B`\n# C is {1, 2, 3}`',
@@ -445,7 +446,7 @@ LESSONS_DATA = [
         "hint": "The result is assigned to the new variable, using the pipe operator between the two sets.",
         "type": "set_union"
     },
-    { # L50 (Index 49)
+    { 
         "concept": "Set Operations: Intersection (`&`) 🎯",
         "instruction": "The **Intersection** operation returns only the elements that are common to both sets. It is performed using the ampersand character (`&`) operator or the `.intersection()` method.",
         "example": '`A = {1, 2}`\n`B = {2, 3}`\n`C = A & B`\n# C is {2}`',
@@ -454,7 +455,7 @@ LESSONS_DATA = [
         "hint": "Use the ampersand operator (`&`) between the two sets.",
         "type": "set_intersection"
     },
-    { # L51 (Index 50)
+    { 
         "concept": "Error Handling: The `try...except` Block 🛡️",
         "instruction": "Use a **`try`** block to execute code that might cause an error, and an **`except`** block to handle the error gracefully if it occurs. Both require a colon (`:`).",
         "example": '`try:`\n`    result = 10 / 0  # This raises an error`\n`except:`\n`    print("Cannot divide by zero.")`',
@@ -462,8 +463,35 @@ LESSONS_DATA = [
         "answer": "try:\n    print('Attempting code...')\nexcept:\n    print('An error occurred.')",
         "hint": "Remember the colon on both `try:` and `except:`, and ensure the print statements are indented.",
         "type": "try_except_block"
+    },
+    { # L52 (Index 51)
+        "concept": "Pandas: Importing the Library 🐼",
+        "instruction": "The **Pandas** library is the foundation of data analysis in Python. It is almost universally imported using the alias **`pd`** for brevity. This is the first step in any data project.",
+        "example": '`import numpy as np`',
+        "challenge": "Challenge: Write the single line of code to import the **`pandas`** library using the standard alias **`pd`**.",
+        "answer": "import pandas as pd",
+        "hint": "Use `import`, the library name, `as`, and the alias `pd`.",
+        "type": "exact_match"
+    },
+    { # L53 (Index 52)
+        "concept": "Pandas Series: Creation from a List 📈",
+        "instruction": "A Pandas **Series** is a one-dimensional labeled array (like a column in a spreadsheet). You create one by calling the **`pd.Series()`** constructor and passing it a standard Python list.",
+        "example": '`data = [10, 20, 30]`\n`s = pd.Series(data)`',
+        "challenge": "Challenge: Assume a list named **`temperatures`** exists. Create a Pandas Series named **`temp_series`** by passing the `temperatures` list to the **`pd.Series()`** constructor.",
+        "answer": "temp_series = pd.Series(temperatures)",
+        "hint": "Remember to use the alias `pd` and ensure the argument is correctly passed in parentheses.",
+        "type": "exact_match"
+    },
+    { # L54 (Index 53)
+        "concept": "Pandas DataFrame: Creation from a Dictionary 📊",
+        "instruction": "A **DataFrame** is a two-dimensional labeled data structure (like a whole spreadsheet or SQL table). It is usually created by passing a **dictionary** of lists (where keys become column names and values become the column data) to the **`pd.DataFrame()`** constructor.",
+        "example": '`data = {"A": [1, 2], "B": [3, 4]}`\n`df = pd.DataFrame(data)`',
+        "challenge": "Challenge: Assume a dictionary named **`data_dict`** exists. Create a Pandas DataFrame named **`user_df`** by passing the `data_dict` to the **`pd.DataFrame()`** constructor.",
+        "answer": "user_df = pd.DataFrame(data_dict)",
+        "hint": "Use the assignment operator (`=`) and the constructor with the alias: `pd.DataFrame()`.",
+        "type": "exact_match"
     }
-    # --- END LESSONS (51 Total) ---
+    # --- END LESSONS (54 Total) ---
 ]
 
 # --- 2. Game State Management & Callbacks (No Change) ---
@@ -559,10 +587,38 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
-    # --- LOGIC FOR NEW LESSONS 49-51 ---
+    # --- LOGIC FOR NEW LESSONS 52-54 ---
     
+    # LESSON 54 (Index 53): pd.DataFrame creation
+    if match_type == "exact_match" and current_lesson["concept"].startswith("Pandas DataFrame:"):
+        # Check for user_df = pd.DataFrame(data_dict)
+        pattern = re.compile(
+            r"^user_df\s*=\s*pd\.DataFrame\s*\(\s*data_dict\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+    
+    # LESSON 53 (Index 52): pd.Series creation
+    elif match_type == "exact_match" and current_lesson["concept"].startswith("Pandas Series:"):
+        # Check for temp_series = pd.Series(temperatures)
+        pattern = re.compile(
+            r"^temp_series\s*=\s*pd\.Series\s*\(\s*temperatures\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+    
+    # LESSON 52 (Index 51): import pandas as pd
+    elif match_type == "exact_match" and current_lesson["concept"].startswith("Pandas: Importing"):
+        # Check for import pandas as pd
+        pattern = re.compile(
+            r"^import\s+pandas\s+as\s+pd$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+
+
     # LESSON 51 (Index 50): try_except_block
-    if match_type == "try_except_block":
+    elif match_type == "try_except_block":
         # Check for try:\n    print('Attempting code...')\nexcept:\n    print('An error occurred.')
         required_pattern = re.compile(
             r"^try\s*:\s*\n\s*print\s*\(\s*['\"]Attempting\s*code\s*...\s*['\"]\s*\)\s*\nexcept\s*:\s*\n\s*print\s*\(\s*['\"]An\s*error\s*occurred\s*\.\s*['\"]\s*\)$", 
@@ -774,7 +830,7 @@ def display_lesson(lesson_data):
             37: "def add(a, b):\n    ",
             45: "for subject, score in scores.items():\n    ", 
             46: "for i, country in enumerate(countries):\n    ",
-            50: "try:\n    \nexcept:\n    " # L51 (New)
+            50: "try:\n    \nexcept:\n    " 
         }
         
         prefill_value = block_lessons.get(st.session_state.q_index, prefill_value)
