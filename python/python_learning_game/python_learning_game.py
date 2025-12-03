@@ -3,7 +3,7 @@ import random
 import re
 import pandas as pd # <-- Note: Included for completeness, though not strictly needed for the syntax checker
 
-# --- 1. Question/Lesson Data (The Content - Now 57 Lessons) ---
+# --- 1. Question/Lesson Data (The Content - Now 60 Lessons) ---
 LESSONS_DATA = [
     {
         "concept": "Hello World - The Print Statement 🌎",
@@ -324,7 +324,7 @@ LESSONS_DATA = [
         "concept": "Built-in Modules: Random Numbers (`import random`) 🎲",
         "instruction": "To use external functions, you must first import the module. Use the **`import`** keyword to load the **`random`** module. Then, call the **`randint()`** function on the module to get a random integer between two specified numbers (inclusive).",
         "example": '`import random`\n`num = random.randint(1, 6)`',
-        "challenge": "Challenge: Write two commands: First, **`import`** the **`random`** module. Second, create a variable named **`rand_val`** and assign it a random integer between **1** and **100** (inclusive).",
+        "challenge": "Challenge: Write two commands: First, **`import`** the **`random`** module. Second, create a variable named **`rand_val`** and assign it a random integer between **1** and **100** (inclusive**.",
         "answer": "import random\nrand_val = random.randint(1, 100)",
         "hint": "The second line uses dot notation: `module.function(min, max)`.",
         "type": "random_import"
@@ -517,8 +517,35 @@ LESSONS_DATA = [
         "answer": "print(user_df.head())",
         "hint": "The method requires parentheses (`()`) and should be wrapped in a `print()` function to display the output.",
         "type": "exact_match_print"
+    },
+    { # L58 (Index 57)
+        "concept": "DataFrame: Checking Data Types (`.dtypes`) 🧬",
+        "instruction": "The **`.dtypes`** attribute returns a **Series** that lists the data type (**`dtype`**) for each column in the DataFrame. This is crucial for identifying mixed data or unexpected types.",
+        "example": '`df.dtypes`\n# Output:\n# Name    object\n# Age      int64\n# dtype: object',
+        "challenge": "Challenge: Assuming a DataFrame named **`user_df`** exists, assign its column data types (using the `.dtypes` attribute) to a new variable named **`df_types`**.",
+        "answer": "df_types = user_df.dtypes",
+        "hint": "Like `.columns` and `.shape`, this is an attribute and does **not** require parentheses.",
+        "type": "exact_match"
+    },
+    { # L59 (Index 58)
+        "concept": "DataFrame: Getting Row Count (`len()`) 🔢",
+        "instruction": "You can quickly determine the total number of rows (entries) in a DataFrame by using the Python built-in **`len()`** function on the DataFrame object.",
+        "example": '`num_rows = len(df)`\n# num_rows is 100',
+        "challenge": "Challenge: Assuming a DataFrame named **`user_df`** exists, use the **`len()`** function to count the number of rows and assign the result to a variable named **`total_rows`**.",
+        "answer": "total_rows = len(user_df)",
+        "hint": "The DataFrame variable goes inside the `len()` function's parentheses.",
+        "type": "exact_match"
+    },
+    { # L60 (Index 59)
+        "concept": "DataFrame: Full Summary Info (`.info()`) 📜",
+        "instruction": "The **`.info()`** method prints a concise summary of the DataFrame, including the index range, column names, non-null counts, and data types, all in one command. It is typically printed directly.",
+        "example": '`df.info()`',
+        "challenge": "Challenge: Assuming a DataFrame named **`user_df`** exists, write the command to print its full summary information using the **`.info()`** method.",
+        "answer": "user_df.info()",
+        "hint": "This method needs parentheses (`()`) but does **not** need to be wrapped in a `print()` function, as it prints directly to the console/output.",
+        "type": "exact_match"
     }
-    # --- END LESSONS (57 Total) ---
+    # --- END LESSONS (60 Total) ---
 ]
 
 # --- 2. Game State Management & Callbacks (No Change) ---
@@ -614,10 +641,40 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
-    # --- LOGIC FOR NEW LESSONS 55-57 ---
+    # --- LOGIC FOR NEW LESSONS 58-60 ---
+
+    # LESSON 60 (Index 59): .info() method (exact match)
+    if match_type == "exact_match" and current_lesson["concept"].startswith("DataFrame: Full Summary Info"):
+        # Check for user_df.info() (no print, just the method call)
+        pattern = re.compile(
+            r"^user_df\s*\.\s*info\s*\(\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+
+    # LESSON 59 (Index 58): len(df)
+    elif match_type == "exact_match" and current_lesson["concept"].startswith("DataFrame: Getting Row Count"):
+        # Check for total_rows = len(user_df)
+        pattern = re.compile(
+            r"^total_rows\s*=\s*len\s*\(\s*user_df\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+        
+    # LESSON 58 (Index 57): .dtypes attribute
+    elif match_type == "exact_match" and current_lesson["concept"].startswith("DataFrame: Checking Data Types"):
+        # Check for df_types = user_df.dtypes
+        pattern = re.compile(
+            r"^df_types\s*=\s*user_df\s*\.\s*dtypes$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+
+
+    # --- EXISTING LOGIC (Default Fallback and Pandas) ---
     
     # LESSON 57 (Index 56): .head() with print
-    if match_type == "exact_match_print" and current_lesson["concept"].startswith("DataFrame: Viewing"):
+    elif match_type == "exact_match_print" and current_lesson["concept"].startswith("DataFrame: Viewing"):
         # Check for print(user_df.head())
         pattern = re.compile(
             r"^print\s*\(\s*user_df\s*\.\s*head\s*\(\s*\)\s*\)$", 
@@ -838,10 +895,17 @@ def check_code_submission(user_code: str):
             )
         # Provide a specific warning for Pandas dot-notation
         elif current_lesson["concept"].startswith("Pandas") or current_lesson["concept"].startswith("DataFrame:"):
-            st.error(
-                f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
-                "Check your **dot notation** (`df.attribute` or `df.method()`) and ensure you are correctly using a variable assignment (`=`) for attributes, or a `print()` for methods like `.head()`."
-            )
+            # L60 is a special case: method call without assignment or print
+            if st.session_state.q_index == 59: # L60 - .info()
+                st.error(
+                    f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
+                    "Check your method call. For `.info()`, it's just `user_df.info()`. Ensure you included the parentheses `()` and did **not** wrap it in `print()`."
+                )
+            else:
+                st.error(
+                    f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
+                    "Check your **dot notation** (`df.attribute` or `df.method()`) and ensure you are correctly using a variable assignment (`=`) for attributes, or a `print()` for methods like `.head()`. Also check if you incorrectly included parentheses for an attribute or vice-versa."
+                )
         else:
             st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
 
