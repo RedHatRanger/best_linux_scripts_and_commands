@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import re
 
-# --- 1. Question/Lesson Data (The Content - Now 48 Lessons) ---
+# --- 1. Question/Lesson Data (The Content - Now 51 Lessons) ---
 LESSONS_DATA = [
     {
         "concept": "Hello World - The Print Statement 🌎",
@@ -409,7 +409,7 @@ LESSONS_DATA = [
         "hint": "Use the keyword combination `not in` to test for absence.",
         "type": "membership_not_in"
     },
-    { # L46 (Index 45)
+    { 
         "concept": "Iteration: Looping over Dictionary Items (`.items()`) 🔄🔑",
         "instruction": "The **`.items()`** method lets you iterate over both the **key** and the **value** in a dictionary simultaneously, which is crucial for structuring data.",
         "example": '`data = {"a": 1, "b": 2}`\n`for key, value in data.items():`\n`    print(f"{key}: {value}")`\n# Output: a: 1, b: 2',
@@ -418,7 +418,7 @@ LESSONS_DATA = [
         "hint": "The `for` line must use two variables, the `in` keyword, the dictionary name, and `.items()`, followed by a colon.",
         "type": "for_loop_dict_items"
     },
-    { # L47 (Index 46)
+    { 
         "concept": "Built-in Functions: `enumerate()` for Indexing 🧭",
         "instruction": "The **`enumerate()`** function is used with `for` loops over sequences (like lists). It returns both the **index** and the **value** for each item, which is helpful for creating a Pandas Index.",
         "example": '`colors = ["R", "G"]`\n`for index, color in enumerate(colors):`\n`    print(f"{index}: {color}")`\n# Output: 0: R, 1: G',
@@ -427,16 +427,43 @@ LESSONS_DATA = [
         "hint": "The syntax is `for index_var, value_var in enumerate(list_name):`.",
         "type": "enumerate_loop"
     },
-    { # L48 (Index 47)
+    { 
         "concept": "Data Structures: Sets (Creation and Uniqueness) 🧩",
-        "instruction": "A **Set** is an unordered collection of unique items. They are defined using curly braces (`{}`) or the `set()` function. Duplicate entries are automatically discarded, which is useful for cleaning data.",
+        "instruction": "A **Set** is an unordered collection of **unique** items. They are defined using curly braces (`{}`) or the `set()` function. Duplicate entries are automatically discarded, which is useful for cleaning data.",
         "example": '`unique = {1, 2, 2, 3}`\n# unique is {1, 2, 3}',
         "challenge": "Challenge: Create a set named **`unique_ids`** and assign it the integer values **1**, **5**, **5**, and **10** using curly braces.",
         "answer": "unique_ids = {1, 5, 10}",
         "hint": "Use curly braces `{}` and only list the unique values you want to be included.",
         "type": "set_creation"
+    },
+    { # L49 (Index 48)
+        "concept": "Set Operations: Union (`|`) 🤝",
+        "instruction": "The **Union** operation combines all unique elements from two or more sets. It is performed using the pipe character (`|`) operator or the `.union()` method.",
+        "example": '`A = {1, 2}`\n`B = {2, 3}`\n`C = A | B`\n# C is {1, 2, 3}`',
+        "challenge": "Challenge: Assume sets **`set1`** and **`set2`** exist. Create a new set named **`combined_set`** using the **`|`** operator to get the union of `set1` and `set2`.",
+        "answer": "combined_set = set1 | set2",
+        "hint": "The result is assigned to the new variable, using the pipe operator between the two sets.",
+        "type": "set_union"
+    },
+    { # L50 (Index 49)
+        "concept": "Set Operations: Intersection (`&`) 🎯",
+        "instruction": "The **Intersection** operation returns only the elements that are common to both sets. It is performed using the ampersand character (`&`) operator or the `.intersection()` method.",
+        "example": '`A = {1, 2}`\n`B = {2, 3}`\n`C = A & B`\n# C is {2}`',
+        "challenge": "Challenge: Assume sets **`set1`** and **`set2`** exist. Create a new set named **`common_set`** using the **`&`** operator to get the intersection of `set1` and `set2`.",
+        "answer": "common_set = set1 & set2",
+        "hint": "Use the ampersand operator (`&`) between the two sets.",
+        "type": "set_intersection"
+    },
+    { # L51 (Index 50)
+        "concept": "Error Handling: The `try...except` Block 🛡️",
+        "instruction": "Use a **`try`** block to execute code that might cause an error, and an **`except`** block to handle the error gracefully if it occurs. Both require a colon (`:`).",
+        "example": '`try:`\n`    result = 10 / 0  # This raises an error`\n`except:`\n`    print("Cannot divide by zero.")`',
+        "challenge": "Challenge: Write a complete `try...except` block. In the `try` block, print the string **'Attempting code...'**. In the `except` block, print the string **'An error occurred.'**",
+        "answer": "try:\n    print('Attempting code...')\nexcept:\n    print('An error occurred.')",
+        "hint": "Remember the colon on both `try:` and `except:`, and ensure the print statements are indented.",
+        "type": "try_except_block"
     }
-    # --- END LESSONS (48 Total) ---
+    # --- END LESSONS (51 Total) ---
 ]
 
 # --- 2. Game State Management & Callbacks (No Change) ---
@@ -532,10 +559,37 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
-    # --- LOGIC FOR NEW LESSONS 46-48 ---
+    # --- LOGIC FOR NEW LESSONS 49-51 ---
+    
+    # LESSON 51 (Index 50): try_except_block
+    if match_type == "try_except_block":
+        # Check for try:\n    print('Attempting code...')\nexcept:\n    print('An error occurred.')
+        required_pattern = re.compile(
+            r"^try\s*:\s*\n\s*print\s*\(\s*['\"]Attempting\s*code\s*...\s*['\"]\s*\)\s*\nexcept\s*:\s*\n\s*print\s*\(\s*['\"]An\s*error\s*occurred\s*\.\s*['\"]\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(required_pattern.match(user_code_normalized.strip()))
+        
+    # LESSON 50 (Index 49): set_intersection
+    elif match_type == "set_intersection":
+        # Check for common_set = set1 & set2
+        pattern = re.compile(
+            r"^common_set\s*=\s*set1\s*&\s*set2$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip().replace(' ', '')))
+        
+    # LESSON 49 (Index 48): set_union
+    elif match_type == "set_union":
+        # Check for combined_set = set1 | set2
+        pattern = re.compile(
+            r"^combined_set\s*=\s*set1\s*\|\s*set2$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip().replace(' ', '')))
 
     # LESSON 48 (Index 47): set_creation
-    if match_type == "set_creation":
+    elif match_type == "set_creation":
         # Check for unique_ids = {1, 5, 10} - flexible on spacing
         pattern = re.compile(
             r"^unique_ids\s*=\s*\{\s*1\s*,\s*5\s*,\s*10\s*\}$", 
@@ -655,10 +709,10 @@ def check_code_submission(user_code: str):
         st.session_state.correct = False
         
         # Provide a specific warning for indentation/structure lessons
-        if match_type in ["if_statement", "if_else_statement", "if_elif_statement", "if_elif_else_statement", "while_loop", "for_loop", "function_define", "function_define_with_arg", "function_define_return", "random_import", "for_loop_list_iterate", "function_two_args", "for_loop_dict_items", "enumerate_loop"]:
+        if match_type in ["if_statement", "if_else_statement", "if_elif_statement", "if_elif_else_statement", "while_loop", "for_loop", "function_define", "function_define_with_arg", "function_define_return", "random_import", "for_loop_list_iterate", "function_two_args", "for_loop_dict_items", "enumerate_loop", "try_except_block"]:
              st.error(
                 f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
-                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to a block (`if`, `elif`, `else`, `while`, `for`, or `def`). Also check spacing, parentheses, and keywords for new lessons."
+                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to a block (`if`, `elif`, `else`, `while`, `for`, `def`, `try`, or `except`). Also check spacing, parentheses, and keywords for new lessons."
             )
         # Provide a specific warning for list comprehensions
         elif match_type in ["list_comprehension_1", "list_comprehension_2"]:
@@ -667,10 +721,10 @@ def check_code_submission(user_code: str):
                 "List comprehensions are tricky! Ensure your syntax is `[operation for variable in list if condition]` and check your variable names."
             )
         # Provide a specific warning for membership/set operators
-        elif match_type in ["membership_in", "membership_not_in", "set_creation"]:
+        elif match_type in ["membership_in", "membership_not_in", "set_creation", "set_union", "set_intersection"]:
              st.error(
                 f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
-                "Check your brackets (`{}`), quotes, and whether you included only the unique values/correct keywords."
+                "Check your operators (`|`, `&`), brackets (`{}`), quotes, and whether you included only the unique values/correct keywords."
             )
         else:
             st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
@@ -718,14 +772,15 @@ def display_lesson(lesson_data):
             35: "import random\n",
             36: "for name in names:\n    ",
             37: "def add(a, b):\n    ",
-            45: "for subject, score in scores.items():\n    ", # L46 (New)
-            46: "for i, country in enumerate(countries):\n    "  # L47 (New)
+            45: "for subject, score in scores.items():\n    ", 
+            46: "for i, country in enumerate(countries):\n    ",
+            50: "try:\n    \nexcept:\n    " # L51 (New)
         }
         
         prefill_value = block_lessons.get(st.session_state.q_index, prefill_value)
 
     # Determine height based on whether it's a block structure
-    height_lessons_250 = [17, 18] # Full if/elif/else and while loop
+    height_lessons_250 = [17, 18, 50] # Full if/elif/else, while loop, try/except
     height_lessons_200 = [14, 15, 16, 30, 32, 33, 36, 37, 45, 46] # Other conditional/loops/functions
     
     if st.session_state.q_index in height_lessons_250:
@@ -829,7 +884,7 @@ def main():
             is_unlocked = i in st.session_state.passed_indices or i == current_lesson_num
             is_current = i == current_lesson_num
             
-            # Use EMOJI icons for clear status indication (per user request)
+            # Use EMOJI icons for clear status indication
             icon = "➡️" if is_current else ("✅" if i in st.session_state.passed_indices else "🔒")
             label = f"L{i+1}: {lesson['concept']}"
             
