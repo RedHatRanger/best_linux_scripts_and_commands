@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import re
 
-# --- 1. Question/Lesson Data (The Content - Now 42 Lessons) ---
+# --- 1. Question/Lesson Data (The Content - Now 45 Lessons) ---
 LESSONS_DATA = [
     {
         "concept": "Hello World - The Print Statement 🌎",
@@ -133,7 +133,7 @@ LESSONS_DATA = [
     {
         "concept": "Control Flow: The `if` Statement and Indentation ✅",
         "instruction": "The `if` statement executes a block of code only if its condition is `True`. It must end with a colon (`:`). The code block that executes if the condition is true MUST be indented by 4 spaces or one tab.",
-        "example": '`score = 90`\n`if score > 80:`\n`    print("Great job!")`\n# Output: Great job!',
+        "example": '`score = 90`\n`if score > 80:`\n`    print("Great job!")`\n`# Output: Great job!`',
         "challenge": "Challenge: Write a complete `if` statement that checks if the variable **`is_rainy`** is equal to **`True`**. If it is, print the string **'Bring an umbrella.'** (Remember the colon and the 4-space indentation for the print line!)",
         "answer": "if is_rainy == True:\n    print('Bring an umbrella.')",
         "hint": "The first line needs `if` and a condition ending in a colon. The second line must start with 4 spaces.",
@@ -355,8 +355,6 @@ LESSONS_DATA = [
         "hint": "The arguments inside the parentheses must be named with an equals sign.",
         "type": "exact_match"
     },
-    
-    # --- NEW LESSONS 40-42: LIST COMPREHENSION AND TUPLES ---
     {
         "concept": "List Comprehension: Simple Mapping 🚀",
         "instruction": "List comprehension provides a concise way to create lists. Instead of a `for` loop, you define the operation and the loop inside square brackets (`[]`). Example: `[x * 2 for x in [1, 2, 3]]` creates `[2, 4, 6]`.",
@@ -383,11 +381,38 @@ LESSONS_DATA = [
         "answer": "user_data = (101, 'Alice', True)",
         "hint": "Use parentheses `()` and ensure the string value is in quotes.",
         "type": "tuple_creation"
+    },
+    {
+        "concept": "Tuples: Accessing Elements by Index 🔎",
+        "instruction": "Just like lists, items in a tuple are accessed using their **index number** inside square brackets (`[]`). The first item is at index 0.",
+        "example": '`point = ("x", 5)`\n`print(point[0])`\n# Output: x',
+        "challenge": "Challenge: Assuming the tuple **`user_data`** is **`(101, 'Alice', True)`**, write the command to print the item at **index 1**.",
+        "answer": "print(user_data[1])",
+        "hint": "Use the `print()` function with the tuple variable name followed by the index in square brackets (`[]`).",
+        "type": "tuple_access"
+    },
+    {
+        "concept": "Membership: The `in` Keyword (Lists) ❓",
+        "instruction": "The **`in`** keyword is used to test if a specific item is present in a list (or any sequence). It returns a Boolean value (`True` or `False`).",
+        "example": '`numbers = [1, 2, 3]`\n`is_present = 2 in numbers`\n# is_present is True',
+        "challenge": "Challenge: Assuming a list **`fruits`** exists, check if the string **'banana'** is present in the list. Store the result in a variable named **`found_fruit`**.",
+        "answer": "found_fruit = 'banana' in fruits",
+        "hint": "The value being searched for comes before the `in` keyword.",
+        "type": "membership_in"
+    },
+    {
+        "concept": "Membership: The `not in` Keyword (Dictionaries) ⛔",
+        "instruction": "The **`not in`** keyword checks if an item is *not* present. When checking dictionaries, `in` and `not in` test against the **keys** by default.",
+        "example": '`user = {"name": "Alex"}`\n`is_missing = "age" not in user`\n# is_missing is True',
+        "challenge": "Challenge: Assuming a dictionary **`settings`** exists, check if the key **'theme'** is **not** present in the dictionary. Store the result in a variable named **`theme_missing`**.",
+        "answer": "theme_missing = 'theme' not in settings",
+        "hint": "Use the keyword combination `not in` to test for absence.",
+        "type": "membership_not_in"
     }
-    # --- END LESSONS (42 Total) ---
+    # --- END LESSONS (45 Total) ---
 ]
 
-# --- 2. Game State Management & Callbacks ---
+# --- 2. Game State Management & Callbacks (No Change) ---
 
 def initialize_state():
     """Initializes or ensures the existence of all session state variables."""
@@ -480,16 +505,44 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
-    # --- NEW LOGIC FOR LESSONS 40-42 ---
+    # --- LOGIC FOR NEW LESSONS 43-45 ---
     
-    # LESSON 42: tuple_creation (Flexible spacing/quotes)
-    if match_type == "tuple_creation":
+    # LESSON 45: membership_not_in
+    if match_type == "membership_not_in":
+        # Check for theme_missing = 'theme' not in settings
+        pattern = re.compile(
+            r"^theme_missing\s*=\s*['\"]theme['\"]\s+not\s+in\s+settings$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip().replace('"', "'")))
+        
+    # LESSON 44: membership_in
+    elif match_type == "membership_in":
+        # Check for found_fruit = 'banana' in fruits
+        pattern = re.compile(
+            r"^found_fruit\s*=\s*['\"]banana['\"]\s+in\s+fruits$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip().replace('"', "'")))
+        
+    # LESSON 43: tuple_access
+    elif match_type == "tuple_access":
+        # Check for print(user_data[1])
+        pattern = re.compile(
+            r"^print\s*\(\s*user_data\s*\[\s*1\s*\]\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+        
+    # LESSON 42: tuple_creation (Robust check)
+    elif match_type == "tuple_creation":
         # Check for user_data = (101, 'Alice', True)
         pattern = re.compile(
             r"^user_data\s*=\s*\(\s*101\s*,\s*['\"]Alice['\"]\s*,\s*True\s*\)$", 
             re.IGNORECASE 
         )
-        is_correct = bool(pattern.match(user_code.strip().replace('"', "'")))
+        # Check a version that allows for variable spacing and quotes
+        is_correct = bool(pattern.match(user_code.strip().replace('"', "'").replace(' ', '')))
         
     # LESSON 41: list_comprehension_2
     elif match_type == "list_comprehension_2":
@@ -509,9 +562,6 @@ def check_code_submission(user_code: str):
         )
         is_correct = bool(pattern.match(user_code.strip()))
 
-
-    # --- EXISTING LOGIC FOR LESSONS 37-39 ---
-    
     # LESSON 38: function_two_args
     elif match_type == "function_two_args":
         # Check for def add(a, b):\n    return a + b
@@ -531,13 +581,10 @@ def check_code_submission(user_code: str):
         is_correct = bool(required_pattern.match(user_code_normalized.strip()))
 
 
-    # --- EXISTING LOGIC FOR LESSONS 34-36 (Omitted for brevity, but present in the full script) ---
-
-    # ... (Includes logic for dict_pop, dict_values, list_creation, etc. as above)
+    # --- EXISTING LOGIC (Default Fallback) ---
                 
     else:
-        # Exact Match Logic (Covers L32, L35, L39 and all previous exact_match types)
-        # Also serves as the fallback for all previous lessons not explicitly pattern-checked above
+        # Exact Match Logic (Covers all other types: exact_match, quote_flexible, list_creation, etc.)
         is_correct = (user_code_normalized == required_answer)
 
     if is_correct:
@@ -565,11 +612,17 @@ def check_code_submission(user_code: str):
                 f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
                 "List comprehensions are tricky! Ensure your syntax is `[operation for variable in list if condition]` and check your variable names."
             )
+        # Provide a specific warning for membership operators
+        elif match_type in ["membership_in", "membership_not_in"]:
+             st.error(
+                f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
+                "Check the order: `item` before `in/not in`, followed by the `collection`."
+            )
         else:
             st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
 
 
-# --- 4. Display Functions ---
+# --- 4. Display Functions (No Change) ---
 
 def display_lesson(lesson_data):
     """Renders the instruction, example, and code input area for the current lesson."""
@@ -724,6 +777,7 @@ def main():
             is_unlocked = i in st.session_state.passed_indices or i == current_lesson_num
             is_current = i == current_lesson_num
             
+            # Reverting to EMOJI icons for clear status indication
             icon = "➡️" if is_current else ("✅" if i in st.session_state.passed_indices else "🔒")
             label = f"L{i+1}: {lesson['concept']}"
             
