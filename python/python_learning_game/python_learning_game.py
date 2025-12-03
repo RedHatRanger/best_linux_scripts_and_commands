@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import re
 
-# --- 1. Question/Lesson Data (The Content - Now 27 Lessons) ---
+# --- 1. Question/Lesson Data (The Content - Now 30 Lessons) ---
 LESSONS_DATA = [
     {
         "concept": "Hello World - The Print Statement 🌎",
@@ -169,7 +169,7 @@ LESSONS_DATA = [
     # --- LESSON 19 ---
     {
         "concept": "Iteration: The `while` Loop 🔄",
-        "instruction": "The `while` loop executes its block as long as its condition is `True`. Like `if`, it needs a colon (`:`) and indentation. **Crucially**, the variable used in the condition must be changed inside the loop to prevent an infinite loop.",
+        "instruction": "The `while` loop executes its block as long as its condition is `True`. Like `if`, it needs a colon (`:`). **Crucially**, the variable used in the condition must be changed inside the loop to prevent an infinite loop.",
         "example": '`count = 0`\n`while count < 3:`\n`    print("Looping")`\n`    count = count + 1`\n# Output: Looping (3 times)',
         "challenge": "Challenge: Write a complete `while` loop. Initialize a variable **`x`** to `0`. Loop while `x` is less than **2**. Inside the loop, print **'Counting'** and then update `x` by adding `1` to it.",
         "answer": "x = 0\nwhile x < 2:\n    print('Counting')\n    x = x + 1",
@@ -226,7 +226,7 @@ LESSONS_DATA = [
         "hint": "Remember the curly braces (`{}`), quotes around string keys/values, and the colon separator.",
         "type": "dict_creation"
     },
-    # --- LESSON 25 (NEW) ---
+    # --- LESSON 25 ---
     {
         "concept": "Data Structures: Dictionaries (Accessing Values by Key) 🔑",
         "instruction": "Values in a dictionary are retrieved using their unique key inside square brackets (`[]`). Keys are usually strings and must be quoted.",
@@ -236,7 +236,7 @@ LESSONS_DATA = [
         "hint": "Use `print()`, the dictionary name, and the quoted key inside square brackets.",
         "type": "dict_access"
     },
-    # --- LESSON 26 (NEW) ---
+    # --- LESSON 26 ---
     {
         "concept": "Data Structures: Dictionaries (Modification and Adding) ✏️",
         "instruction": "Dictionaries are mutable. You can update an existing value or add a new key-value pair by accessing the key in square brackets and assigning a new value.",
@@ -246,7 +246,7 @@ LESSONS_DATA = [
         "hint": "You need the dictionary name, the quoted key in brackets, the assignment operator (`=`), and the new boolean value.",
         "type": "dict_modify"
     },
-    # --- LESSON 27 (NEW) ---
+    # --- LESSON 27 ---
     {
         "concept": "Built-in Functions: Finding Length (`len()`) 📏",
         "instruction": "The `len()` function returns the number of items in a list, dictionary, or the number of characters in a string. It is essential for determining loop boundaries or collection sizes.",
@@ -255,8 +255,38 @@ LESSONS_DATA = [
         "answer": "data_size = len(data)",
         "hint": "Use the assignment operator (`=`) and the `len()` function.",
         "type": "len_function"
+    },
+    # --- LESSON 28 (NEW) ---
+    {
+        "concept": "Dictionary Methods: Retrieving Keys (`.keys()`) 🔑",
+        "instruction": "Use the `.keys()` method to get an iterable view of all keys in a dictionary. Wrap the result in `list()` to get a standard list of keys.",
+        "example": '`user = {"name": "Alex", "level": 5}`\n`keys = list(user.keys())`\n# keys is now ["name", "level"]',
+        "challenge": "Challenge: Assuming the dictionary **`profile`** is **`{'user': 'admin', 'id': 101}`**, create a variable named **`key_list`** and assign it a list of all the keys in `profile`.",
+        "answer": "key_list = list(profile.keys())",
+        "hint": "Start with the variable assignment, then use `list()` around the dictionary name followed by `.keys()`.",
+        "type": "dict_keys"
+    },
+    # --- LESSON 29 (NEW) ---
+    {
+        "concept": "Dictionary Methods: Retrieving Values (`.values()`) 📦",
+        "instruction": "Use the `.values()` method to get an iterable view of all values in a dictionary. Wrap the result in `list()` to get a standard list of values.",
+        "example": '`scores = {"math": 90, "science": 85}`\n`vals = list(scores.values())`\n# vals is now [90, 85]',
+        "challenge": "Challenge: Assuming the dictionary **`profile`** is **`{'user': 'admin', 'id': 101}`**, create a variable named **`value_list`** and assign it a list of all the values in `profile`.",
+        "answer": "value_list = list(profile.values())",
+        "hint": "The syntax is almost identical to `.keys()`, but replace `keys` with `values`.",
+        "type": "dict_values"
+    },
+    # --- LESSON 30 (NEW) ---
+    {
+        "concept": "Dictionary Methods: Removing Items (`.pop()`) 🗑️",
+        "instruction": "The `.pop()` method removes the specified key-value pair from the dictionary and returns the value of the removed item. The key must be provided inside the parentheses.",
+        "example": '`data = {"a": 1, "b": 2}`\n`removed = data.pop("a")`\n# removed is 1. data is now {"b": 2}',
+        "challenge": "Challenge: Assuming the dictionary **`profile`** is **`{'user': 'admin', 'id': 101}`**, write the command to remove the **'id'** key and its associated value from the dictionary.",
+        "answer": "profile.pop('id')",
+        "hint": "Call the method directly on the dictionary, including the quoted key in the parentheses.",
+        "type": "dict_pop"
     }
-    # --- END LESSONS (27 Total) ---
+    # --- END LESSONS (30 Total) ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -352,10 +382,37 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
-    # --- NEW LESSON LOGIC (L25, L26, L27) ---
+    # --- NEW LESSON LOGIC (L28, L29, L30) ---
     
+    # LESSON 30: dict_pop
+    if match_type == "dict_pop":
+        # Check for profile.pop('id') with flexible quotes and spacing
+        pattern = re.compile(
+            r"^profile\s*\.\s*pop\s*\(\s*['\"]id['\"]\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip().replace('"', "'")))
+        
+    # LESSON 29: dict_values
+    elif match_type == "dict_values":
+        # Check for value_list = list(profile.values()) with flexible spacing
+        pattern = re.compile(
+            r"^value_list\s*=\s*list\s*\(\s*profile\s*\.\s*values\s*\(\s*\)\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+        
+    # LESSON 28: dict_keys
+    elif match_type == "dict_keys":
+        # Check for key_list = list(profile.keys()) with flexible spacing
+        pattern = re.compile(
+            r"^key_list\s*=\s*list\s*\(\s*profile\s*\.\s*keys\s*\(\s*\)\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+
     # LESSON 27: len_function
-    if match_type == "len_function":
+    elif match_type == "len_function":
         # Check for data_size = len(data) with flexible spacing
         pattern = re.compile(
             r"^data_size\s*=\s*len\s*\(\s*data\s*\)$", 
@@ -522,7 +579,7 @@ def display_lesson(lesson_data):
             prefill_value = "x = 0\nwhile x < 2:\n    \n    "
         elif st.session_state.q_index == 19: # L20 (for loop)
             prefill_value = "for i in range(3):\n    "
-        # L21-L27 are single-line, so they use the default empty string
+        # L21-L30 are single-line, so they use the default empty string
 
     user_code = st.text_area(
         "Type your Python command(s) below and click 'Submit'. Be precise with indentation!",
