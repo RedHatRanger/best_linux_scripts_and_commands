@@ -75,6 +75,15 @@ LESSONS_DATA = [
         "answer": "whole_parts = 17 // 5",
         "hint": "Use the double-slash operator (`//`) to perform floor division.",
         "type": "exact_match"
+    },
+    {
+        "concept": "Arithmetic: Modulus Operator (Remainder) %", # <-- NEW LESSON 9
+        "instruction": "The modulus operator (`%`) returns the **remainder** after performing a division. For example, 7 divided by 3 is 2 with a remainder of 1, so `7 % 3` equals 1.",
+        "example": '`remainder_a = 10 % 3`\n# Output: 1\n`is_even = 8 % 2`\n# Output: 0',
+        "challenge": "Challenge: Find the remainder when 20 is divided by 6. Create a variable named **`left_over`** and assign it the result of **20 % 6**.",
+        "answer": "left_over = 20 % 6",
+        "hint": "Divide 20 by 6 (6 goes into 20 three times). What number is left over?",
+        "type": "exact_match"
     }
 ]
 
