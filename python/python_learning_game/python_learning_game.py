@@ -115,8 +115,8 @@ def set_lesson(index):
     """Callback: Sets the current lesson index and resets attempts/correct state."""
     st.session_state.q_index = index
     st.session_state.attempts = 0
-    # Set 'correct' based on whether the lesson is already passed
-    st.session_state.correct = index in st.session_state.passed_indices
+    # Crucially, always reset 'correct' to False so the submit button is enabled on navigation.
+    st.session_state.correct = False
 
 def next_lesson():
     """Advances the lesson index and resets attempts and correct state."""
@@ -178,7 +178,7 @@ def check_code_submission(user_code: str):
             st.session_state.passed_lessons += 1
             st.session_state.passed_indices.add(current_index)
         
-        st.session_state.correct = True # Set to True to display success message
+        st.session_state.correct = True # Set to True to display success message (disables submit if not permanently passed)
         
         # Success actions
         st.balloons() 
@@ -207,18 +207,25 @@ def display_lesson(lesson_data):
     st.markdown(f"### 📝 Your Challenge")
     st.warning(lesson_data['challenge'])
     
+    # Check if lesson is permanently passed
+    is_permanently_passed = st.session_state.q_index in st.session_state.passed_indices
+    
     # 2. User Input Area (Code Editor)
     input_key = f"code_input_{st.session_state.q_index}" 
     user_code = st.text_area(
         "Type your Python command below and click 'Submit' (Case and syntax matter for non-string parts!)",
         height=100,
         key=input_key,
-        # *** FIX APPLIED HERE: Use 'lesson_data' which was safely passed from main ***
-        value=lesson_data["answer"] if st.session_state.q_index in st.session_state.passed_indices else ""
+        # Pre-fill with the correct answer if the lesson is already passed
+        value=lesson_data["answer"] if is_permanently_passed else ""
     )
     
     # 3. Submission Logic
-    submit_disabled = st.session_state.get('correct', False)
+    submit_disabled_after_success = st.session_state.get('correct', False) 
+    
+    # The button is disabled ONLY if they just passed it AND it wasn't already passed.
+    # This prevents button spamming after a *new* pass, but allows re-submission for relearn (is_permanently_passed overrides the disable).
+    submit_disabled = submit_disabled_after_success and not is_permanently_passed
     
     if not submit_disabled:
         st.button("Submit Code", 
@@ -229,13 +236,21 @@ def display_lesson(lesson_data):
     st.markdown("---")
     
     # === DEDICATED FEEDBACK AREA ===
-    # *** Removed redundant and unsafe index access here ***
 
-    if st.session_state.get('correct', False):
-        # Display congratulations message
-        st.success("🎉 **PASS! Congratulations!** Excellent syntax. Click 'Next Lesson' to continue.")
+    # Show success message if either state is true.
+    if is_permanently_passed or st.session_state.get('correct', False):
+        
+        # Determine the correct success message based on context
+        if is_permanently_passed and not st.session_state.get('correct', False):
+            # Case 1: Permanently passed and just navigated back
+            st.success("🎉 **PASSED!** Click 'Next Lesson' to continue, or **edit the code and click 'Submit' to relearn/test.**")
+        else:
+            # Case 2: Just passed the lesson in this run (or permanently passed and re-submitted correctly)
+            st.success("🎉 **PASS! Congratulations!** Excellent syntax. Click 'Next Lesson' to continue.")
+
         st.button("Next Lesson >>", on_click=next_lesson)
-
+        
+    # Case 3: Failed attempt
     elif st.session_state.attempts > 0:
         # Display retry/error message
         st.error(
@@ -244,7 +259,6 @@ def display_lesson(lesson_data):
         )
         if st.session_state.attempts >= 2:
             with st.expander("💡 Show Hint"):
-                # *** FIX APPLIED HERE: Use 'lesson_data' ***
                 st.info(lesson_data["hint"])
 
 
@@ -272,7 +286,7 @@ def main():
 
     total_lessons = len(LESSONS_DATA)
     current_lesson_num = st.session_state.q_index
-    passed = len(st.session_state.passed_indices) # Use the size of the set
+    passed = len(st.session_state.passed_indices) 
     
     # --- SIDEBAR: Progress and Navigation ---
     with st.sidebar:
@@ -307,7 +321,6 @@ def main():
     st.markdown("# 🚀 Interactive Python Syntax Practice")
     
     if st.session_state.q_index < total_lessons:
-        # This check ensures that only a valid index is passed to display_lesson
         display_lesson(LESSONS_DATA[st.session_state.q_index])
     else:
         display_completion_screen()
