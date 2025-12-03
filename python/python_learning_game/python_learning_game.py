@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import re
 
-# --- 1. Question/Lesson Data (The Content) ---
+# --- 1. Question/Lesson Data (The Content - Now 27 Lessons) ---
 LESSONS_DATA = [
     {
         "concept": "Hello World - The Print Statement 🌎",
@@ -225,8 +225,38 @@ LESSONS_DATA = [
         "answer": "profile = {'user': 'admin', 'id': 101}",
         "hint": "Remember the curly braces (`{}`), quotes around string keys/values, and the colon separator.",
         "type": "dict_creation"
+    },
+    # --- LESSON 25 (NEW) ---
+    {
+        "concept": "Data Structures: Dictionaries (Accessing Values by Key) 🔑",
+        "instruction": "Values in a dictionary are retrieved using their unique key inside square brackets (`[]`). Keys are usually strings and must be quoted.",
+        "example": '`user = {"name": "Alex", "level": 5}`\n`print(user["name"])`\n# Output: Alex',
+        "challenge": "Challenge: Assuming the dictionary **`profile`** is **`{'user': 'admin', 'id': 101}`**, write the command to print the value associated with the key **'user'**.",
+        "answer": "print(profile['user'])",
+        "hint": "Use `print()`, the dictionary name, and the quoted key inside square brackets.",
+        "type": "dict_access"
+    },
+    # --- LESSON 26 (NEW) ---
+    {
+        "concept": "Data Structures: Dictionaries (Modification and Adding) ✏️",
+        "instruction": "Dictionaries are mutable. You can update an existing value or add a new key-value pair by accessing the key in square brackets and assigning a new value.",
+        "example": '`user = {"level": 5}`\n`user["level"] = 6`\n# user is now {"level": 6}',
+        "challenge": "Challenge: Assuming the dictionary **`settings`** is **`{'dark_mode': True}`**, write the command to change the value of the key **'dark_mode'** to **`False`**.",
+        "answer": "settings['dark_mode'] = False",
+        "hint": "You need the dictionary name, the quoted key in brackets, the assignment operator (`=`), and the new boolean value.",
+        "type": "dict_modify"
+    },
+    # --- LESSON 27 (NEW) ---
+    {
+        "concept": "Built-in Functions: Finding Length (`len()`) 📏",
+        "instruction": "The `len()` function returns the number of items in a list, dictionary, or the number of characters in a string. It is essential for determining loop boundaries or collection sizes.",
+        "example": '`items = [1, 2, 3]`\n`length = len(items)`\n# length is 3',
+        "challenge": "Challenge: Assuming the list **`data`** is **`[10, 20, 30, 40]`**, create a variable named **`data_size`** and assign it the length of **`data`**.",
+        "answer": "data_size = len(data)",
+        "hint": "Use the assignment operator (`=`) and the `len()` function.",
+        "type": "len_function"
     }
-    # --- END LESSONS ---
+    # --- END LESSONS (27 Total) ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -322,13 +352,41 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
-    # --- NEW LESSON LOGIC (L22-L24) ---
+    # --- NEW LESSON LOGIC (L25, L26, L27) ---
     
+    # LESSON 27: len_function
+    if match_type == "len_function":
+        # Check for data_size = len(data) with flexible spacing
+        pattern = re.compile(
+            r"^data_size\s*=\s*len\s*\(\s*data\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+
+    # LESSON 26: dict_modify
+    elif match_type == "dict_modify":
+        # Check for settings['dark_mode'] = False with flexible quotes and spacing
+        pattern = re.compile(
+            r"^settings\s*\[\s*['\"]dark_mode['\"]\s*\]\s*=\s*False$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip().replace('"', "'")))
+
+    # LESSON 25: dict_access
+    elif match_type == "dict_access":
+        # Check for print(profile['user']) with flexible quotes and spacing
+        pattern = re.compile(
+            r"^print\s*\(\s*profile\s*\[\s*['\"]user['\"]\s*\]\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip().replace('"', "'")))
+
     # LESSON 24: dict_creation
-    if match_type == "dict_creation":
+    elif match_type == "dict_creation":
         # Check for profile={'user':'admin','id':101} or profile={'id':101,'user':'admin'}
         user_code_simple = user_code.strip().replace('"', "'")
         user_code_no_ws = re.sub(r'\s+', '', user_code_simple)
+        # Allows reordering of key-value pairs
         is_correct = bool(re.match(r"^profile=\{('user':'admin','id':101|'id':101,'user':'admin')\}$", user_code_no_ws))
 
 
@@ -464,7 +522,7 @@ def display_lesson(lesson_data):
             prefill_value = "x = 0\nwhile x < 2:\n    \n    "
         elif st.session_state.q_index == 19: # L20 (for loop)
             prefill_value = "for i in range(3):\n    "
-        # L21-L24 are single-line, so they use the default empty string
+        # L21-L27 are single-line, so they use the default empty string
 
     user_code = st.text_area(
         "Type your Python command(s) below and click 'Submit'. Be precise with indentation!",
