@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import re
 
-# --- 1. Question/Lesson Data (The Content - Now 33 Lessons) ---
+# --- 1. Question/Lesson Data (The Content - Now 36 Lessons) ---
 LESSONS_DATA = [
     {
         "concept": "Hello World - The Print Statement 🌎",
@@ -178,7 +178,7 @@ LESSONS_DATA = [
     {
         "concept": "Iteration: The `for` Loop and `range()` 🔢",
         "instruction": "The `for` loop iterates through items in a sequence. It often uses the built-in `range()` function to define the number of repetitions. It requires a temporary loop variable (like `i`), the `in` keyword, the sequence, a colon (`:`), and indentation.",
-        "example": '`for i in range(3):`\n`    print("Hello")`\n# Output: Hello (3 times)',
+        "example": '`for i in range(3):`\n`    print("Hello")`\n`# Output: Hello (3 times)`',
         "challenge": "Challenge: Write a `for` loop that iterates over the numbers 0, 1, and 2. Use **`i`** as the loop variable. Inside the loop, print the string **'Repeat'**.",
         "answer": "for i in range(3):\n    print('Repeat')",
         "hint": "The `for` line needs a variable, the `in` keyword, `range(3)`, and a colon. The print line needs indentation.",
@@ -274,7 +274,8 @@ LESSONS_DATA = [
         "hint": "Call the method directly on the dictionary, including the quoted key in the parentheses.",
         "type": "dict_pop"
     },
-    # --- NEW FUNCTION LESSONS ---
+    
+    # --- LESSONS 31-33: FUNCTIONS (DEFINE/CALL/ARGS) ---
     {
         "concept": "Functions: Defining a Function (`def`) ✍️",
         "instruction": "Define a function using the `def` keyword, a name, parentheses, and a colon. The body of the function is indented. For this challenge, define a function named **`greet`** that prints **'Hello!'**.",
@@ -301,8 +302,37 @@ LESSONS_DATA = [
         "answer": "def show_level(level):\n    print(level)",
         "hint": "The argument name goes inside the parentheses of the `def` line. The print statement uses the argument name.",
         "type": "function_define_with_arg"
+    },
+    
+    # --- NEW LESSONS 34-36: FUNCTIONS (RETURN) AND MODULES (RANDOM) ---
+    {
+        "concept": "Functions: Returning a Value (`return`) ↩️",
+        "instruction": "The `return` keyword exits a function and sends a specified value back to the code that called it. Define a function named **`get_number`** that simply returns the integer value **10**.",
+        "example": '`def get_five():`\n`    return 5`',
+        "challenge": "Challenge: Write a complete function definition for a function named **`get_number`**. The body of the function should be a single line that returns the integer **10**.",
+        "answer": "def get_number():\n    return 10",
+        "hint": "The `def` line needs a colon. The `return` statement needs 4 spaces of indentation.",
+        "type": "function_define_return"
+    },
+    {
+        "concept": "Functions: Using Returned Values ❓",
+        "instruction": "To store the value a function returns, assign the function call to a variable. Call the function **`get_number`** (defined in the last lesson) and store its result in a new variable named **`result`**.",
+        "example": '`five = get_five()`\n# five is now 5',
+        "challenge": "Challenge: Write the command to call the **`get_number`** function and assign the returned value to a variable named **`result`**.",
+        "answer": "result = get_number()",
+        "hint": "The variable name is followed by the assignment operator, then the function name with parentheses.",
+        "type": "exact_match"
+    },
+    {
+        "concept": "Built-in Modules: Random Numbers (`import random`) 🎲",
+        "instruction": "To use external functions, you must first import the module. Use the **`import`** keyword to load the **`random`** module. Then, call the **`randint()`** function on the module to get a random integer between two specified numbers (inclusive).",
+        "example": '`import random`\n`num = random.randint(1, 6)`',
+        "challenge": "Challenge: Write two commands: First, **`import`** the **`random`** module. Second, create a variable named **`rand_val`** and assign it a random integer between **1** and **100** (inclusive).",
+        "answer": "import random\nrand_val = random.randint(1, 100)",
+        "hint": "The second line uses dot notation: `module.function(min, max)`.",
+        "type": "random_import"
     }
-    # --- END LESSONS (33 Total) ---
+    # --- END LESSONS (36 Total) ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -398,10 +428,28 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
-    # --- NEW LOGIC FOR FUNCTIONS (L31, L33) ---
+    # --- NEW LOGIC FOR LESSONS 34-36 ---
     
+    # LESSON 36: random_import
+    if match_type == "random_import":
+        # Check for import random\nrand_val = random.randint(1, 100)
+        required_pattern = re.compile(
+            r"^import\s+random\nrand_val\s*=\s*random\s*\.\s*randint\s*\(\s*1\s*,\s*100\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(required_pattern.match(user_code_normalized.strip().replace('"', "'")))
+
+    # LESSON 34: function_define_return
+    elif match_type == "function_define_return":
+        # Check for def get_number():\n    return 10
+        required_pattern = re.compile(
+            r"^def\s+get_number\s*\(\s*\)\s*:\s*\n\s*return\s+10$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(required_pattern.match(user_code_normalized.strip()))
+        
     # LESSON 33: function_define_with_arg
-    if match_type == "function_define_with_arg":
+    elif match_type == "function_define_with_arg":
         # Check for def show_level(level):\n    print(level)
         required_pattern = re.compile(
             r"^def\s+show_level\s*\(\s*level\s*\)\s*:\s*\n\s*print\s*\(\s*level\s*\)$", 
@@ -561,7 +609,7 @@ def check_code_submission(user_code: str):
              is_correct = (user_code_normalized == required_answer)
                 
     else:
-        # Exact Match Logic (The rest of the lessons, including L32: greet())
+        # Exact Match Logic (Covers L32, L35, and all previous exact_match types)
         is_correct = (user_code_normalized == required_answer)
 
     if is_correct:
@@ -578,10 +626,10 @@ def check_code_submission(user_code: str):
         st.session_state.correct = False
         
         # Provide a specific warning for indentation/structure lessons
-        if match_type in ["if_statement", "if_else_statement", "if_elif_statement", "if_elif_else_statement", "while_loop", "for_loop", "function_define", "function_define_with_arg"]:
+        if match_type in ["if_statement", "if_else_statement", "if_elif_statement", "if_elif_else_statement", "while_loop", "for_loop", "function_define", "function_define_with_arg", "function_define_return", "random_import"]:
              st.error(
                 f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
-                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to a block (`if`, `elif`, `else`, `while`, `for`, or `def`)!"
+                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to a block (`if`, `elif`, `else`, `while`, `for`, or `def`). Also check imports for Lesson 36."
             )
         else:
             st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
@@ -628,16 +676,21 @@ def display_lesson(lesson_data):
             prefill_value = "x = 0\nwhile x < 2:\n    \n    "
         elif st.session_state.q_index == 19: # L20 (for loop)
             prefill_value = "for i in range(3):\n    "
-        # Function Block Structures (L31, L33)
+        # Function Block Structures (L31, L33, L34)
         elif st.session_state.q_index == 30: # L31 (def)
             prefill_value = "def greet():\n    "
         elif st.session_state.q_index == 32: # L33 (def with arg)
             prefill_value = "def show_level(level):\n    "
+        elif st.session_state.q_index == 33: # L34 (def with return)
+            prefill_value = "def get_number():\n    "
+        # Module Import (L36)
+        elif st.session_state.q_index == 35: # L36 (import random)
+             prefill_value = "import random\n"
         # All other lessons are single-line, so they use the default empty string
 
     user_code = st.text_area(
         "Type your Python command(s) below and click 'Submit'. Be precise with indentation!",
-        height=250 if st.session_state.q_index in [17, 18] else (200 if st.session_state.q_index in [14, 15, 16, 30, 32] else 100),
+        height=250 if st.session_state.q_index in [17, 18] else (200 if st.session_state.q_index in [14, 15, 16, 30, 32, 33, 35] else 100),
         key=input_key,
         value=prefill_value
     )
