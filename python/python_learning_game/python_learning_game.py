@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import re
 
-# --- 1. Question/Lesson Data (The Content - Now 30 Lessons) ---
+# --- 1. Question/Lesson Data (The Content - Now 33 Lessons) ---
 LESSONS_DATA = [
     {
         "concept": "Hello World - The Print Statement 🌎",
@@ -166,7 +166,6 @@ LESSONS_DATA = [
         "hint": "Remember: The first `if` starts the block, `elif` checks the next condition, and `else` must be the last, unconditioned block.",
         "type": "if_elif_else_statement"
     },
-    # --- LESSON 19 ---
     {
         "concept": "Iteration: The `while` Loop 🔄",
         "instruction": "The `while` loop executes its block as long as its condition is `True`. Like `if`, it needs a colon (`:`). **Crucially**, the variable used in the condition must be changed inside the loop to prevent an infinite loop.",
@@ -176,7 +175,6 @@ LESSONS_DATA = [
         "hint": "Your challenge requires four lines: initialization, the while statement, the indented print, and the indented counter update (e.g., `x = x + 1`).",
         "type": "while_loop"
     },
-    # --- LESSON 20 ---
     {
         "concept": "Iteration: The `for` Loop and `range()` 🔢",
         "instruction": "The `for` loop iterates through items in a sequence. It often uses the built-in `range()` function to define the number of repetitions. It requires a temporary loop variable (like `i`), the `in` keyword, the sequence, a colon (`:`), and indentation.",
@@ -186,7 +184,6 @@ LESSONS_DATA = [
         "hint": "The `for` line needs a variable, the `in` keyword, `range(3)`, and a colon. The print line needs indentation.",
         "type": "for_loop"
     },
-    # --- LESSON 21 ---
     {
         "concept": "Data Structures: Lists (Creation) 🖼️",
         "instruction": "A List is an ordered collection of items enclosed in square brackets (`[]`). Lists can hold different data types. They are defined by assigning the bracketed values to a variable.",
@@ -196,7 +193,6 @@ LESSONS_DATA = [
         "hint": "Remember to use square brackets (`[]`) and quote the string items.",
         "type": "list_creation"
     },
-    # --- LESSON 22 ---
     {
         "concept": "Data Structures: Lists (Accessing Elements) 🔍",
         "instruction": "List items are accessed using their **index number** (position) inside square brackets (`[]`). The first item is always at **index 0**.",
@@ -206,7 +202,6 @@ LESSONS_DATA = [
         "hint": "Use the `print()` function with the list variable name followed by the index in square brackets (`[]`).",
         "type": "list_access"
     },
-    # --- LESSON 23 ---
     {
         "concept": "Data Structures: Lists (Modification and Append) 📝",
         "instruction": "Lists are **mutable** (changeable). You can add a new item to the end using the built-in **`.append()`** method. This method is called directly on the list variable.",
@@ -216,7 +211,6 @@ LESSONS_DATA = [
         "hint": "The method is `.append()`. Don't forget the parentheses and quotes around the item!",
         "type": "list_append"
     },
-    # --- LESSON 24 ---
     {
         "concept": "Data Structures: Dictionaries (Creation) 📘",
         "instruction": "Dictionaries store data in **key: value** pairs, enclosed in **curly braces** (`{}`). Keys and values are separated by a colon, and pairs are separated by commas. Keys must be unique.",
@@ -226,7 +220,6 @@ LESSONS_DATA = [
         "hint": "Remember the curly braces (`{}`), quotes around string keys/values, and the colon separator.",
         "type": "dict_creation"
     },
-    # --- LESSON 25 ---
     {
         "concept": "Data Structures: Dictionaries (Accessing Values by Key) 🔑",
         "instruction": "Values in a dictionary are retrieved using their unique key inside square brackets (`[]`). Keys are usually strings and must be quoted.",
@@ -236,7 +229,6 @@ LESSONS_DATA = [
         "hint": "Use `print()`, the dictionary name, and the quoted key inside square brackets.",
         "type": "dict_access"
     },
-    # --- LESSON 26 ---
     {
         "concept": "Data Structures: Dictionaries (Modification and Adding) ✏️",
         "instruction": "Dictionaries are mutable. You can update an existing value or add a new key-value pair by accessing the key in square brackets and assigning a new value.",
@@ -246,7 +238,6 @@ LESSONS_DATA = [
         "hint": "You need the dictionary name, the quoted key in brackets, the assignment operator (`=`), and the new boolean value.",
         "type": "dict_modify"
     },
-    # --- LESSON 27 ---
     {
         "concept": "Built-in Functions: Finding Length (`len()`) 📏",
         "instruction": "The `len()` function returns the number of items in a list, dictionary, or the number of characters in a string. It is essential for determining loop boundaries or collection sizes.",
@@ -256,7 +247,6 @@ LESSONS_DATA = [
         "hint": "Use the assignment operator (`=`) and the `len()` function.",
         "type": "len_function"
     },
-    # --- LESSON 28 (NEW) ---
     {
         "concept": "Dictionary Methods: Retrieving Keys (`.keys()`) 🔑",
         "instruction": "Use the `.keys()` method to get an iterable view of all keys in a dictionary. Wrap the result in `list()` to get a standard list of keys.",
@@ -266,7 +256,6 @@ LESSONS_DATA = [
         "hint": "Start with the variable assignment, then use `list()` around the dictionary name followed by `.keys()`.",
         "type": "dict_keys"
     },
-    # --- LESSON 29 (NEW) ---
     {
         "concept": "Dictionary Methods: Retrieving Values (`.values()`) 📦",
         "instruction": "Use the `.values()` method to get an iterable view of all values in a dictionary. Wrap the result in `list()` to get a standard list of values.",
@@ -276,7 +265,6 @@ LESSONS_DATA = [
         "hint": "The syntax is almost identical to `.keys()`, but replace `keys` with `values`.",
         "type": "dict_values"
     },
-    # --- LESSON 30 (NEW) ---
     {
         "concept": "Dictionary Methods: Removing Items (`.pop()`) 🗑️",
         "instruction": "The `.pop()` method removes the specified key-value pair from the dictionary and returns the value of the removed item. The key must be provided inside the parentheses.",
@@ -285,8 +273,36 @@ LESSONS_DATA = [
         "answer": "profile.pop('id')",
         "hint": "Call the method directly on the dictionary, including the quoted key in the parentheses.",
         "type": "dict_pop"
+    },
+    # --- NEW FUNCTION LESSONS ---
+    {
+        "concept": "Functions: Defining a Function (`def`) ✍️",
+        "instruction": "Define a function using the `def` keyword, a name, parentheses, and a colon. The body of the function is indented. For this challenge, define a function named **`greet`** that prints **'Hello!'**.",
+        "example": '`def hello():`\n`    print("World")`',
+        "challenge": "Challenge: Write a complete function definition for a function named **`greet`**. The body of the function should be a single line that prints the string **'Hello!'**.",
+        "answer": "def greet():\n    print('Hello!')",
+        "hint": "The `def` line needs to end with a colon. The print statement needs 4 spaces of indentation.",
+        "type": "function_define"
+    },
+    {
+        "concept": "Functions: Calling/Executing a Function 📞",
+        "instruction": "After a function is defined, you execute its code block by calling it using its name followed by parentheses `()`.",
+        "example": '`def hello():\n    print("World")`\n`hello()`\n# Output: World',
+        "challenge": "Challenge: Assuming the function **`greet`** is already defined, write the command to call (execute) the **`greet`** function.",
+        "answer": "greet()",
+        "hint": "The function name is followed by parentheses, with no quotes or keywords.",
+        "type": "exact_match"
+    },
+    {
+        "concept": "Functions: Using Arguments (Parameters) 🎁",
+        "instruction": "Function arguments (also called parameters) are variables listed inside the parentheses during definition. They allow data to be passed into the function when it is called.",
+        "example": '`def say_name(name):`\n`    print("Hello, " + name)`',
+        "challenge": "Challenge: Define a function named **`show_level`** that accepts one argument named **`level`**. The function body should print the argument, `level`.",
+        "answer": "def show_level(level):\n    print(level)",
+        "hint": "The argument name goes inside the parentheses of the `def` line. The print statement uses the argument name.",
+        "type": "function_define_with_arg"
     }
-    # --- END LESSONS (30 Total) ---
+    # --- END LESSONS (33 Total) ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -382,10 +398,31 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
-    # --- NEW LESSON LOGIC (L28, L29, L30) ---
+    # --- NEW LOGIC FOR FUNCTIONS (L31, L33) ---
+    
+    # LESSON 33: function_define_with_arg
+    if match_type == "function_define_with_arg":
+        # Check for def show_level(level):\n    print(level)
+        required_pattern = re.compile(
+            r"^def\s+show_level\s*\(\s*level\s*\)\s*:\s*\n\s*print\s*\(\s*level\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(required_pattern.match(user_code_normalized.strip()))
+        
+    # LESSON 31: function_define
+    elif match_type == "function_define":
+        # Check for def greet():\n    print('Hello!')
+        required_pattern = re.compile(
+            r"^def\s+greet\s*\(\s*\)\s*:\s*\n\s*print\s*\(\s*['\"]Hello!['\"]\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(required_pattern.match(user_code_normalized.strip().replace('"', "'")))
+
+
+    # --- EXISTING LOGIC FOR DICTIONARY METHODS (L28, L29, L30) ---
     
     # LESSON 30: dict_pop
-    if match_type == "dict_pop":
+    elif match_type == "dict_pop":
         # Check for profile.pop('id') with flexible quotes and spacing
         pattern = re.compile(
             r"^profile\s*\.\s*pop\s*\(\s*['\"]id['\"]\s*\)$", 
@@ -410,6 +447,9 @@ def check_code_submission(user_code: str):
             re.IGNORECASE 
         )
         is_correct = bool(pattern.match(user_code.strip()))
+
+
+    # --- EXISTING LOGIC FOR LISTS/DICTS (L21-L27) ---
 
     # LESSON 27: len_function
     elif match_type == "len_function":
@@ -476,13 +516,19 @@ def check_code_submission(user_code: str):
         )
         is_correct = bool(pattern.match(user_code.strip().replace('"', "'"))) 
         
-    # LESSON 20-17, 12-16: for_loop, while_loop, conditionals
+    # --- EXISTING LOGIC FOR CONTROL FLOW (L15-L20) ---
+    
+    # L20-17: for_loop, while_loop, if/elif/else 
     elif match_type in ["for_loop", "while_loop", "if_elif_else_statement", "if_elif_statement"]:
         is_correct = (user_code_normalized == required_answer)
     
+    # L15-16: if, if/else 
     elif match_type in ["if_else_statement", "if_statement"]:
         is_correct = check_conditional(current_lesson["answer"], user_code)
 
+    # --- EXISTING LOGIC FOR VARIABLES/OPERATORS (L1-L14) ---
+    
+    # L7: String Concatenation 
     elif match_type == "concatenation_flexible":
         # Logic for L7: full_city = city + ' Bridge'
         pattern = re.compile(
@@ -491,6 +537,7 @@ def check_code_submission(user_code: str):
         )
         is_correct = bool(pattern.match(user_code.strip()))
         
+    # L2, L11: Quote Flexible
     elif match_type == "quote_flexible":
         # Logic for L11 (Comparison)
         if st.session_state.q_index == 10:
@@ -514,7 +561,7 @@ def check_code_submission(user_code: str):
              is_correct = (user_code_normalized == required_answer)
                 
     else:
-        # Exact Match Logic (The rest of the lessons)
+        # Exact Match Logic (The rest of the lessons, including L32: greet())
         is_correct = (user_code_normalized == required_answer)
 
     if is_correct:
@@ -531,10 +578,10 @@ def check_code_submission(user_code: str):
         st.session_state.correct = False
         
         # Provide a specific warning for indentation/structure lessons
-        if match_type in ["if_statement", "if_else_statement", "if_elif_statement", "if_elif_else_statement", "while_loop", "for_loop"]:
+        if match_type in ["if_statement", "if_else_statement", "if_elif_statement", "if_elif_else_statement", "while_loop", "for_loop", "function_define", "function_define_with_arg"]:
              st.error(
                 f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
-                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to a block (`if`, `elif`, `else`, `while`, or `for`)!"
+                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to a block (`if`, `elif`, `else`, `while`, `for`, or `def`)!"
             )
         else:
             st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
@@ -567,6 +614,7 @@ def display_lesson(lesson_data):
     
     # Custom Placeholders for complex multi-line inputs
     if not is_permanently_passed:
+        # Control Flow Block Structures (L15-L18)
         if st.session_state.q_index == 14: # L15 (if)
             prefill_value = "if is_rainy == True:\n    "
         elif st.session_state.q_index == 15: # L16 (if/else)
@@ -575,15 +623,21 @@ def display_lesson(lesson_data):
             prefill_value = "if grade > 90:\n    \nelif grade > 80:\n    "
         elif st.session_state.q_index == 17: # L18 (if/elif/else)
             prefill_value = "if day == 'Sat':\n    \nelif day == 'Sun':\n    \nelse:\n    "
+        # Loop Block Structures (L19-L20)
         elif st.session_state.q_index == 18: # L19 (while loop)
             prefill_value = "x = 0\nwhile x < 2:\n    \n    "
         elif st.session_state.q_index == 19: # L20 (for loop)
             prefill_value = "for i in range(3):\n    "
-        # L21-L30 are single-line, so they use the default empty string
+        # Function Block Structures (L31, L33)
+        elif st.session_state.q_index == 30: # L31 (def)
+            prefill_value = "def greet():\n    "
+        elif st.session_state.q_index == 32: # L33 (def with arg)
+            prefill_value = "def show_level(level):\n    "
+        # All other lessons are single-line, so they use the default empty string
 
     user_code = st.text_area(
         "Type your Python command(s) below and click 'Submit'. Be precise with indentation!",
-        height=250 if st.session_state.q_index in [17, 18] else (200 if st.session_state.q_index in [14, 15, 16] else 100),
+        height=250 if st.session_state.q_index in [17, 18] else (200 if st.session_state.q_index in [14, 15, 16, 30, 32] else 100),
         key=input_key,
         value=prefill_value
     )
