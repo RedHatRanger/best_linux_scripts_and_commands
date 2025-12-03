@@ -139,7 +139,6 @@ LESSONS_DATA = [
         "hint": "The first line needs `if` and a condition ending in a colon. The second line must start with 4 spaces.",
         "type": "if_statement"
     },
-    # --- LESSON 16 ---
     {
         "concept": "Control Flow: The `else` Statement 🚫",
         "instruction": "The `else` statement is paired with an `if` statement and runs when the `if` condition is `False`. It must be aligned with the `if` and end with a colon (`:`).",
@@ -148,8 +147,28 @@ LESSONS_DATA = [
         "answer": "if is_sunny == True:\n    print('Go hiking.')\nelse:\n    print('Stay inside and read.')",
         "hint": "Ensure the `else:` aligns with the `if`, and the `print()` line underneath `else:` is indented.",
         "type": "if_else_statement"
+    },
+    # --- LESSON 17 ---
+    {
+        "concept": "Control Flow: The `elif` (Else If) Statement ➡️",
+        "instruction": "The `elif` statement lets you check multiple conditions sequentially. It runs only if the preceding `if` or `elif` conditions were `False`. It requires its own condition and colon (`:`).",
+        "example": '`temp = 40`\n`if temp > 50:`\n`    print("Hot")`\n`elif temp > 30:`\n`    print("Warm")`\n# Output: Warm',
+        "challenge": "Challenge: Write a structure. If **`grade`** is greater than 90, print **'A'**. Use **`elif`** to check if `grade` is greater than 80, and if so, print **'B'**.",
+        "answer": "if grade > 90:\n    print('A')\nelif grade > 80:\n    print('B')",
+        "hint": "Ensure the `elif` line is not indented, has a condition, and ends in a colon. The print line below it must be indented.",
+        "type": "if_elif_statement"
+    },
+    # --- LESSON 18 ---
+    {
+        "concept": "Control Flow: The Full `if/elif/else` Structure 🧠",
+        "instruction": "This combines all three control flow statements: `if` for the first test, `elif` for secondary tests, and `else` for the final default case (if all other conditions are false).",
+        "example": '`color = "red"`\n`if color == "blue":`\n`    print("Cold")`\n`elif color == "red":`\n`    print("Hot")`\n`else:`\n`    print("Neutral")`',
+        "challenge": "Challenge: Complete a structure. If **`day`** is 'Sat', print **'Weekend'**. If `day` is 'Sun', print **'Weekend'**. Otherwise, print **'Weekday'**.",
+        "answer": "if day == 'Sat':\n    print('Weekend')\nelif day == 'Sun':\n    print('Weekend')\nelse:\n    print('Weekday')",
+        "hint": "Remember: The first `if` starts the block, `elif` checks the next condition, and `else` must be the last, unconditioned block.",
+        "type": "if_elif_else_statement"
     }
-    # --- END LESSON 16 ---
+    # --- END LESSON 18 ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -230,24 +249,36 @@ def check_code_submission(user_code: str):
     is_correct = False
     match_type = current_lesson.get("type")
 
-    # Lesson 16: if_else_statement
-    if match_type == "if_else_statement":
-        # Check against the normalized required answer.
+    # Helper function for conditional statement checks
+    def check_conditional(required_template: str, user_code: str):
+        # We assume required_template uses the full form (e.g., `== True`)
+        is_match = (user_code_normalized == required_answer)
+        
+        # Check for the simplified Pythonic form (e.g., `if is_sunny:` instead of `if is_sunny == True:`)
+        if not is_match:
+            # Generate the normalized simplified required answer
+            # This is complex, so we will manually define the simplified answers for the boolean checks
+            if st.session_state.q_index == 14: # L15 (if)
+                simplified_required = normalize_code("if is_rainy:\n    print('Bring an umbrella.')")
+                is_match = (user_code_normalized == simplified_required)
+            elif st.session_state.q_index == 15: # L16 (if/else)
+                simplified_required = normalize_code("if is_sunny:\n    print('Go hiking.')\nelse:\n    print('Stay inside and read.')")
+                is_match = (user_code_normalized == simplified_required)
+                
+        return is_match
+
+    # LESSON 18: if_elif_else_statement
+    if match_type == "if_elif_else_statement":
         is_correct = (user_code_normalized == required_answer)
         
-        # Allow simplified 'if is_sunny:' which is the Pythonic way for checking True
-        if not is_correct:
-            simplified_required = normalize_code("if is_sunny:\n    print('Go hiking.')\nelse:\n    print('Stay inside and read.')")
-            is_correct = (user_code_normalized == simplified_required)
+    # LESSON 17: if_elif_statement
+    elif match_type == "if_elif_statement":
+        is_correct = (user_code_normalized == required_answer)
     
-    # Lesson 15: if_statement
-    elif match_type == "if_statement":
-        is_correct = (user_code_normalized == required_answer)
-        
-        if not is_correct:
-            simplified_required = normalize_code("if is_rainy:\n    print('Bring an umbrella.')")
-            is_correct = (user_code_normalized == simplified_required)
-            
+    # LESSON 16 & 15: if_else_statement / if_statement (Uses flexible boolean checking)
+    elif match_type in ["if_else_statement", "if_statement"]:
+        is_correct = check_conditional(current_lesson["answer"], user_code)
+
     elif match_type == "concatenation_flexible":
         # Logic for L7: full_city = city + ' Bridge'
         pattern = re.compile(
@@ -296,10 +327,10 @@ def check_code_submission(user_code: str):
         st.session_state.correct = False
         
         # Provide a specific warning for indentation/structure lessons
-        if match_type in ["if_statement", "if_else_statement"]:
+        if match_type in ["if_statement", "if_else_statement", "if_elif_statement", "if_elif_else_statement"]:
              st.error(
                 f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
-                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to an `if` or `else` block!"
+                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to an `if`, `elif`, or `else` block! Also check the alignment of `elif` and `else`."
             )
         else:
             st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
@@ -327,17 +358,21 @@ def display_lesson(lesson_data):
     # 2. User Input Area (Code Editor)
     input_key = f"code_input_{st.session_state.q_index}" 
     
-    # Pre-fill with answer if passed, otherwise use a multi-line placeholder if it's L15 or L16
+    # Pre-fill with answer if passed, otherwise use a multi-line placeholder if it's L15, L16, L17, or L18
     prefill_value = LESSONS_DATA[st.session_state.q_index]["answer"] if is_permanently_passed else ""
     
     if st.session_state.q_index == 14 and not is_permanently_passed: # L15 (if)
         prefill_value = "if is_rainy == True:\n    "
     elif st.session_state.q_index == 15 and not is_permanently_passed: # L16 (if/else)
         prefill_value = "if is_sunny == True:\n    \nelse:\n    "
+    elif st.session_state.q_index == 16 and not is_permanently_passed: # L17 (if/elif)
+        prefill_value = "if grade > 90:\n    \nelif grade > 80:\n    "
+    elif st.session_state.q_index == 17 and not is_permanently_passed: # L18 (if/elif/else)
+        prefill_value = "if day == 'Sat':\n    \nelif day == 'Sun':\n    \nelse:\n    "
 
     user_code = st.text_area(
         "Type your Python command(s) below and click 'Submit'. Be precise with indentation!",
-        height=200 if st.session_state.q_index in [14, 15] else 100,
+        height=250 if st.session_state.q_index in [17] else (200 if st.session_state.q_index in [14, 15, 16] else 100),
         key=input_key,
         value=prefill_value
     )
