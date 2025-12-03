@@ -65,7 +65,7 @@ LESSONS_DATA = [
         "challenge": "Challenge: Create a variable named **`full_city`** and assign it the result of joining the variables **`city`** (from Lesson 2) and the string **' Bridge'**.",
         "answer": "full_city = city + ' Bridge'", # The canonical answer
         "hint": "The variable `city` already contains the string value 'London', so the correct syntax is the variable name plus the operator plus the new string in quotes.",
-        "type": "concatenation_flexible" # <-- NEW TYPE
+        "type": "concatenation_flexible" 
     },
     {
         "concept": "Arithmetic: Division (/) and Floor Division (//) ➗", 
@@ -107,7 +107,7 @@ def initialize_state():
     if 'passed_lessons' not in st.session_state:
         st.session_state.passed_lessons = 0
     if 'passed_indices' not in st.session_state:
-        st.session_state.passed_indices = set() # NEW: Set to store indices of passed lessons
+        st.session_state.passed_indices = set() 
     if 'correct' not in st.session_state:
         st.session_state.correct = False
 
@@ -213,8 +213,8 @@ def display_lesson(lesson_data):
         "Type your Python command below and click 'Submit' (Case and syntax matter for non-string parts!)",
         height=100,
         key=input_key,
-        # Default the text area with the correct answer if the lesson is already passed
-        value=current_lesson["answer"] if st.session_state.q_index in st.session_state.passed_indices else ""
+        # *** FIX APPLIED HERE: Use 'lesson_data' which was safely passed from main ***
+        value=lesson_data["answer"] if st.session_state.q_index in st.session_state.passed_indices else ""
     )
     
     # 3. Submission Logic
@@ -229,7 +229,7 @@ def display_lesson(lesson_data):
     st.markdown("---")
     
     # === DEDICATED FEEDBACK AREA ===
-    current_lesson = LESSONS_DATA[st.session_state.q_index]
+    # *** Removed redundant and unsafe index access here ***
 
     if st.session_state.get('correct', False):
         # Display congratulations message
@@ -244,7 +244,8 @@ def display_lesson(lesson_data):
         )
         if st.session_state.attempts >= 2:
             with st.expander("💡 Show Hint"):
-                st.info(current_lesson["hint"])
+                # *** FIX APPLIED HERE: Use 'lesson_data' ***
+                st.info(lesson_data["hint"])
 
 
 def display_completion_screen():
@@ -306,6 +307,7 @@ def main():
     st.markdown("# 🚀 Interactive Python Syntax Practice")
     
     if st.session_state.q_index < total_lessons:
+        # This check ensures that only a valid index is passed to display_lesson
         display_lesson(LESSONS_DATA[st.session_state.q_index])
     else:
         display_completion_screen()
