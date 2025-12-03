@@ -77,7 +77,7 @@ LESSONS_DATA = [
         "type": "exact_match"
     },
     {
-        "concept": "Arithmetic: Modulus Operator (Remainder) %", # <-- NEW LESSON 9
+        "concept": "Arithmetic: Modulus Operator (Remainder) %",
         "instruction": "The modulus operator (`%`) returns the **remainder** after performing a division. For example, 7 divided by 3 is 2 with a remainder of 1, so `7 % 3` equals 1.",
         "example": '`remainder_a = 10 % 3`\n# Output: 1\n`is_even = 8 % 2`\n# Output: 0',
         "challenge": "Challenge: Find the remainder when 20 is divided by 6. Create a variable named **`left_over`** and assign it the result of **20 % 6**.",
@@ -87,7 +87,7 @@ LESSONS_DATA = [
     }
 ]
 
-# --- 2. Game State Management ---
+# --- 2. Game State Management & Callbacks ---
 
 def initialize_state():
     """Initializes or ensures the existence of all session state variables."""
@@ -100,13 +100,18 @@ def initialize_state():
     if 'correct' not in st.session_state:
         st.session_state.correct = False
 
+def set_lesson(index):
+    """Callback: Sets the current lesson index and resets attempts/correct state."""
+    st.session_state.q_index = index
+    st.session_state.attempts = 0
+    st.session_state.correct = False
+
 def next_lesson():
     """Advances the lesson index and resets attempts and correct state."""
     if st.session_state.q_index < len(LESSONS_DATA) - 1:
         st.session_state.q_index += 1
         st.session_state.attempts = 0
         st.session_state.correct = False
-        # st.rerun() removed: Change to session state triggers auto-rerun.
     else:
         st.session_state.q_index += 1 
 
@@ -147,14 +152,12 @@ def check_code_submission(user_code: str):
         
         # Success actions
         st.balloons() 
-        # st.rerun() removed: Change to session state triggers auto-rerun.
         
     else:
         st.session_state.correct = False
         
         # Failure actions
         st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
-        # st.rerun() removed: Change to session state triggers auto-rerun.
 
 
 # --- 4. Display Functions ---
@@ -229,19 +232,44 @@ def display_completion_screen():
 
 def main():
     """The main function to run the Streamlit app."""
-    st.set_page_config(page_title="W3Schools Python Practice", layout="centered")
+    st.set_page_config(page_title="Python Syntax Practice", layout="centered")
     
     initialize_state()
 
-    st.sidebar.title("Progress Tracker")
     total_lessons = len(LESSONS_DATA)
     current_lesson_num = st.session_state.q_index
+    passed = st.session_state.passed_lessons
     
-    if current_lesson_num < total_lessons:
-        st.sidebar.write(f"**Lesson:** {current_lesson_num + 1} of {total_lessons}")
-        st.sidebar.progress((current_lesson_num + 1) / total_lessons)
-        st.sidebar.markdown(f"**Passed:** {st.session_state.passed_lessons}")
-
+    # --- SIDEBAR: Progress and Navigation ---
+    with st.sidebar:
+        st.title("Progress & Navigation")
+        
+        # 1. Overall Progress
+        st.write(f"**Passed Lessons:** {passed} of {total_lessons}")
+        st.progress(passed / total_lessons if total_lessons > 0 else 0)
+        st.markdown("---")
+        
+        # 2. Lesson Navigation Buttons
+        st.markdown("### Jump to Lesson:")
+        for i, lesson in enumerate(LESSONS_DATA):
+            # Check if the user is currently on this lesson or has passed it
+            is_unlocked = i <= passed or (i == passed and current_lesson_num == passed)
+            is_current = i == current_lesson_num
+            
+            # Determine the label and icon
+            icon = "➡️" if is_current else ("✅" if i < passed else "🔒")
+            label = f"L{i+1}: {lesson['concept']}"
+            
+            st.button(
+                f"{icon} {label}", 
+                key=f"nav_btn_{i}",
+                on_click=set_lesson, 
+                args=(i,),
+                disabled=not is_unlocked,
+                type="primary" if is_current else "secondary"
+            )
+            
+    # --- MAIN CONTENT ---
     st.markdown("# 🚀 Interactive Python Syntax Practice")
     
     if st.session_state.q_index < total_lessons:
