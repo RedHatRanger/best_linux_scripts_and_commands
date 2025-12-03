@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import re
 
-# --- 1. Question/Lesson Data (The Content - Now 36 Lessons) ---
+# --- 1. Question/Lesson Data (The Content - Now 39 Lessons) ---
 LESSONS_DATA = [
     {
         "concept": "Hello World - The Print Statement 🌎",
@@ -274,8 +274,6 @@ LESSONS_DATA = [
         "hint": "Call the method directly on the dictionary, including the quoted key in the parentheses.",
         "type": "dict_pop"
     },
-    
-    # --- LESSONS 31-33: FUNCTIONS (DEFINE/CALL/ARGS) ---
     {
         "concept": "Functions: Defining a Function (`def`) ✍️",
         "instruction": "Define a function using the `def` keyword, a name, parentheses, and a colon. The body of the function is indented. For this challenge, define a function named **`greet`** that prints **'Hello!'**.",
@@ -303,8 +301,6 @@ LESSONS_DATA = [
         "hint": "The argument name goes inside the parentheses of the `def` line. The print statement uses the argument name.",
         "type": "function_define_with_arg"
     },
-    
-    # --- NEW LESSONS 34-36: FUNCTIONS (RETURN) AND MODULES (RANDOM) ---
     {
         "concept": "Functions: Returning a Value (`return`) ↩️",
         "instruction": "The `return` keyword exits a function and sends a specified value back to the code that called it. Define a function named **`get_number`** that simply returns the integer value **10**.",
@@ -331,8 +327,37 @@ LESSONS_DATA = [
         "answer": "import random\nrand_val = random.randint(1, 100)",
         "hint": "The second line uses dot notation: `module.function(min, max)`.",
         "type": "random_import"
+    },
+    
+    # --- NEW LESSONS 37-39: ITERATION AND MULTIPLE ARGUMENTS ---
+    {
+        "concept": "Iteration: `for` Loop over a List 💡",
+        "instruction": "You can use a `for` loop to iterate directly over the *items* of a list, not just a range of numbers. The loop variable (e.g., `item`) takes the value of each element sequentially.",
+        "example": '`items = ["A", "B"]`\n`for item in items:`\n`    print(item)`\n# Output: A, B',
+        "challenge": "Challenge: Assuming a list **`names`** exists, write a `for` loop that iterates over each element in **`names`** and prints the value of the element (use **`name`** as the loop variable).",
+        "answer": "for name in names:\n    print(name)",
+        "hint": "The structure is `for variable in list_name:` followed by an indented action.",
+        "type": "for_loop_list_iterate"
+    },
+    {
+        "concept": "Functions: Multiple Arguments (Comma Separated) ✨",
+        "instruction": "Functions can accept any number of arguments, separated by commas during definition and when called. Define a function named **`add`** that takes two arguments, **`a`** and **`b`**, and returns their sum.",
+        "example": '`def product(x, y):`\n`    return x * y`',
+        "challenge": "Challenge: Define a function named **`add`** that accepts two arguments, **`a`** and **`b`**. The function body should contain a single line that returns the result of **`a + b`**.",
+        "answer": "def add(a, b):\n    return a + b",
+        "hint": "The arguments in the `def` line must be comma-separated, and the return line must be indented.",
+        "type": "function_two_args"
+    },
+    {
+        "concept": "Functions: Calling with Keyword Arguments (Named) 🏷️",
+        "instruction": "When calling a function, you can optionally specify which parameter a value is assigned to using its name (`param=value`). This is useful for clarity and allows you to pass arguments out of order.",
+        "example": '`def power(base, exp):`\n`    return base ** exp`\n`result = power(exp=3, base=2)`\n# result is 8 (2**3)',
+        "challenge": "Challenge: Assuming the function **`add`** is defined, call it, passing the value **10** to the **`a`** argument and the value **20** to the **`b`** argument using keyword arguments. Store the returned sum in a variable named **`final_sum`**.",
+        "answer": "final_sum = add(a=10, b=20)",
+        "hint": "The arguments inside the parentheses must be named with an equals sign.",
+        "type": "exact_match"
     }
-    # --- END LESSONS (36 Total) ---
+    # --- END LESSONS (39 Total) ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -428,10 +453,30 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
-    # --- NEW LOGIC FOR LESSONS 34-36 ---
+    # --- NEW LOGIC FOR LESSONS 37-39 ---
+    
+    # LESSON 38: function_two_args
+    if match_type == "function_two_args":
+        # Check for def add(a, b):\n    return a + b
+        required_pattern = re.compile(
+            r"^def\s+add\s*\(\s*a\s*,\s*b\s*\)\s*:\s*\n\s*return\s+a\s*\+\s*b$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(required_pattern.match(user_code_normalized.strip()))
+        
+    # LESSON 37: for_loop_list_iterate
+    elif match_type == "for_loop_list_iterate":
+        # Check for for name in names:\n    print(name)
+        required_pattern = re.compile(
+            r"^for\s+name\s+in\s+names\s*:\s*\n\s*print\s*\(\s*name\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(required_pattern.match(user_code_normalized.strip()))
+
+    # --- EXISTING LOGIC FOR LESSONS 34-36 ---
     
     # LESSON 36: random_import
-    if match_type == "random_import":
+    elif match_type == "random_import":
         # Check for import random\nrand_val = random.randint(1, 100)
         required_pattern = re.compile(
             r"^import\s+random\nrand_val\s*=\s*random\s*\.\s*randint\s*\(\s*1\s*,\s*100\s*\)$", 
@@ -609,7 +654,7 @@ def check_code_submission(user_code: str):
              is_correct = (user_code_normalized == required_answer)
                 
     else:
-        # Exact Match Logic (Covers L32, L35, and all previous exact_match types)
+        # Exact Match Logic (Covers L32, L35, L39 and all previous exact_match types)
         is_correct = (user_code_normalized == required_answer)
 
     if is_correct:
@@ -626,10 +671,10 @@ def check_code_submission(user_code: str):
         st.session_state.correct = False
         
         # Provide a specific warning for indentation/structure lessons
-        if match_type in ["if_statement", "if_else_statement", "if_elif_statement", "if_elif_else_statement", "while_loop", "for_loop", "function_define", "function_define_with_arg", "function_define_return", "random_import"]:
+        if match_type in ["if_statement", "if_else_statement", "if_elif_statement", "if_elif_else_statement", "while_loop", "for_loop", "function_define", "function_define_with_arg", "function_define_return", "random_import", "for_loop_list_iterate", "function_two_args"]:
              st.error(
                 f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
-                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to a block (`if`, `elif`, `else`, `while`, `for`, or `def`). Also check imports for Lesson 36."
+                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to a block (`if`, `elif`, `else`, `while`, `for`, or `def`). Also check imports/arguments for Lessons 36, 38, 39."
             )
         else:
             st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
@@ -671,18 +716,22 @@ def display_lesson(lesson_data):
             prefill_value = "if grade > 90:\n    \nelif grade > 80:\n    "
         elif st.session_state.q_index == 17: # L18 (if/elif/else)
             prefill_value = "if day == 'Sat':\n    \nelif day == 'Sun':\n    \nelse:\n    "
-        # Loop Block Structures (L19-L20)
+        # Loop Block Structures (L19, L20, L37)
         elif st.session_state.q_index == 18: # L19 (while loop)
             prefill_value = "x = 0\nwhile x < 2:\n    \n    "
-        elif st.session_state.q_index == 19: # L20 (for loop)
+        elif st.session_state.q_index == 19: # L20 (for loop with range)
             prefill_value = "for i in range(3):\n    "
-        # Function Block Structures (L31, L33, L34)
+        elif st.session_state.q_index == 36: # L37 (for loop over list)
+            prefill_value = "for name in names:\n    "
+        # Function Block Structures (L31, L33, L34, L38)
         elif st.session_state.q_index == 30: # L31 (def)
             prefill_value = "def greet():\n    "
         elif st.session_state.q_index == 32: # L33 (def with arg)
             prefill_value = "def show_level(level):\n    "
         elif st.session_state.q_index == 33: # L34 (def with return)
             prefill_value = "def get_number():\n    "
+        elif st.session_state.q_index == 37: # L38 (def with two args)
+            prefill_value = "def add(a, b):\n    "
         # Module Import (L36)
         elif st.session_state.q_index == 35: # L36 (import random)
              prefill_value = "import random\n"
@@ -690,7 +739,7 @@ def display_lesson(lesson_data):
 
     user_code = st.text_area(
         "Type your Python command(s) below and click 'Submit'. Be precise with indentation!",
-        height=250 if st.session_state.q_index in [17, 18] else (200 if st.session_state.q_index in [14, 15, 16, 30, 32, 33, 35] else 100),
+        height=250 if st.session_state.q_index in [17, 18] else (200 if st.session_state.q_index in [14, 15, 16, 30, 32, 33, 35, 36, 37] else 100),
         key=input_key,
         value=prefill_value
     )
