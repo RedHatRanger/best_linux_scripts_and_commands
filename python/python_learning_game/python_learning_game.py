@@ -195,8 +195,38 @@ LESSONS_DATA = [
         "answer": "colors = ['Red', 'Green', 'Blue']",
         "hint": "Remember to use square brackets (`[]`) and quote the string items.",
         "type": "list_creation"
+    },
+    # --- LESSON 22 ---
+    {
+        "concept": "Data Structures: Lists (Accessing Elements) 🔍",
+        "instruction": "List items are accessed using their **index number** (position) inside square brackets (`[]`). The first item is always at **index 0**.",
+        "example": '`fruits = ["apple", "banana", "cherry"]`\n`print(fruits[1])`\n# Output: banana',
+        "challenge": "Challenge: Assuming the list **`colors`** is **`['Red', 'Green', 'Blue']`**, write the command to print the item at **index 0**.",
+        "answer": "print(colors[0])",
+        "hint": "Use the `print()` function with the list variable name followed by the index in square brackets (`[]`).",
+        "type": "list_access"
+    },
+    # --- LESSON 23 ---
+    {
+        "concept": "Data Structures: Lists (Modification and Append) 📝",
+        "instruction": "Lists are **mutable** (changeable). You can add a new item to the end using the built-in **`.append()`** method. This method is called directly on the list variable.",
+        "example": '`my_list = [1, 2]`\n`my_list.append(3)`\n# my_list is now [1, 2, 3]',
+        "challenge": "Challenge: Assuming the list **`colors`** is **`['Red', 'Green', 'Blue']`**, write the command to add the string **'Yellow'** to the end of the list.",
+        "answer": "colors.append('Yellow')",
+        "hint": "The method is `.append()`. Don't forget the parentheses and quotes around the item!",
+        "type": "list_append"
+    },
+    # --- LESSON 24 ---
+    {
+        "concept": "Data Structures: Dictionaries (Creation) 📘",
+        "instruction": "Dictionaries store data in **key: value** pairs, enclosed in **curly braces** (`{}`). Keys and values are separated by a colon, and pairs are separated by commas. Keys must be unique.",
+        "example": '`person = {"name": "Alice", "age": 30}`',
+        "challenge": "Challenge: Create a dictionary named **`profile`** with two key-value pairs: the key **'user'** set to the value **'admin'**, and the key **'id'** set to the integer value **101**.",
+        "answer": "profile = {'user': 'admin', 'id': 101}",
+        "hint": "Remember the curly braces (`{}`), quotes around string keys/values, and the colon separator.",
+        "type": "dict_creation"
     }
-    # --- END LESSON 21 ---
+    # --- END LESSONS ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -292,33 +322,49 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
+    # --- NEW LESSON LOGIC (L22-L24) ---
+    
+    # LESSON 24: dict_creation
+    if match_type == "dict_creation":
+        # Check for profile={'user':'admin','id':101} or profile={'id':101,'user':'admin'}
+        user_code_simple = user_code.strip().replace('"', "'")
+        user_code_no_ws = re.sub(r'\s+', '', user_code_simple)
+        is_correct = bool(re.match(r"^profile=\{('user':'admin','id':101|'id':101,'user':'admin')\}$", user_code_no_ws))
+
+
+    # LESSON 23: list_append
+    elif match_type == "list_append":
+        # Check for colors.append('Yellow') with flexible quotes and spacing
+        pattern = re.compile(
+            r"^colors\s*\.\s*append\s*\(\s*['\"]Yellow['\"]\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip().replace('"', "'")))
+
+
+    # LESSON 22: list_access
+    elif match_type == "list_access":
+        # Check for print(colors[0]) with flexible spacing
+        pattern = re.compile(
+            r"^print\s*\(\s*colors\s*\[\s*0\s*\]\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+
+
     # LESSON 21: list_creation
-    if match_type == "list_creation":
+    elif match_type == "list_creation":
         # Allow flexible spacing around the list items and quotes
         pattern = re.compile(
             r"^colors\s*=\s*\[\s*['\"]Red['\"]\s*,\s*['\"]Green['\"]\s*,\s*['\"]Blue['\"]\s*\]$", 
             re.IGNORECASE 
         )
-        # Note: We must use the original user_code for list check due to potential issues with comma space normalization.
         is_correct = bool(pattern.match(user_code.strip().replace('"', "'"))) 
         
-    # LESSON 20: for_loop
-    elif match_type == "for_loop":
-        is_correct = (user_code_normalized == required_answer)
-        
-    # LESSON 19: while_loop
-    elif match_type == "while_loop":
-        is_correct = (user_code_normalized == required_answer)
-
-    # LESSON 18: if_elif_else_statement
-    elif match_type == "if_elif_else_statement":
-        is_correct = (user_code_normalized == required_answer)
-        
-    # LESSON 17: if_elif_statement
-    elif match_type == "if_elif_statement":
+    # LESSON 20-17, 12-16: for_loop, while_loop, conditionals
+    elif match_type in ["for_loop", "while_loop", "if_elif_else_statement", "if_elif_statement"]:
         is_correct = (user_code_normalized == required_answer)
     
-    # LESSON 16 & 15: if_else_statement / if_statement (Uses flexible boolean checking)
     elif match_type in ["if_else_statement", "if_statement"]:
         is_correct = check_conditional(current_lesson["answer"], user_code)
 
@@ -393,7 +439,7 @@ def display_lesson(lesson_data):
     st.markdown(f"### 💻 Example")
     st.code(lesson_data['example'], language='python')
     
-    st.markdown(f"### 📝 Your Challenge")
+    st.markdown(f"### 3. Your Challenge")
     st.warning(lesson_data['challenge'])
     
     is_permanently_passed = st.session_state.q_index in st.session_state.passed_indices
@@ -418,7 +464,7 @@ def display_lesson(lesson_data):
             prefill_value = "x = 0\nwhile x < 2:\n    \n    "
         elif st.session_state.q_index == 19: # L20 (for loop)
             prefill_value = "for i in range(3):\n    "
-
+        # L21-L24 are single-line, so they use the default empty string
 
     user_code = st.text_area(
         "Type your Python command(s) below and click 'Submit'. Be precise with indentation!",
