@@ -148,7 +148,6 @@ LESSONS_DATA = [
         "hint": "Ensure the `else:` aligns with the `if`, and the `print()` line underneath `else:` is indented.",
         "type": "if_else_statement"
     },
-    # --- LESSON 17 ---
     {
         "concept": "Control Flow: The `elif` (Else If) Statement ➡️",
         "instruction": "The `elif` statement lets you check multiple conditions sequentially. It runs only if the preceding `if` or `elif` conditions were `False`. It requires its own condition and colon (`:`).",
@@ -158,7 +157,6 @@ LESSONS_DATA = [
         "hint": "Ensure the `elif` line is not indented, has a condition, and ends in a colon. The print line below it must be indented.",
         "type": "if_elif_statement"
     },
-    # --- LESSON 18 ---
     {
         "concept": "Control Flow: The Full `if/elif/else` Structure 🧠",
         "instruction": "This combines all three control flow statements: `if` for the first test, `elif` for secondary tests, and `else` for the final default case (if all other conditions are false).",
@@ -167,8 +165,38 @@ LESSONS_DATA = [
         "answer": "if day == 'Sat':\n    print('Weekend')\nelif day == 'Sun':\n    print('Weekend')\nelse:\n    print('Weekday')",
         "hint": "Remember: The first `if` starts the block, `elif` checks the next condition, and `else` must be the last, unconditioned block.",
         "type": "if_elif_else_statement"
+    },
+    # --- LESSON 19 ---
+    {
+        "concept": "Iteration: The `while` Loop 🔄",
+        "instruction": "The `while` loop executes its block as long as its condition is `True`. Like `if`, it needs a colon (`:`) and indentation. **Crucially**, the variable used in the condition must be changed inside the loop to prevent an infinite loop.",
+        "example": '`count = 0`\n`while count < 3:`\n`    print("Looping")`\n`    count = count + 1`\n# Output: Looping (3 times)',
+        "challenge": "Challenge: Write a complete `while` loop. Initialize a variable **`x`** to `0`. Loop while `x` is less than **2**. Inside the loop, print **'Counting'** and then update `x` by adding `1` to it.",
+        "answer": "x = 0\nwhile x < 2:\n    print('Counting')\n    x = x + 1",
+        "hint": "Your challenge requires four lines: initialization, the while statement, the indented print, and the indented counter update (e.g., `x = x + 1`).",
+        "type": "while_loop"
+    },
+    # --- LESSON 20 ---
+    {
+        "concept": "Iteration: The `for` Loop and `range()` 🔢",
+        "instruction": "The `for` loop iterates through items in a sequence. It often uses the built-in `range()` function to define the number of repetitions. It requires a temporary loop variable (like `i`), the `in` keyword, the sequence, a colon (`:`), and indentation.",
+        "example": '`for i in range(3):`\n`    print("Hello")`\n# Output: Hello (3 times)',
+        "challenge": "Challenge: Write a `for` loop that iterates over the numbers 0, 1, and 2. Use **`i`** as the loop variable. Inside the loop, print the string **'Repeat'**.",
+        "answer": "for i in range(3):\n    print('Repeat')",
+        "hint": "The `for` line needs a variable, the `in` keyword, `range(3)`, and a colon. The print line needs indentation.",
+        "type": "for_loop"
+    },
+    # --- LESSON 21 ---
+    {
+        "concept": "Data Structures: Lists (Creation) 🖼️",
+        "instruction": "A List is an ordered collection of items enclosed in square brackets (`[]`). Lists can hold different data types. They are defined by assigning the bracketed values to a variable.",
+        "example": '`numbers = [1, 2, 3]`\n`names = ["Alice", "Bob"]`',
+        "challenge": "Challenge: Create a list named **`colors`** and assign it the string values **'Red'**, **'Green'**, and **'Blue'**.",
+        "answer": "colors = ['Red', 'Green', 'Blue']",
+        "hint": "Remember to use square brackets (`[]`) and quote the string items.",
+        "type": "list_creation"
     }
-    # --- END LESSON 18 ---
+    # --- END LESSON 21 ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -249,15 +277,12 @@ def check_code_submission(user_code: str):
     is_correct = False
     match_type = current_lesson.get("type")
 
-    # Helper function for conditional statement checks
+    # Helper function for conditional statement checks (L15, L16)
     def check_conditional(required_template: str, user_code: str):
-        # We assume required_template uses the full form (e.g., `== True`)
         is_match = (user_code_normalized == required_answer)
         
         # Check for the simplified Pythonic form (e.g., `if is_sunny:` instead of `if is_sunny == True:`)
         if not is_match:
-            # Generate the normalized simplified required answer
-            # This is complex, so we will manually define the simplified answers for the boolean checks
             if st.session_state.q_index == 14: # L15 (if)
                 simplified_required = normalize_code("if is_rainy:\n    print('Bring an umbrella.')")
                 is_match = (user_code_normalized == simplified_required)
@@ -267,8 +292,26 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
+    # LESSON 21: list_creation
+    if match_type == "list_creation":
+        # Allow flexible spacing around the list items and quotes
+        pattern = re.compile(
+            r"^colors\s*=\s*\[\s*['\"]Red['\"]\s*,\s*['\"]Green['\"]\s*,\s*['\"]Blue['\"]\s*\]$", 
+            re.IGNORECASE 
+        )
+        # Note: We must use the original user_code for list check due to potential issues with comma space normalization.
+        is_correct = bool(pattern.match(user_code.strip().replace('"', "'"))) 
+        
+    # LESSON 20: for_loop
+    elif match_type == "for_loop":
+        is_correct = (user_code_normalized == required_answer)
+        
+    # LESSON 19: while_loop
+    elif match_type == "while_loop":
+        is_correct = (user_code_normalized == required_answer)
+
     # LESSON 18: if_elif_else_statement
-    if match_type == "if_elif_else_statement":
+    elif match_type == "if_elif_else_statement":
         is_correct = (user_code_normalized == required_answer)
         
     # LESSON 17: if_elif_statement
@@ -327,10 +370,10 @@ def check_code_submission(user_code: str):
         st.session_state.correct = False
         
         # Provide a specific warning for indentation/structure lessons
-        if match_type in ["if_statement", "if_else_statement", "if_elif_statement", "if_elif_else_statement"]:
+        if match_type in ["if_statement", "if_else_statement", "if_elif_statement", "if_elif_else_statement", "while_loop", "for_loop"]:
              st.error(
                 f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
-                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to an `if`, `elif`, or `else` block! Also check the alignment of `elif` and `else`."
+                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to a block (`if`, `elif`, `else`, `while`, or `for`)!"
             )
         else:
             st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
@@ -358,21 +401,28 @@ def display_lesson(lesson_data):
     # 2. User Input Area (Code Editor)
     input_key = f"code_input_{st.session_state.q_index}" 
     
-    # Pre-fill with answer if passed, otherwise use a multi-line placeholder if it's L15, L16, L17, or L18
+    # Pre-fill with answer if passed, otherwise use a multi-line placeholder if it's a block structure
     prefill_value = LESSONS_DATA[st.session_state.q_index]["answer"] if is_permanently_passed else ""
     
-    if st.session_state.q_index == 14 and not is_permanently_passed: # L15 (if)
-        prefill_value = "if is_rainy == True:\n    "
-    elif st.session_state.q_index == 15 and not is_permanently_passed: # L16 (if/else)
-        prefill_value = "if is_sunny == True:\n    \nelse:\n    "
-    elif st.session_state.q_index == 16 and not is_permanently_passed: # L17 (if/elif)
-        prefill_value = "if grade > 90:\n    \nelif grade > 80:\n    "
-    elif st.session_state.q_index == 17 and not is_permanently_passed: # L18 (if/elif/else)
-        prefill_value = "if day == 'Sat':\n    \nelif day == 'Sun':\n    \nelse:\n    "
+    # Custom Placeholders for complex multi-line inputs
+    if not is_permanently_passed:
+        if st.session_state.q_index == 14: # L15 (if)
+            prefill_value = "if is_rainy == True:\n    "
+        elif st.session_state.q_index == 15: # L16 (if/else)
+            prefill_value = "if is_sunny == True:\n    \nelse:\n    "
+        elif st.session_state.q_index == 16: # L17 (if/elif)
+            prefill_value = "if grade > 90:\n    \nelif grade > 80:\n    "
+        elif st.session_state.q_index == 17: # L18 (if/elif/else)
+            prefill_value = "if day == 'Sat':\n    \nelif day == 'Sun':\n    \nelse:\n    "
+        elif st.session_state.q_index == 18: # L19 (while loop)
+            prefill_value = "x = 0\nwhile x < 2:\n    \n    "
+        elif st.session_state.q_index == 19: # L20 (for loop)
+            prefill_value = "for i in range(3):\n    "
+
 
     user_code = st.text_area(
         "Type your Python command(s) below and click 'Submit'. Be precise with indentation!",
-        height=250 if st.session_state.q_index in [17] else (200 if st.session_state.q_index in [14, 15, 16] else 100),
+        height=250 if st.session_state.q_index in [17, 18] else (200 if st.session_state.q_index in [14, 15, 16] else 100),
         key=input_key,
         value=prefill_value
     )
