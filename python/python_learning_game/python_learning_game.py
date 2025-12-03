@@ -59,13 +59,13 @@ LESSONS_DATA = [
         "type": "exact_match"
     },
     {
-        "concept": "String Concatenation (Joining Text) 🔗", 
+        "concept": "String Concatenation (Joining Text) 🔗", # L7 RESTORED
         "instruction": "The plus sign (`+`) can be used to join two or more strings together (a process called concatenation). You must include a space yourself if you want one between the words.",
         "example": '`first_name = "Jane"`\n`full_name = first_name + " Doe"`\n# Output: "Jane Doe"',
         "challenge": "Challenge: Create a variable named **`full_city`** and assign it the result of joining the variables **`city`** (from Lesson 2) and the string **' Bridge'**.",
-        "answer": "full_city = city + ' Bridge'",
+        "answer": "full_city = city + ' Bridge'", # The canonical answer
         "hint": "The variable `city` already contains the string value 'London', so the correct syntax is the variable name plus the operator plus the new string in quotes.",
-        "type": "exact_match"
+        "type": "concatenation_flexible" # <-- NEW TYPE
     },
     {
         "concept": "Arithmetic: Division (/) and Floor Division (//) ➗", 
@@ -83,6 +83,15 @@ LESSONS_DATA = [
         "challenge": "Challenge: Find the remainder when 20 is divided by 6. Create a variable named **`left_over`** and assign it the result of **20 % 6**.",
         "answer": "left_over = 20 % 6",
         "hint": "Divide 20 by 6 (6 goes into 20 three times). What number is left over?",
+        "type": "exact_match"
+    },
+    {
+        "concept": "Data Types: Boolean (True/False) 🚦", 
+        "instruction": "A Boolean variable can only hold one of two values: **`True`** or **`False`**. Note that these must be capitalized and do not use quotes.",
+        "example": '`is_active = True`\n`has_errors = False`',
+        "challenge": "Challenge: Create a variable named **`is_valid`** and assign it the Boolean value **`True`**.",
+        "answer": "is_valid = True",
+        "hint": "Ensure the value is capitalized and has no quotes around it.",
         "type": "exact_match"
     }
 ]
@@ -119,7 +128,7 @@ def next_lesson():
 
 def check_code_submission(user_code: str):
     """
-    Checks the submitted code using either exact match or quote-flexible regex match.
+    Checks the submitted code using either exact match, quote-flexible, or concatenation-flexible logic.
     """
     st.session_state.attempts += 1
     
@@ -128,13 +137,25 @@ def check_code_submission(user_code: str):
     user_code_stripped = user_code.strip()
     
     is_correct = False
+    
+    match_type = current_lesson.get("type")
 
-    if current_lesson.get("type") == "quote_flexible":
-        # Flexible Match Logic
+    if match_type == "concatenation_flexible":
+        # Custom logic for Lesson 7: full_city = city + ' Bridge' (flexible quotes allowed)
+        # Pattern looks for: full_city = city + (' Bridge' or " Bridge") with optional spaces
+        pattern = re.compile(
+            r"^full_city\s*=\s*city\s*\+\s*['\"] Bridge['\"]\s*$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code_stripped))
+        
+    elif match_type == "quote_flexible":
+        # Logic for simple variable assignment (e.g., city = 'London')
         try:
             var_name, var_value_quoted = required_answer.split('=', 1)
             var_value = var_value_quoted.strip().strip("'\"") 
             var_name = var_name.strip()
+            # Regex to accept var_name = 'value' or var_name = "value"
             pattern = re.compile(
                 rf"^{re.escape(var_name)}\s*=\s*['\"]{re.escape(var_value)}['\"]$", 
                 re.IGNORECASE 
@@ -142,8 +163,9 @@ def check_code_submission(user_code: str):
             is_correct = bool(pattern.match(user_code_stripped))
         except ValueError:
             is_correct = (user_code_stripped == required_answer)
+            
     else:
-        # Exact Match Logic
+        # Exact Match Logic (Used for numbers, print(), math, booleans)
         is_correct = (user_code_stripped == required_answer)
 
     if is_correct:
