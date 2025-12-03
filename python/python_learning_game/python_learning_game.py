@@ -130,7 +130,6 @@ LESSONS_DATA = [
         "hint": "Ensure the comparison operator is written correctly: the greater-than sign comes before the equals sign.",
         "type": "exact_match"
     },
-    # --- LESSON 15 ---
     {
         "concept": "Control Flow: The `if` Statement and Indentation ✅",
         "instruction": "The `if` statement executes a block of code only if its condition is `True`. It must end with a colon (`:`). The code block that executes if the condition is true MUST be indented by 4 spaces or one tab.",
@@ -139,8 +138,18 @@ LESSONS_DATA = [
         "answer": "if is_rainy == True:\n    print('Bring an umbrella.')",
         "hint": "The first line needs `if` and a condition ending in a colon. The second line must start with 4 spaces.",
         "type": "if_statement"
+    },
+    # --- LESSON 16 ---
+    {
+        "concept": "Control Flow: The `else` Statement 🚫",
+        "instruction": "The `else` statement is paired with an `if` statement and runs when the `if` condition is `False`. It must be aligned with the `if` and end with a colon (`:`).",
+        "example": '`score = 65`\n`if score >= 70:`\n`    print("Passed")`\n`else:`\n`    print("Failed")`\n# Output: Failed',
+        "challenge": "Challenge: Complete the structure. If **`is_sunny`** is `True`, print **'Go hiking.'**. Otherwise (using `else`), print **'Stay inside and read.'**",
+        "answer": "if is_sunny == True:\n    print('Go hiking.')\nelse:\n    print('Stay inside and read.')",
+        "hint": "Ensure the `else:` aligns with the `if`, and the `print()` line underneath `else:` is indented.",
+        "type": "if_else_statement"
     }
-    # --- END LESSON 15 ---
+    # --- END LESSON 16 ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -221,16 +230,20 @@ def check_code_submission(user_code: str):
     is_correct = False
     match_type = current_lesson.get("type")
 
-    if match_type == "if_statement":
-        # Specific check for multi-line if statement (Lesson 15)
-        # Allows flexible quoting on the print string and flexible spacing/tabs, 
-        # as long as normalization results in the correct structure.
-        
-        # We'll rely on the robust normalization above, which handles whitespace and tabs.
+    # Lesson 16: if_else_statement
+    if match_type == "if_else_statement":
         # Check against the normalized required answer.
         is_correct = (user_code_normalized == required_answer)
         
-        # Allow simplified 'if is_rainy:' which is the Pythonic way for checking True
+        # Allow simplified 'if is_sunny:' which is the Pythonic way for checking True
+        if not is_correct:
+            simplified_required = normalize_code("if is_sunny:\n    print('Go hiking.')\nelse:\n    print('Stay inside and read.')")
+            is_correct = (user_code_normalized == simplified_required)
+    
+    # Lesson 15: if_statement
+    elif match_type == "if_statement":
+        is_correct = (user_code_normalized == required_answer)
+        
         if not is_correct:
             simplified_required = normalize_code("if is_rainy:\n    print('Bring an umbrella.')")
             is_correct = (user_code_normalized == simplified_required)
@@ -266,7 +279,7 @@ def check_code_submission(user_code: str):
              is_correct = (user_code_normalized == required_answer)
                 
     else:
-        # Exact Match Logic (L1, L3, L4, L5, L6, L8, L9, L10, L12, L13, L14)
+        # Exact Match Logic (The rest of the lessons)
         is_correct = (user_code_normalized == required_answer)
 
     if is_correct:
@@ -282,11 +295,11 @@ def check_code_submission(user_code: str):
     else:
         st.session_state.correct = False
         
-        # Provide a specific warning for the indentation lesson
-        if match_type == "if_statement":
+        # Provide a specific warning for indentation/structure lessons
+        if match_type in ["if_statement", "if_else_statement"]:
              st.error(
                 f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
-                "Double-check your **COLON** (`:`) and the **4-space indentation** before the `print` line!"
+                "Double-check your **COLONS** (`:`) and ensure lines are indented by 4 spaces (or a tab) *only* when they belong to an `if` or `else` block!"
             )
         else:
             st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
@@ -314,16 +327,17 @@ def display_lesson(lesson_data):
     # 2. User Input Area (Code Editor)
     input_key = f"code_input_{st.session_state.q_index}" 
     
-    # Pre-fill with answer if passed, otherwise empty
+    # Pre-fill with answer if passed, otherwise use a multi-line placeholder if it's L15 or L16
     prefill_value = LESSONS_DATA[st.session_state.q_index]["answer"] if is_permanently_passed else ""
     
-    # Provide a placeholder for the multi-line input
-    if st.session_state.q_index == 14 and not is_permanently_passed:
+    if st.session_state.q_index == 14 and not is_permanently_passed: # L15 (if)
         prefill_value = "if is_rainy == True:\n    "
+    elif st.session_state.q_index == 15 and not is_permanently_passed: # L16 (if/else)
+        prefill_value = "if is_sunny == True:\n    \nelse:\n    "
 
     user_code = st.text_area(
         "Type your Python command(s) below and click 'Submit'. Be precise with indentation!",
-        height=150 if st.session_state.q_index == 14 else 100,
+        height=200 if st.session_state.q_index in [14, 15] else 100,
         key=input_key,
         value=prefill_value
     )
