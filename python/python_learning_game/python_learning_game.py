@@ -3,7 +3,7 @@ import random
 import re
 import pandas as pd # <-- Note: Included for completeness, though not strictly needed for the syntax checker
 
-# --- 1. Question/Lesson Data (The Content - Now 54 Lessons) ---
+# --- 1. Question/Lesson Data (The Content - Now 57 Lessons) ---
 LESSONS_DATA = [
     {
         "concept": "Hello World - The Print Statement 🌎",
@@ -490,8 +490,35 @@ LESSONS_DATA = [
         "answer": "user_df = pd.DataFrame(data_dict)",
         "hint": "Use the assignment operator (`=`) and the constructor with the alias: `pd.DataFrame()`.",
         "type": "exact_match"
+    },
+    { # L55 (Index 54)
+        "concept": "DataFrame: Checking Column Names (`.columns`) 🏷️",
+        "instruction": "The **`.columns`** attribute is used to retrieve an index containing the names of all columns in a Pandas DataFrame. It is read-only and does not require parentheses.",
+        "example": '`df.columns`\n# Output: Index([\'Name\', \'Age\'])',
+        "challenge": "Challenge: Assuming a DataFrame named **`user_df`** exists, assign its column names (using the `.columns` attribute) to a new variable named **`col_names`**.",
+        "answer": "col_names = user_df.columns",
+        "hint": "The attribute is called directly on the DataFrame variable, with no parentheses.",
+        "type": "exact_match"
+    },
+    { # L56 (Index 55)
+        "concept": "DataFrame: Checking Data Shape (`.shape`) 📐",
+        "instruction": "The **`.shape`** attribute returns a **tuple** representing the dimensionality of the DataFrame: `(number_of_rows, number_of_columns)`. It is read-only and does not require parentheses.",
+        "example": '`df.shape`\n# Output: (100, 5) # 100 rows, 5 columns',
+        "challenge": "Challenge: Assuming a DataFrame named **`user_df`** exists, assign its shape (a tuple of rows and columns) to a new variable named **`df_shape`**.",
+        "answer": "df_shape = user_df.shape",
+        "hint": "The attribute is called directly on the DataFrame variable, with no parentheses.",
+        "type": "exact_match"
+    },
+    { # L57 (Index 56)
+        "concept": "DataFrame: Viewing the First Rows (`.head()`) 👓",
+        "instruction": "The **`.head()`** method displays the first 5 rows of the DataFrame by default. This is essential for quickly inspecting the data structure and content after loading.",
+        "example": '`df.head()`\n# Displays the first 5 rows',
+        "challenge": "Challenge: Assuming a DataFrame named **`user_df`** exists, write the command to print the **first 5 rows** of the DataFrame using the `.head()` method.",
+        "answer": "print(user_df.head())",
+        "hint": "The method requires parentheses (`()`) and should be wrapped in a `print()` function to display the output.",
+        "type": "exact_match_print"
     }
-    # --- END LESSONS (54 Total) ---
+    # --- END LESSONS (57 Total) ---
 ]
 
 # --- 2. Game State Management & Callbacks (No Change) ---
@@ -587,10 +614,37 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
-    # --- LOGIC FOR NEW LESSONS 52-54 ---
+    # --- LOGIC FOR NEW LESSONS 55-57 ---
     
+    # LESSON 57 (Index 56): .head() with print
+    if match_type == "exact_match_print" and current_lesson["concept"].startswith("DataFrame: Viewing"):
+        # Check for print(user_df.head())
+        pattern = re.compile(
+            r"^print\s*\(\s*user_df\s*\.\s*head\s*\(\s*\)\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+    
+    # LESSON 56 (Index 55): .shape attribute
+    elif match_type == "exact_match" and current_lesson["concept"].startswith("DataFrame: Checking Data Shape"):
+        # Check for df_shape = user_df.shape
+        pattern = re.compile(
+            r"^df_shape\s*=\s*user_df\s*\.\s*shape$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+
+    # LESSON 55 (Index 54): .columns attribute
+    elif match_type == "exact_match" and current_lesson["concept"].startswith("DataFrame: Checking Column Names"):
+        # Check for col_names = user_df.columns
+        pattern = re.compile(
+            r"^col_names\s*=\s*user_df\s*\.\s*columns$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+
     # LESSON 54 (Index 53): pd.DataFrame creation
-    if match_type == "exact_match" and current_lesson["concept"].startswith("Pandas DataFrame:"):
+    elif match_type == "exact_match" and current_lesson["concept"].startswith("Pandas DataFrame:"):
         # Check for user_df = pd.DataFrame(data_dict)
         pattern = re.compile(
             r"^user_df\s*=\s*pd\.DataFrame\s*\(\s*data_dict\s*\)$", 
@@ -782,6 +836,12 @@ def check_code_submission(user_code: str):
                 f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
                 "Check your operators (`|`, `&`), brackets (`{}`), quotes, and whether you included only the unique values/correct keywords."
             )
+        # Provide a specific warning for Pandas dot-notation
+        elif current_lesson["concept"].startswith("Pandas") or current_lesson["concept"].startswith("DataFrame:"):
+            st.error(
+                f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
+                "Check your **dot notation** (`df.attribute` or `df.method()`) and ensure you are correctly using a variable assignment (`=`) for attributes, or a `print()` for methods like `.head()`."
+            )
         else:
             st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
 
@@ -830,14 +890,21 @@ def display_lesson(lesson_data):
             37: "def add(a, b):\n    ",
             45: "for subject, score in scores.items():\n    ", 
             46: "for i, country in enumerate(countries):\n    ",
-            50: "try:\n    \nexcept:\n    " 
+            50: "try:\n    \nexcept:\n    " ,
+            # Pandas lessons
+            51: "import pandas as pd\n",
         }
         
-        prefill_value = block_lessons.get(st.session_state.q_index, prefill_value)
+        # Check if the current lesson is a special multi-line structure
+        if st.session_state.q_index in block_lessons:
+            prefill_value = block_lessons[st.session_state.q_index]
+        # For single-line Pandas lessons, check if they need a leading placeholder
+        elif st.session_state.q_index >= 52:
+            pass # Keep prefill_value as "" unless passed
 
     # Determine height based on whether it's a block structure
     height_lessons_250 = [17, 18, 50] # Full if/elif/else, while loop, try/except
-    height_lessons_200 = [14, 15, 16, 30, 32, 33, 36, 37, 45, 46] # Other conditional/loops/functions
+    height_lessons_200 = [14, 15, 16, 30, 32, 33, 36, 37, 45, 46, 51] # Other conditional/loops/functions, import
     
     if st.session_state.q_index in height_lessons_250:
         height = 250
