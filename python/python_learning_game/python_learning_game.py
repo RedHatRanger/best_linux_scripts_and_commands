@@ -1,6 +1,6 @@
 import streamlit as st
 import random
-import re  # Import the regular expression module
+import re
 
 # --- 1. Question/Lesson Data (The Content) ---
 LESSONS_DATA = [
@@ -33,7 +33,7 @@ LESSONS_DATA = [
     }, 
     {
         "concept": "Checking Data Type with type() 🔬", 
-        "instruction": "The **`type()`** function is a built-in Python tool used to determine the data type of an object or variable. It takes the variable name inside its parentheses.", 
+        "instruction": "The **`type()`** function is a built-in Python tool used to determine the data type of an object or variable.", 
         "example": '`type(age)`\n# Output: <class \'int\'>',
         "challenge": "Challenge: Type the command to find the data type of the **`count`** variable you created in the last lesson.",
         "answer": "type(count)",
@@ -42,57 +42,66 @@ LESSONS_DATA = [
     },
     {
         "concept": "Arithmetic: Addition Operator (+) ➕",
-        "instruction": "The plus sign (`+`) is used to add numbers or numerical variables together. The result can be assigned to a new variable.",
+        "instruction": "The plus sign (`+`) is used to add numbers or numerical variables together.",
         "example": '`total = 10 + 5` or `new_age = age + 1`',
-        "challenge": "Challenge: Assuming the variable `count` is 42 (from Lesson 3), create a new variable named **`sum`** and assign it the result of **`count` + 8**.",
+        "challenge": "Challenge: Assuming the variable `count` is 42, create a new variable named **`sum`** and assign it the result of **`count` + 8**.",
         "answer": "sum = count + 8",
-        "hint": "The answer should only contain the variable assignment. Remember, `count` is treated as the number 42.",
+        "hint": "The answer should only contain the variable assignment.",
         "type": "exact_match"
     },
     {
         "concept": "Arithmetic: Subtraction (-) and Multiplication (*) ✖️",
-        "instruction": "The minus sign (`-`) is used for subtraction, and the asterisk (`*`) is used for multiplication. Both follow standard mathematical rules for assigning results to variables.",
+        "instruction": "The minus sign (`-`) is for subtraction, and the asterisk (`*`) is for multiplication.",
         "example": '`difference = 20 - 7`\n`area = 5 * 6`',
         "challenge": "Challenge: Calculate the total cost of 12 items at $5 each. Create a variable named **`cost`** and assign it the result of **12 * 5**.",
         "answer": "cost = 12 * 5",
-        "hint": "The answer should only contain the variable assignment. Remember to use the asterisk (*) for multiplication.",
+        "hint": "Use the asterisk (*) for multiplication.",
         "type": "exact_match"
     },
     {
         "concept": "String Concatenation (Joining Text) 🔗", 
-        "instruction": "The plus sign (`+`) can be used to join two or more strings together (a process called concatenation). You must include a space yourself if you want one between the words.",
-        "example": '`first_name = "Jane"`\n`full_name = first_name + " Doe"`\n# Output: "Jane Doe"',
-        "challenge": "Challenge: Create a variable named **`full_city`** and assign it the result of joining the variables **`city`** (from Lesson 2) and the string **' Bridge'**.",
-        "answer": "full_city = city + ' Bridge'", # The canonical answer
-        "hint": "The variable `city` already contains the string value 'London', so the correct syntax is the variable name plus the operator plus the new string in quotes.",
+        "instruction": "The plus sign (`+`) joins two or more strings together (concatenation).",
+        "example": '`first_name = "Jane"`\n`full_name = first_name + " Doe"`',
+        "challenge": "Challenge: Create a variable named **`full_city`** and assign it the result of joining the variables **`city`** and the string **' Bridge'**.",
+        "answer": "full_city = city + ' Bridge'",
+        "hint": "The variable name comes first, then the operator, then the new string in quotes.",
         "type": "concatenation_flexible" 
     },
     {
         "concept": "Arithmetic: Division (/) and Floor Division (//) ➗", 
-        "instruction": "Standard division (`/`) always produces a **float** (a number with a decimal). Floor division (`//`) discards the fractional part, resulting in an **integer**.",
+        "instruction": "Standard division (`/`) produces a **float**. Floor division (`//`) results in an **integer**.",
         "example": '`result_float = 7 / 2`\n# Output: 3.5\n`result_int = 7 // 2`\n# Output: 3',
         "challenge": "Challenge: Calculate the floor division of 17 divided by 5 (the whole number result). Create a variable named **`whole_parts`** and assign it the result of **17 // 5**.",
         "answer": "whole_parts = 17 // 5",
-        "hint": "Use the double-slash operator (`//`) to perform floor division.",
+        "hint": "Use the double-slash operator (`//`).",
         "type": "exact_match"
     },
     {
         "concept": "Arithmetic: Modulus Operator (Remainder) %",
-        "instruction": "The modulus operator (`%`) returns the **remainder** after performing a division. For example, 7 divided by 3 is 2 with a remainder of 1, so `7 % 3` equals 1.",
-        "example": '`remainder_a = 10 % 3`\n# Output: 1\n`is_even = 8 % 2`\n# Output: 0',
+        "instruction": "The modulus operator (`%`) returns the **remainder** after performing a division.",
+        "example": '`remainder_a = 10 % 3`\n# Output: 1',
         "challenge": "Challenge: Find the remainder when 20 is divided by 6. Create a variable named **`left_over`** and assign it the result of **20 % 6**.",
         "answer": "left_over = 20 % 6",
-        "hint": "Divide 20 by 6 (6 goes into 20 three times). What number is left over?",
+        "hint": "What number is left over after dividing 20 by 6?",
         "type": "exact_match"
     },
     {
         "concept": "Data Types: Boolean (True/False) 🚦", 
-        "instruction": "A Boolean variable can only hold one of two values: **`True`** or **`False`**. Note that these must be capitalized and do not use quotes.",
-        "example": '`is_active = True`\n`has_errors = False`',
+        "instruction": "A Boolean variable can only hold one of two values: **`True`** or **`False`** (capitalized and no quotes).",
+        "example": '`is_active = True`',
         "challenge": "Challenge: Create a variable named **`is_valid`** and assign it the Boolean value **`True`**.",
         "answer": "is_valid = True",
         "hint": "Ensure the value is capitalized and has no quotes around it.",
         "type": "exact_match"
+    },
+    {
+        "concept": "Comparison Operators: Equality (==) ⚖️",
+        "instruction": "The **double equals sign** (`==`) checks if two values are equal. The result is always a Boolean value.",
+        "example": '`is_equal = 10 == 10`\n# Output: True',
+        "challenge": "Challenge: Create a variable named **`result_match`** and assign it the result of comparing if the string **'Python'** is equal to the string **'python'**.",
+        "answer": "result_match = 'Python' == 'python'",
+        "hint": "Remember that strings are case-sensitive.",
+        "type": "quote_flexible"
     }
 ]
 
@@ -115,7 +124,6 @@ def set_lesson(index):
     """Callback: Sets the current lesson index and resets attempts/correct state."""
     st.session_state.q_index = index
     st.session_state.attempts = 0
-    # Crucially, always reset 'correct' to False so the submit button is enabled on navigation.
     st.session_state.correct = False
 
 def next_lesson():
@@ -127,12 +135,29 @@ def next_lesson():
     else:
         st.session_state.q_index += 1 
 
+def unlock_all_lessons():
+    """Adds all lesson indices to the passed_indices set, skipping them."""
+    total_lessons = len(LESSONS_DATA)
+    all_indices = set(range(total_lessons))
+    
+    # 1. Update the set to include all lessons
+    st.session_state.passed_indices.update(all_indices)
+    
+    # 2. Update the passed count
+    st.session_state.passed_lessons = total_lessons
+    
+    # 3. Set the current index to the last lesson (or high number)
+    if total_lessons > 0:
+        st.session_state.q_index = total_lessons - 1 
+    
+    # 4. Reset temporary state
+    st.session_state.attempts = 0
+    st.session_state.correct = False
+
 # --- 3. Core Logic ---
 
 def check_code_submission(user_code: str):
-    """
-    Checks the submitted code using either exact match, quote-flexible, or concatenation-flexible logic.
-    """
+    """Checks the submitted code."""
     st.session_state.attempts += 1
     
     current_lesson = LESSONS_DATA[st.session_state.q_index]
@@ -140,11 +165,9 @@ def check_code_submission(user_code: str):
     user_code_stripped = user_code.strip()
     
     is_correct = False
-    
     match_type = current_lesson.get("type")
 
     if match_type == "concatenation_flexible":
-        # Custom logic for Lesson 7: full_city = city + ' Bridge' (flexible quotes allowed)
         pattern = re.compile(
             r"^full_city\s*=\s*city\s*\+\s*['\"] Bridge['\"]\s*$", 
             re.IGNORECASE 
@@ -152,41 +175,43 @@ def check_code_submission(user_code: str):
         is_correct = bool(pattern.match(user_code_stripped))
         
     elif match_type == "quote_flexible":
-        # Logic for simple variable assignment (e.g., city = 'London')
-        try:
-            var_name, var_value_quoted = required_answer.split('=', 1)
-            var_value = var_value_quoted.strip().strip("'\"") 
-            var_name = var_name.strip()
-            # Regex to accept var_name = 'value' or var_name = "value"
-            pattern = re.compile(
-                rf"^{re.escape(var_name)}\s*=\s*['\"]{re.escape(var_value)}['\"]$", 
+        # Check for Lesson 11 (index 10) comparison: result_match = 'Python' == 'python'
+        if st.session_state.q_index == 10:
+            p = re.compile(
+                r"^result_match\s*=\s*['\"]Python['\"]\s*==\s*['\"]python['\"]\s*$", 
                 re.IGNORECASE 
             )
-            is_correct = bool(pattern.match(user_code_stripped))
-        except ValueError:
-            is_correct = (user_code_stripped == required_answer)
-            
+            is_correct = bool(p.match(user_code_stripped))
+        
+        # Check for Lesson 2 (index 1) assignment: city = 'London'
+        elif st.session_state.q_index == 1: 
+             var_name, var_value_quoted = required_answer.split('=', 1)
+             var_value = var_value_quoted.strip().strip("'\"") 
+             var_name = var_name.strip()
+             pattern = re.compile(
+                rf"^{re.escape(var_name)}\s*=\s*['\"]{re.escape(var_value)}['\"]$", 
+                re.IGNORECASE 
+             )
+             is_correct = bool(pattern.match(user_code_stripped))
+        else:
+             is_correct = (user_code_stripped == required_answer)
+                
     else:
-        # Exact Match Logic (Used for numbers, print(), math, booleans)
+        # Exact Match Logic
         is_correct = (user_code_stripped == required_answer)
 
     if is_correct:
         current_index = st.session_state.q_index
         
-        # Only increment score and add index to set if lesson is being passed for the first time
         if current_index not in st.session_state.passed_indices:
             st.session_state.passed_lessons += 1
             st.session_state.passed_indices.add(current_index)
         
-        st.session_state.correct = True # Set to True to display success message (disables submit if not permanently passed)
-        
-        # Success actions
+        st.session_state.correct = True 
         st.balloons() 
         
     else:
         st.session_state.correct = False
-        
-        # Failure actions
         st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
 
 
@@ -207,7 +232,6 @@ def display_lesson(lesson_data):
     st.markdown(f"### 📝 Your Challenge")
     st.warning(lesson_data['challenge'])
     
-    # Check if lesson is permanently passed
     is_permanently_passed = st.session_state.q_index in st.session_state.passed_indices
     
     # 2. User Input Area (Code Editor)
@@ -216,15 +240,11 @@ def display_lesson(lesson_data):
         "Type your Python command below and click 'Submit' (Case and syntax matter for non-string parts!)",
         height=100,
         key=input_key,
-        # Pre-fill with the correct answer if the lesson is already passed
         value=lesson_data["answer"] if is_permanently_passed else ""
     )
     
     # 3. Submission Logic
     submit_disabled_after_success = st.session_state.get('correct', False) 
-    
-    # The button is disabled ONLY if they just passed it AND it wasn't already passed.
-    # This prevents button spamming after a *new* pass, but allows re-submission for relearn (is_permanently_passed overrides the disable).
     submit_disabled = submit_disabled_after_success and not is_permanently_passed
     
     if not submit_disabled:
@@ -237,22 +257,16 @@ def display_lesson(lesson_data):
     
     # === DEDICATED FEEDBACK AREA ===
 
-    # Show success message if either state is true.
     if is_permanently_passed or st.session_state.get('correct', False):
         
-        # Determine the correct success message based on context
         if is_permanently_passed and not st.session_state.get('correct', False):
-            # Case 1: Permanently passed and just navigated back
             st.success("🎉 **PASSED!** Click 'Next Lesson' to continue, or **edit the code and click 'Submit' to relearn/test.**")
         else:
-            # Case 2: Just passed the lesson in this run (or permanently passed and re-submitted correctly)
             st.success("🎉 **PASS! Congratulations!** Excellent syntax. Click 'Next Lesson' to continue.")
 
         st.button("Next Lesson >>", on_click=next_lesson)
         
-    # Case 3: Failed attempt
     elif st.session_state.attempts > 0:
-        # Display retry/error message
         st.error(
             f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
             "Please check your capitalization, quotes, and spacing, and type the command again."
@@ -292,6 +306,13 @@ def main():
     with st.sidebar:
         st.title("Progress & Navigation")
         
+        # --- NEW UNLOCK FEATURE ---
+        if st.button("🔓 Skip/Unlock All Lessons (For Testing)", type="secondary"):
+            unlock_all_lessons()
+            st.rerun() 
+        st.markdown("---")
+        # -----------------------------
+        
         # 1. Overall Progress
         st.write(f"**Passed Lessons:** {passed} of {total_lessons}")
         st.progress(passed / total_lessons if total_lessons > 0 else 0)
@@ -300,11 +321,9 @@ def main():
         # 2. Lesson Navigation Buttons
         st.markdown("### Jump to Lesson:")
         for i, lesson in enumerate(LESSONS_DATA):
-            # Check if the lesson is in the passed set OR if it's the current lesson
             is_unlocked = i in st.session_state.passed_indices or i == current_lesson_num
             is_current = i == current_lesson_num
             
-            # Determine the label and icon
             icon = "➡️" if is_current else ("✅" if i in st.session_state.passed_indices else "🔒")
             label = f"L{i+1}: {lesson['concept']}"
             
@@ -313,7 +332,8 @@ def main():
                 key=f"nav_btn_{i}",
                 on_click=set_lesson, 
                 args=(i,),
-                disabled=not is_unlocked,
+                # Allow jumping to any lesson if unlocked (passed) or if the unlock button was clicked
+                disabled=not is_unlocked and not st.session_state.get('passed_lessons', 0) == total_lessons,
                 type="primary" if is_current else "secondary"
             )
             
