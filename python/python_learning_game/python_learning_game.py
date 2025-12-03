@@ -59,7 +59,7 @@ LESSONS_DATA = [
         "type": "exact_match"
     },
     {
-        "concept": "String Concatenation (Joining Text) 🔗", # L7 RESTORED
+        "concept": "String Concatenation (Joining Text) 🔗", 
         "instruction": "The plus sign (`+`) can be used to join two or more strings together (a process called concatenation). You must include a space yourself if you want one between the words.",
         "example": '`first_name = "Jane"`\n`full_name = first_name + " Doe"`\n# Output: "Jane Doe"',
         "challenge": "Challenge: Create a variable named **`full_city`** and assign it the result of joining the variables **`city`** (from Lesson 2) and the string **' Bridge'**.",
@@ -106,6 +106,8 @@ def initialize_state():
         st.session_state.attempts = 0
     if 'passed_lessons' not in st.session_state:
         st.session_state.passed_lessons = 0
+    if 'passed_indices' not in st.session_state:
+        st.session_state.passed_indices = set() # NEW: Set to store indices of passed lessons
     if 'correct' not in st.session_state:
         st.session_state.correct = False
 
@@ -113,7 +115,8 @@ def set_lesson(index):
     """Callback: Sets the current lesson index and resets attempts/correct state."""
     st.session_state.q_index = index
     st.session_state.attempts = 0
-    st.session_state.correct = False
+    # Set 'correct' based on whether the lesson is already passed
+    st.session_state.correct = index in st.session_state.passed_indices
 
 def next_lesson():
     """Advances the lesson index and resets attempts and correct state."""
@@ -142,7 +145,6 @@ def check_code_submission(user_code: str):
 
     if match_type == "concatenation_flexible":
         # Custom logic for Lesson 7: full_city = city + ' Bridge' (flexible quotes allowed)
-        # Pattern looks for: full_city = city + (' Bridge' or " Bridge") with optional spaces
         pattern = re.compile(
             r"^full_city\s*=\s*city\s*\+\s*['\"] Bridge['\"]\s*$", 
             re.IGNORECASE 
@@ -169,8 +171,14 @@ def check_code_submission(user_code: str):
         is_correct = (user_code_stripped == required_answer)
 
     if is_correct:
-        st.session_state.passed_lessons += 1
-        st.session_state.correct = True
+        current_index = st.session_state.q_index
+        
+        # Only increment score and add index to set if lesson is being passed for the first time
+        if current_index not in st.session_state.passed_indices:
+            st.session_state.passed_lessons += 1
+            st.session_state.passed_indices.add(current_index)
+        
+        st.session_state.correct = True # Set to True to display success message
         
         # Success actions
         st.balloons() 
@@ -204,7 +212,9 @@ def display_lesson(lesson_data):
     user_code = st.text_area(
         "Type your Python command below and click 'Submit' (Case and syntax matter for non-string parts!)",
         height=100,
-        key=input_key 
+        key=input_key,
+        # Default the text area with the correct answer if the lesson is already passed
+        value=current_lesson["answer"] if st.session_state.q_index in st.session_state.passed_indices else ""
     )
     
     # 3. Submission Logic
@@ -243,7 +253,8 @@ def display_completion_screen():
     st.title("✅ Congratulations! All Lessons Complete!")
     
     total_lessons = len(LESSONS_DATA)
-    st.markdown(f"## You completed **{st.session_state.passed_lessons}** out of **{total_lessons}** lessons.")
+    passed = len(st.session_state.passed_indices)
+    st.markdown(f"## You completed **{passed}** out of **{total_lessons}** lessons.")
     
     st.info("You've built strong Python syntax muscle memory. Ready for the next level of challenges?")
     
@@ -260,7 +271,7 @@ def main():
 
     total_lessons = len(LESSONS_DATA)
     current_lesson_num = st.session_state.q_index
-    passed = st.session_state.passed_lessons
+    passed = len(st.session_state.passed_indices) # Use the size of the set
     
     # --- SIDEBAR: Progress and Navigation ---
     with st.sidebar:
@@ -274,12 +285,12 @@ def main():
         # 2. Lesson Navigation Buttons
         st.markdown("### Jump to Lesson:")
         for i, lesson in enumerate(LESSONS_DATA):
-            # Check if the user is currently on this lesson or has passed it
-            is_unlocked = i <= passed or (i == passed and current_lesson_num == passed)
+            # Check if the lesson is in the passed set OR if it's the current lesson
+            is_unlocked = i in st.session_state.passed_indices or i == current_lesson_num
             is_current = i == current_lesson_num
             
             # Determine the label and icon
-            icon = "➡️" if is_current else ("✅" if i < passed else "🔒")
+            icon = "➡️" if is_current else ("✅" if i in st.session_state.passed_indices else "🔒")
             label = f"L{i+1}: {lesson['concept']}"
             
             st.button(
