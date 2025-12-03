@@ -50,12 +50,30 @@ LESSONS_DATA = [
         "type": "exact_match"
     },
     {
-        "concept": "Arithmetic: Subtraction (-) and Multiplication (*) ✖️", # <-- NEW LESSON 6
+        "concept": "Arithmetic: Subtraction (-) and Multiplication (*) ✖️",
         "instruction": "The minus sign (`-`) is used for subtraction, and the asterisk (`*`) is used for multiplication. Both follow standard mathematical rules for assigning results to variables.",
         "example": '`difference = 20 - 7`\n`area = 5 * 6`',
         "challenge": "Challenge: Calculate the total cost of 12 items at $5 each. Create a variable named **`cost`** and assign it the result of **12 * 5**.",
         "answer": "cost = 12 * 5",
         "hint": "The answer should only contain the variable assignment. Remember to use the asterisk (*) for multiplication.",
+        "type": "exact_match"
+    },
+    {
+        "concept": "String Concatenation (Joining Text) 🔗", 
+        "instruction": "The plus sign (`+`) can be used to join two or more strings together (a process called concatenation). You must include a space yourself if you want one between the words.",
+        "example": '`first_name = "Jane"`\n`full_name = first_name + " Doe"`\n# Output: "Jane Doe"',
+        "challenge": "Challenge: Create a variable named **`full_city`** and assign it the result of joining the variables **`city`** (from Lesson 2) and the string **' Bridge'**.",
+        "answer": "full_city = city + ' Bridge'",
+        "hint": "The variable `city` already contains the string value 'London', so the correct syntax is the variable name plus the operator plus the new string in quotes.",
+        "type": "exact_match"
+    },
+    {
+        "concept": "Arithmetic: Division (/) and Floor Division (//) ➗", 
+        "instruction": "Standard division (`/`) always produces a **float** (a number with a decimal). Floor division (`//`) discards the fractional part, resulting in an **integer**.",
+        "example": '`result_float = 7 / 2`\n# Output: 3.5\n`result_int = 7 // 2`\n# Output: 3',
+        "challenge": "Challenge: Calculate the floor division of 17 divided by 5 (the whole number result). Create a variable named **`whole_parts`** and assign it the result of **17 // 5**.",
+        "answer": "whole_parts = 17 // 5",
+        "hint": "Use the double-slash operator (`//`) to perform floor division.",
         "type": "exact_match"
     }
 ]
@@ -79,7 +97,7 @@ def next_lesson():
         st.session_state.q_index += 1
         st.session_state.attempts = 0
         st.session_state.correct = False
-        st.rerun() 
+        # st.rerun() removed: Change to session state triggers auto-rerun.
     else:
         st.session_state.q_index += 1 
 
@@ -120,14 +138,14 @@ def check_code_submission(user_code: str):
         
         # Success actions
         st.balloons() 
-        st.rerun()
+        # st.rerun() removed: Change to session state triggers auto-rerun.
         
     else:
         st.session_state.correct = False
         
         # Failure actions
         st.toast("🚨 Try Again! Your syntax didn't match the required command.", icon="❌")
-        st.rerun()
+        # st.rerun() removed: Change to session state triggers auto-rerun.
 
 
 # --- 4. Display Functions ---
