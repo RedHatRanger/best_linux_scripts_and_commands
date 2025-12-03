@@ -102,7 +102,18 @@ LESSONS_DATA = [
         "answer": "result_match = 'Python' == 'python'",
         "hint": "Remember that strings are case-sensitive.",
         "type": "quote_flexible"
+    },
+    # --- LESSON 12 ---
+    {
+        "concept": "Comparison Operators: Inequality (!=) ❌",
+        "instruction": "The **exclamation mark followed by an equals sign** (`!=`) checks if two values are **NOT** equal to each other. The result is always a Boolean value (`True` or `False`).",
+        "example": '`is_not_equal = 10 != 5`\n# Output: True\n`is_same = 10 != 10`\n# Output: False',
+        "challenge": "Challenge: Create a variable named **`result_diff`** and assign it the result of checking if the integer **20** is not equal to the integer **'20'** (the string).",
+        "answer": "result_diff = 20 != '20'",
+        "hint": "Remember that data types matter! An integer is not the same as a string, even if the characters look identical. No quotes are needed for the integer 20.",
+        "type": "exact_match"
     }
+    # --- END LESSON 12 ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -197,7 +208,7 @@ def check_code_submission(user_code: str):
              is_correct = (user_code_stripped == required_answer)
                 
     else:
-        # Exact Match Logic
+        # Exact Match Logic (L12 uses exact_match, so it falls here)
         is_correct = (user_code_stripped == required_answer)
 
     if is_correct:
@@ -332,7 +343,6 @@ def main():
                 key=f"nav_btn_{i}",
                 on_click=set_lesson, 
                 args=(i,),
-                # Allow jumping to any lesson if unlocked (passed) or if the unlock button was clicked
                 disabled=not is_unlocked and not st.session_state.get('passed_lessons', 0) == total_lessons,
                 type="primary" if is_current else "secondary"
             )
