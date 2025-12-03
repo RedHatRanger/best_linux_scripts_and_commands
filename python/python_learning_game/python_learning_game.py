@@ -1,9 +1,9 @@
 import streamlit as st
 import random
 import re
-import pandas as pd # <-- Note: Included for completeness, though not strictly needed for the syntax checker
+import pandas as pd 
 
-# --- 1. Question/Lesson Data (The Content - Now 60 Lessons) ---
+# --- 1. Question/Lesson Data (The Content - Now 63 Lessons) ---
 LESSONS_DATA = [
     {
         "concept": "Hello World - The Print Statement 🌎",
@@ -18,7 +18,7 @@ LESSONS_DATA = [
         "concept": "Variables - Storing Data 📦",
         "instruction": "Variables are containers for storing data values. Use the assignment operator (`=`) to assign a value to a variable. **Python accepts both single (') and double (\") quotes for strings.**",
         "example": '`country = "France"` or `continent = \'Europe\'`',
-        "challenge": "Challenge: Create a variable named **`city`** and assign it the string value **'London'**.",
+        "challenge": "Challenge: Create a variable named **`city`** and assign it the string value **'London'**",
         "answer": "city = 'London'",
         "hint": "No `print()` is needed. Just the variable name, the equals sign, and the value in quotes.",
         "type": "quote_flexible"
@@ -544,8 +544,35 @@ LESSONS_DATA = [
         "answer": "user_df.info()",
         "hint": "This method needs parentheses (`()`) but does **not** need to be wrapped in a `print()` function, as it prints directly to the console/output.",
         "type": "exact_match"
+    },
+    { # L61 (Index 60)
+        "concept": "DataFrame: Column Selection (Series Extraction) 🗄️",
+        "instruction": "To select a single column (which results in a Pandas **Series**), use the column name as a **key** inside square brackets (`[]`) on the DataFrame variable. This is similar to accessing a dictionary value.",
+        "example": '`ages = df["Age"]`',
+        "challenge": "Challenge: Assuming a DataFrame named **`user_df`** exists with a column named **'Name'**, extract this column and assign the resulting Series to a variable named **`name_series`**.",
+        "answer": "name_series = user_df['Name']",
+        "hint": "Use square brackets (`[]`) after the DataFrame name, with the quoted column name inside.",
+        "type": "dataframe_column_select"
+    },
+    { # L62 (Index 61)
+        "concept": "DataFrame: Index-based Row Selection (`.iloc[]`) 📍",
+        "instruction": "The **`.iloc[]`** accessor is used to select rows (or rows and columns) based on their **integer position** (index), similar to Python lists. The first row is at index 0.",
+        "example": '`first_row = df.iloc[0]`',
+        "challenge": "Challenge: Assuming a DataFrame named **`user_df`** exists, use the `.iloc[]` accessor to select the row at **index 2** and assign it to a variable named **`third_row`**.",
+        "answer": "third_row = user_df.iloc[2]",
+        "hint": "Use the DataFrame name followed by `.iloc[]` with the index number inside the brackets.",
+        "type": "dataframe_iloc"
+    },
+    { # L63 (Index 62)
+        "concept": "File Handling: Reading CSV Files (`pd.read_csv()`) 💾",
+        "instruction": "To load external data into a DataFrame, use the Pandas function **`pd.read_csv()`**. Pass the path/filename of the CSV file inside the parentheses. This is a crucial data loading step.",
+        "example": '`new_df = pd.read_csv("data.csv")`',
+        "challenge": "Challenge: Use the `pd.read_csv()` function to load the file named **'users.csv'** and assign the resulting DataFrame to a variable named **`users_df`**.",
+        "answer": "users_df = pd.read_csv('users.csv')",
+        "hint": "The function call starts with the alias `pd.`, and the file name must be quoted.",
+        "type": "dataframe_read_csv"
     }
-    # --- END LESSONS (60 Total) ---
+    # --- END LESSONS (63 Total) ---
 ]
 
 # --- 2. Game State Management & Callbacks (No Change) ---
@@ -641,10 +668,40 @@ def check_code_submission(user_code: str):
                 
         return is_match
 
-    # --- LOGIC FOR NEW LESSONS 58-60 ---
+    # --- LOGIC FOR NEW LESSONS 61-63 ---
+    
+    # LESSON 63 (Index 62): pd.read_csv()
+    if match_type == "dataframe_read_csv":
+        # Check for users_df = pd.read_csv('users.csv') - robust to quote type
+        pattern = re.compile(
+            r"^users_df\s*=\s*pd\s*\.\s*read_csv\s*\(\s*['\"]users\.csv['\"]\s*\)$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+        
+    # LESSON 62 (Index 61): df.iloc[2]
+    elif match_type == "dataframe_iloc":
+        # Check for third_row = user_df.iloc[2]
+        pattern = re.compile(
+            r"^third_row\s*=\s*user_df\s*\.\s*iloc\s*\[\s*2\s*\]$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
+    
+    # LESSON 61 (Index 60): df['ColumnName']
+    elif match_type == "dataframe_column_select":
+        # Check for name_series = user_df['Name'] - robust to quote type
+        pattern = re.compile(
+            r"^name_series\s*=\s*user_df\s*\[\s*['\"]Name['\"]\s*\]$", 
+            re.IGNORECASE 
+        )
+        is_correct = bool(pattern.match(user_code.strip()))
 
+
+    # --- EXISTING LOGIC (Default Fallback and Previous Pandas) ---
+    
     # LESSON 60 (Index 59): .info() method (exact match)
-    if match_type == "exact_match" and current_lesson["concept"].startswith("DataFrame: Full Summary Info"):
+    elif match_type == "exact_match" and current_lesson["concept"].startswith("DataFrame: Full Summary Info"):
         # Check for user_df.info() (no print, just the method call)
         pattern = re.compile(
             r"^user_df\s*\.\s*info\s*\(\s*\)$", 
@@ -669,10 +726,7 @@ def check_code_submission(user_code: str):
             re.IGNORECASE 
         )
         is_correct = bool(pattern.match(user_code.strip()))
-
-
-    # --- EXISTING LOGIC (Default Fallback and Pandas) ---
-    
+        
     # LESSON 57 (Index 56): .head() with print
     elif match_type == "exact_match_print" and current_lesson["concept"].startswith("DataFrame: Viewing"):
         # Check for print(user_df.head())
@@ -894,9 +948,24 @@ def check_code_submission(user_code: str):
                 "Check your operators (`|`, `&`), brackets (`{}`), quotes, and whether you included only the unique values/correct keywords."
             )
         # Provide a specific warning for Pandas dot-notation
-        elif current_lesson["concept"].startswith("Pandas") or current_lesson["concept"].startswith("DataFrame:"):
-            # L60 is a special case: method call without assignment or print
-            if st.session_state.q_index == 59: # L60 - .info()
+        elif current_lesson["concept"].startswith("Pandas") or current_lesson["concept"].startswith("DataFrame:") or match_type in ["dataframe_column_select", "dataframe_iloc", "dataframe_read_csv"]:
+            # Custom message for data manipulation/loading
+            if match_type in ["dataframe_column_select"]:
+                 st.error(
+                    f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
+                    "Did you use the correct **square brackets** `[]` to select the column, and is the column name properly **quoted** inside them?"
+                )
+            elif match_type in ["dataframe_iloc"]:
+                 st.error(
+                    f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
+                    "Make sure the index is inside the **`.iloc[]`** brackets, and there are no quotes around the index number."
+                )
+            elif match_type in ["dataframe_read_csv"]:
+                 st.error(
+                    f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
+                    "Check the function name: `pd.read_csv()`. Is the filename correct and properly **quoted** inside the parentheses?"
+                )
+            elif st.session_state.q_index == 59: # L60 - .info()
                 st.error(
                     f"❌ **RETRY.** Attempt **{st.session_state.attempts}**. "
                     "Check your method call. For `.info()`, it's just `user_df.info()`. Ensure you included the parentheses `()` and did **not** wrap it in `print()`."
@@ -1041,7 +1110,8 @@ def display_completion_screen():
 
 def main():
     """The main function to run the Streamlit app."""
-    st.set_page_config(page_title="Python Syntax Practice", layout="centered")
+    # Setting layout to 'wide' usually helps with sidebar visibility
+    st.set_page_config(page_title="Python Syntax Practice", layout="wide") 
     
     initialize_state()
 
@@ -1088,6 +1158,7 @@ def main():
     st.markdown("# 🚀 Interactive Python Syntax Practice")
     
     if st.session_state.q_index < total_lessons:
+        # **CORRECTED TYPO HERE:** LESSSONS_DATA -> LESSONS_DATA
         display_lesson(LESSONS_DATA[st.session_state.q_index])
     else:
         display_completion_screen()
