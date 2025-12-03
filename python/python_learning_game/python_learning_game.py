@@ -103,17 +103,26 @@ LESSONS_DATA = [
         "hint": "Remember that strings are case-sensitive.",
         "type": "quote_flexible"
     },
-    # --- LESSON 12 ---
     {
         "concept": "Comparison Operators: Inequality (!=) ❌",
         "instruction": "The **exclamation mark followed by an equals sign** (`!=`) checks if two values are **NOT** equal to each other. The result is always a Boolean value (`True` or `False`).",
-        "example": '`is_not_equal = 10 != 5`\n# Output: True\n`is_same = 10 != 10`\n# Output: False',
+        "example": '`is_not_equal = 10 != 5`\n# Output: True',
         "challenge": "Challenge: Create a variable named **`result_diff`** and assign it the result of checking if the integer **20** is not equal to the integer **'20'** (the string).",
         "answer": "result_diff = 20 != '20'",
-        "hint": "Remember that data types matter! An integer is not the same as a string, even if the characters look identical. No quotes are needed for the integer 20.",
+        "hint": "Remember that data types matter! An integer is not the same as a string.",
+        "type": "exact_match"
+    },
+    # --- LESSON 13 ---
+    {
+        "concept": "Comparison Operators: Greater Than/Less Than (<, >) ⬆️⬇️",
+        "instruction": "The **Greater Than** (`>`) and **Less Than** (`<`) operators are used to check the size relationship between two numbers. They form the basis of most conditional checks in programming.",
+        "example": '`is_small = 5 < 10`\n# Output: True\n`is_large = 20 > 50`\n# Output: False',
+        "challenge": "Challenge: Create a variable named **`is_valid_score`** and assign it the result of checking if the number **75** is greater than the number **50**.",
+        "answer": "is_valid_score = 75 > 50",
+        "hint": "Use the correct operator to compare the two numbers. The resulting Boolean should reflect the truth of the statement.",
         "type": "exact_match"
     }
-    # --- END LESSON 12 ---
+    # --- END LESSON 13 ---
 ]
 
 # --- 2. Game State Management & Callbacks ---
@@ -208,7 +217,7 @@ def check_code_submission(user_code: str):
              is_correct = (user_code_stripped == required_answer)
                 
     else:
-        # Exact Match Logic (L12 uses exact_match, so it falls here)
+        # Exact Match Logic (L12 and L13 fall here)
         is_correct = (user_code_stripped == required_answer)
 
     if is_correct:
@@ -317,12 +326,12 @@ def main():
     with st.sidebar:
         st.title("Progress & Navigation")
         
-        # --- NEW UNLOCK FEATURE ---
+        # --- UNLOCK FEATURE ---
         if st.button("🔓 Skip/Unlock All Lessons (For Testing)", type="secondary"):
             unlock_all_lessons()
             st.rerun() 
         st.markdown("---")
-        # -----------------------------
+        # ----------------------
         
         # 1. Overall Progress
         st.write(f"**Passed Lessons:** {passed} of {total_lessons}")
