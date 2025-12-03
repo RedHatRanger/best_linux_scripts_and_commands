@@ -48,6 +48,15 @@ LESSONS_DATA = [
         "answer": "sum = count + 8",
         "hint": "The answer should only contain the variable assignment. Remember, `count` is treated as the number 42.",
         "type": "exact_match"
+    },
+    {
+        "concept": "Arithmetic: Subtraction (-) and Multiplication (*) ✖️", # <-- NEW LESSON 6
+        "instruction": "The minus sign (`-`) is used for subtraction, and the asterisk (`*`) is used for multiplication. Both follow standard mathematical rules for assigning results to variables.",
+        "example": '`difference = 20 - 7`\n`area = 5 * 6`',
+        "challenge": "Challenge: Calculate the total cost of 12 items at $5 each. Create a variable named **`cost`** and assign it the result of **12 * 5**.",
+        "answer": "cost = 12 * 5",
+        "hint": "The answer should only contain the variable assignment. Remember to use the asterisk (*) for multiplication.",
+        "type": "exact_match"
     }
 ]
 
@@ -70,7 +79,7 @@ def next_lesson():
         st.session_state.q_index += 1
         st.session_state.attempts = 0
         st.session_state.correct = False
-        st.rerun() # <-- FIX 1: Using st.rerun()
+        st.rerun() 
     else:
         st.session_state.q_index += 1 
 
@@ -188,7 +197,7 @@ def display_completion_screen():
     
     if st.button("Start Over"):
         st.session_state.clear()
-        st.rerun() # <-- FIX 2: Using st.rerun()
+        st.rerun()
 
 
 def main():
