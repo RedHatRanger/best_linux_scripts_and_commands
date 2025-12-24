@@ -12,14 +12,14 @@
 
 <br>
 
-# Credentials Management
+## Credentials Management
 - Objective: Configure the credentials for:
     - Ansible to SSH
     - Ansible Vault to encrypt/decrypt
     - GitLab SVC Account
     - Private Container Registry
 
-## Creating the Ansible SSH User Machine Credential:
+### Creating the Ansible SSH User Machine Credential:
 1. On the left sidebar, click `Resources` > `Credentials`.
 1. Click `Add` and fill in the details:
     - Name: `Cisco SVC Account (Ansible User)`
@@ -34,7 +34,7 @@
         - Privilege Escalation Method: `enable`
     - Click `Save`.
 
-## Creating a Global Ansible Vault Credential:
+### Creating a Global Ansible Vault Credential:
 >This is required if you have used ansible-vault to encrypt the ansible_password in your Git <project>/group_vars/all.yml):
 1. On the left sidebar, click `Resources` > `Credentials`.
 1. Click `Add` and fill in the details:
@@ -46,7 +46,7 @@
         - Vault Password: <Enter your vault password OR the contents of your vault pw file>
     - Click `Save`.
 
-## Creating the GitLab SVC Account Credential:
+### Creating the GitLab SVC Account Credential:
 1. On the left sidebar, click `Resources` > `Credentials`.
 1. Click `Add` and fill in the details:
     - Name: `GitLab SVC Account`
@@ -59,7 +59,7 @@
         - Password: `<The Personal Access Token generated in GitLab for the awx-user>`
 1. Click `Save`.
 
-## Creating Private Container Registry Credential:
+### Creating Private Container Registry Credential:
 1. On the left sidebar, click `Resources` > `Credentials`.
 1. Click `Add` and fill in the details:
     - Name: `<Your Registry Provider Name> Registry Creds`
@@ -77,7 +77,7 @@
 
 ---
 
-# Execution Environment Management
+## Execution Environment Management
 - Objective: Setup the team's default execution environment.
 
 1. On the left sidebar, click `Administration` > `Execution Environments`.
@@ -96,10 +96,10 @@
 
 ---
 
-# User Management
+## User Management
 - Objective: Setup Organizations, Teams, and Users for Least Privilege
 
-## Creating an Organization:
+### Creating an Organization:
 1. On the left sidebar, click `Access` > `Organizations`.
 1. Click `Add` and fill in the details:
     - Name
@@ -109,7 +109,7 @@
     - Galaxy Credentials (optional for updates)
 1. Click `Save`.
 
-## Creating Teams:
+### Creating Teams:
 1. On the left sidebar, click `Access` > `Teams`.
 1. Click `Add` and fill in the details:
     - Name (team title)
@@ -117,7 +117,7 @@
     - Choose the `Organization`
 1. Click `Save`.
 
-## Creating Users:
+### Creating Users:
 1. On the left sidebar, click `Access` > `Users`.
 1. Click `Add User` and fill in the details (or modify an existing user).
     - First Name
@@ -128,14 +128,14 @@
     - Choose their `Organization` you created earlier.
 1. Click `Save`
 
-## Adding Users to Teams (Membership):
+### Adding Users to Teams (Membership):
 1. On the left sidebar, click `Access` > `Teams`.
 1. In the main part of the screen, click on the `Access` Tab.
 1. Click `Add` to add the user we created previously:
     - `Users` > `Next` > `<myuser>` (checkbox) > `Next` > `Member`
 1. Click `Save`.
 
-## Limiting Job Templates to Teams (Roles = Permissions):
+### Limiting Job Templates to Teams (Roles = Permissions):
 1. On the left sidebar, click `Access` > `Teams`.
 1. Click the target team name for editing.
 1. In the main part of the screen, click on the `Roles` Tab.
@@ -147,7 +147,7 @@
 
 ---
 
-# Projects Management
+## Projects Management
 1. On the left sidebar, click `Resources` > `Projects`.
 1. Click `Add` and fill in the details:
     - Name: `Ansible Config Mgmt`
@@ -170,7 +170,7 @@
 
 ---
 
-# Inventory Management
+## Inventory Management
 - Objective: To manage separate inventories in an organized way 
 
 1. On the left sidebar, click `Resources` > `Inventories`.
@@ -197,7 +197,7 @@
 
 ---
 
-# Templates Management
+## Templates Management
 - Objective: Create a Reusable Job Template to Run Ansible Jobs.
 
 1. On the left sidebar, click `Resources` > `Templates`.
