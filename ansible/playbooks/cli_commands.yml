@@ -14,5 +14,7 @@
 
     - name: Return results to terminal
       ansible.builtin.debug:
-        msg: "{{ output.stdout_lines }}"
+        msg:
+          - "The command {{ survey_input }} returned the following results: "
+          - "{{ output.stdout_lines }}"
       when: ansible_network_os is defined
