@@ -220,6 +220,7 @@
     - Show Changes: Click the slider to `On`.
     - Skip Tags: `awx` (optional)
 1. Click `Save`.
+1. 1. Click `Launch` when ready to kickoff the Ansible Job Run.
 
 <br>
 
