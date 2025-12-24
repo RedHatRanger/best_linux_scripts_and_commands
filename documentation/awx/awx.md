@@ -1,3 +1,4 @@
+# Table of Contents
 1. [Credentials Management](#credentials-management)
     - [The Machine Credential](#creating-the-ansible-ssh-user-machine-credential)
     - [The Ansible Vault Credential](#creating-a-global-ansible-vault-credential)
