@@ -9,6 +9,7 @@
 1. [Projects Management](#projects-management)
 1. [Inventory Management](#inventory-management)
 1. [Templates Management](#templates-management)
+1. [Misc Configuration](#misc-configuration)
 
 <br>
 
@@ -220,9 +221,19 @@
     - Show Changes: Click the slider to `On`.
     - Skip Tags: `awx` (optional)
 1. Click `Save`.
-1. 1. Click `Launch` when ready to kickoff the Ansible Job Run.
+1. Click `Launch` when ready to kickoff the Ansible Job Run.
 
 <br>
 
 ---
 
+## Misc Configuration
+
+Optionally configure AWX to use the Project's `ansible.cfg` instead of the container one:
+1. On the left sidebar, click `Settings` > `Job settings`.
+1. Click `Edit` > `Extra Environment Variables` and fill in:
+    ```bash
+     {
+     "ANSIBLE_CONFIG": "/runner/project/ansible.cfg"
+     }
+    ```
