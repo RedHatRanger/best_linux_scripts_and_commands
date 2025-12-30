@@ -9,6 +9,7 @@
 1. [Projects Management](#projects-management)
 1. [Inventory Management](#inventory-management)
 1. [Templates Management](#templates-management)
+1. [OIDC Authentication](#oidc-authentication)
 1. [Misc Configuration](#misc-configuration)
 
 <br>
@@ -21,6 +22,8 @@
     - Private Container Registry
 
 ### Creating the Ansible SSH User Machine Credential:
+- Objective: Configure Machine Credentials to access the managed devices.
+
 1. On the left sidebar, click `Resources` > `Credentials`.
 1. Click `Add` and fill in the details:
     - Name: `Cisco SVC Account (Ansible User)`
@@ -33,21 +36,25 @@
         - Password: `<Your Ansible SSH Password>`
             >defined by ansible_password in your project's group_vars/all.yml
         - Privilege Escalation Method: `enable`
-    - Click `Save`.
+1. Click `Save` to confirm the setting.
 
 ### Creating a Global Ansible Vault Credential:
->This is required if you have used ansible-vault to encrypt the ansible_password in your Git <project>/group_vars/all.yml):
+- Objective: Setup an Ansible Vault Credential to decrypt the Ansible user pw.
+
+>This is required if you have used ansible-vault to encrypt the ansible_password in your Git `<project>`/group_vars/all.yml):
 1. On the left sidebar, click `Resources` > `Credentials`.
 1. Click `Add` and fill in the details:
     - Name: `Ansible Vault Credential`
     - Description: `Ansible Vault Credential`
-    - Organization: <LEAVE BLANK>
+    - Organization: `<LEAVE BLANK>`
     - Credential Type: Choose `Vault` from the drop-down menu.
     - Type Details:
-        - Vault Password: <Enter your vault password OR the contents of your vault pw file>
-    - Click `Save`.
+        - Vault Password: `<Enter your vault password OR the contents of your vault pw file>`
+1. Click `Save` to confirm the setting.
 
 ### Creating the GitLab SVC Account Credential:
+- Objective: Configure GitLab SVC Account Credentials to pull playbooks.
+
 1. On the left sidebar, click `Resources` > `Credentials`.
 1. Click `Add` and fill in the details:
     - Name: `GitLab SVC Account`
@@ -58,9 +65,11 @@
         - Username: `awx-user` 
             >The SVC Account you created in GitLab which has access to the Ansible Config Mgmt Project
         - Password: `<The Personal Access Token generated in GitLab for the awx-user>`
-1. Click `Save`.
+1. Click `Save` to confirm the setting.
 
 ### Creating Private Container Registry Credential:
+- Objective: Configure Private Registry Credentials to retrieve your EEs.
+
 1. On the left sidebar, click `Resources` > `Credentials`.
 1. Click `Add` and fill in the details:
     - Name: `<Your Registry Provider Name> Registry Creds`
@@ -72,7 +81,7 @@
         - Username: `<the team svc account name>`
         - Password: `<the team's token generated to access the registry>`
         - Options: Check `Verify SSL`.
-1. Click `Save`.
+1. Click `Save` to confirm the setting.
 
 <br>
 
@@ -91,7 +100,7 @@
     - Organization: `<LEAVE BLANK to make it globally available>`
     - Registry Credential: `<Your Registry Provider Name> Registry Creds`
         >We created this in a previous step.
-1. Click `Save`.
+1. Click `Save` to confirm the setting.
 
 <br>
 
@@ -108,15 +117,15 @@
     - Choose the Execution Environment:
         - `Network Automation EE`
     - Galaxy Credentials (optional for updates)
-1. Click `Save`.
+1. Click `Save` to confirm the setting.
 
 ### Creating Teams:
 1. On the left sidebar, click `Access` > `Teams`.
 1. Click `Add` and fill in the details:
-    - Name (team title)
-    - Description
+    - Name: `<team title>`
+    - Description: `<Create a custom>`
     - Choose the `Organization`
-1. Click `Save`.
+1. Click `Save` to confirm the setting.
 
 ### Creating Users:
 1. On the left sidebar, click `Access` > `Users`.
@@ -127,7 +136,7 @@
     - Password 2x
     - Normal User
     - Choose their `Organization` you created earlier.
-1. Click `Save`
+1. Click `Save` to confirm the setting.
 
 ### Adding Users to Teams (Membership):
 1. On the left sidebar, click `Access` > `Teams`.
@@ -142,13 +151,15 @@
 1. In the main part of the screen, click on the `Roles` Tab.
 1. Click `Add`:
     - `Job Templates` > `Next` > Check the desired Job Templates > `Next` > Check `Execute`.
-1. Click `Save`.
+1. Click `Save` to confirm the setting.
 
 <br>
 
 ---
 
 ## Projects Management
+- Objective: To Access the `Ansible Config Mgmt Project` Roles and Playbooks.
+
 1. On the left sidebar, click `Resources` > `Projects`.
 1. Click `Add` and fill in the details:
     - Name: `Ansible Config Mgmt`
@@ -165,14 +176,14 @@
             - Check the boxes:
                 - `Clean`
                 - `Update Revision on Launch`
-1. Click `Save`.
+1. Click `Save` to confirm the setting.
 
 <br>
 
 ---
 
 ## Inventory Management
-- Objective: To manage separate inventories in an organized way 
+- Objective: To manage separate inventories in an organized way.
 
 1. On the left sidebar, click `Resources` > `Inventories`.
 1. Click `Add` and fill in the details:
@@ -192,7 +203,7 @@
         - Inventory file: `inventory/test_inventory.yml`
             >Here it browses GitLab for the inventory.yml file.
         - Check the box for `Update on launch`.
-1. Click `Save`.
+1. Click `Save` to confirm the setting.
 
 <br>
 
@@ -220,8 +231,25 @@
     - Verbosity: `<LEAVE DEFAULT OR set it higher for debugging>`
     - Show Changes: Click the slider to `On`.
     - Skip Tags: `awx` (optional)
-1. Click `Save`.
+1. Click `Save` to confirm the setting.
 1. Click `Launch` when ready to kickoff the Ansible Job Run.
+
+<br>
+
+---
+
+## OIDC Authentication
+- Objective: Setup OIDC for authenticating users via Azure AD:
+
+1. On the left sidebar, click `Settings` > `Generic OIDC`.
+1. Click `Edit` and fill in the details:
+    - OIDC Key: `<Client ID from Azure AD>`
+    - OIDC Secret: `<Generated Secret from Azure AD>`
+    - OIDC Provider URL: `https://login.microsoft.us/<TenantID>/v2.0`
+    - Verify OIDC Provider Certificate: `On`
+1. Click `Save` to confirm the setting.
+1. Log out with your system admininistrative user.
+1. Test OIDC Login using the button below (do not enter a username or pw).
 
 <br>
 
