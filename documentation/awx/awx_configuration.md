@@ -1,4 +1,6 @@
-# Table of Contents
+# Ansible AWX Configuration
+
+## Table of Contents
 1. [Credentials Management](#credentials-management)
     - [The Machine Credential](#creating-the-ansible-ssh-user-machine-credential)
     - [The Ansible Vault Credential](#creating-a-global-ansible-vault-credential)
@@ -10,7 +12,9 @@
 1. [Inventory Management](#inventory-management)
 1. [Templates Management](#templates-management)
 1. [OIDC Authentication](#oidc-authentication)
+1. [Enable Writing to an NFS Share](#enable-writing-to-an-nfs-share)
 1. [Misc Configuration](#misc-configuration)
+    - [Optionally use the Project's Ansible.cfg](#optionally-configure-awx-to-use-the-projects-ansiblecfg-instead-of-the-container-one)
 
 <br>
 
@@ -255,9 +259,40 @@
 
 ---
 
+## Enable Writing to an NFS share:
+1. On the left sidebar, click `Administration` > `Instance Groups`.
+1. Click `Add` > `Add container group` and fill in:
+    - Name: `NFS Mapping Container Group`
+    - Options: Check `Customize pod specification` and fill in the `YAML`:
+        - Custom pod spec:
+            ```bash
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              namespace: <awx namespace>
+            spec:
+              containers:
+                - name: worker
+                  image: <image link and the version #>
+                  securityContext:
+                    runAsUser: 0
+                    privileged: true
+                  volumeMounts:
+                    - name: nfs-volume
+                      mountPath: /<mountpath>
+              volumes:
+                - name: nfs-volume
+                  nfs:
+                    server: 10.61.0.36
+                    path: /<mountpath>
+            ```
+<br>
+
+---
+
 ## Misc Configuration
 
-Optionally configure AWX to use the Project's `ansible.cfg` instead of the container one:
+### Optionally configure AWX to use the Project's `ansible.cfg` instead of the container one:
 1. On the left sidebar, click `Settings` > `Job settings`.
 1. Click `Edit` > `Extra Environment Variables` and fill in:
     ```bash
@@ -265,3 +300,4 @@ Optionally configure AWX to use the Project's `ansible.cfg` instead of the conta
      "ANSIBLE_CONFIG": "/runner/project/ansible.cfg"
      }
     ```
+    
