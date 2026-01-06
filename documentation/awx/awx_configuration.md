@@ -283,7 +283,7 @@
               volumes:
                 - name: nfs-volume
                   nfs:
-                    server: 10.61.0.36
+                    server: <NFS Server IP>
                     path: /<mountpath>
             ```
 <br>
