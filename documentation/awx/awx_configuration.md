@@ -12,7 +12,7 @@
 1. [Inventory Management](#inventory-management)
 1. [Templates Management](#templates-management)
     - [Creating a Reusable Job Template](#creating-a-job-template)
-    - [Creating a Workflow Template (combine or more jobs)](#creating-a-workflow-template)
+    - [Creating a Workflow Template (combine or more job templates)](#creating-a-workflow-template)
 1. [OIDC Authentication](#oidc-authentication)
 1. [Enable Writing to an NFS Share](#enable-writing-to-an-nfs-share)
 1. [Misc Configuration](#misc-configuration)
