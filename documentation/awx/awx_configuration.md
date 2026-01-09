@@ -11,10 +11,13 @@
 1. [Projects Management](#projects-management)
 1. [Inventory Management](#inventory-management)
 1. [Templates Management](#templates-management)
+    - [Creating a Reusable Job Template](#creating-a-job-template)
+    - [Creating a Workflow Template (combine or more jobs)](#creating-a-workflow-template)
 1. [OIDC Authentication](#oidc-authentication)
 1. [Enable Writing to an NFS Share](#enable-writing-to-an-nfs-share)
 1. [Misc Configuration](#misc-configuration)
     - [Optionally use the Project's Ansible.cfg](#optionally-configure-awx-to-use-the-projects-ansiblecfg-instead-of-the-container-one)
+    - [Optionally create an AWX Notifier Role](#optionally-create-the-awx-notifier-role)
 
 <br>
 
@@ -216,8 +219,9 @@
 ## Templates Management
 - Objective: Create a Reusable Job Template to Run Ansible Jobs.
 
+### Creating a Job Template:
 1. On the left sidebar, click `Resources` > `Templates`.
-1. Click `Add` and fill in the details:
+1. Click `Add` -> `Add job template` and fill in the details:
     - Name: `<This name should mirror the name of the playbook or role, plus the site name>`
     - Description: `<A brief description of what the playbook is doing>`
     - Job Type: Choose `Run (OR Check)` from the drop-down menu.
@@ -234,6 +238,23 @@
             - Click `Select` to confirm.
     - Verbosity: `<LEAVE DEFAULT OR set it higher for debugging>`
     - Show Changes: Click the slider to `On`.
+    - Skip Tags: `awx` (optional)
+1. Click `Save` to confirm the setting.
+1. Click `Launch` when ready to kickoff the Ansible Job Run.
+
+<br>
+
+---
+
+### Creating a Workflow Template:
+1. On the left sidebar, click `Resources` > `Templates`.
+1. Click `Add` -> `Add workflow template` and fill in the details:
+    - Name: `<This name should mirror the name of the playbook or role, plus the site name>`
+    - Description: `<A brief description of what the playbook is doing>`
+    - Organization: `<optional or LEAVE BLANK for global visibility>`
+    - Job Type: Choose `Run (OR Check)` from the drop-down menu.
+    - Inventory: `Test Inventory`
+    - Source Control Branch: `<your desired branch from GitLab>`
     - Skip Tags: `awx` (optional)
 1. Click `Save` to confirm the setting.
 1. Click `Launch` when ready to kickoff the Ansible Job Run.
@@ -300,4 +321,93 @@
      "ANSIBLE_CONFIG": "/runner/project/ansible.cfg"
      }
     ```
-    
+### Optionally create the `AWX Notifier Role`:
+- Objective: Create a Job Template which will send email attachments of reports to the desired recipients.
+    - Then create a survey for:
+        - The target devices using the `target` variable
+        - The filename(s) you wish to send (comma-separated or globbed with *) using the `selected_reports` variable.
+        - The email address(es) you wish to send the reports to (comma-separated) using the `target_email` variable.
+
+        - >***Note: The variable `log_type` must be set in the `yaml/json` variables for the job template*** 
+
+<br>
+
+1. In `playbooks/awx_notifier/awx_notifier.yml`:
+  
+    ```yaml
+    ---
+    - name: Execute AWX Notifier Role
+      hosts: localhost
+      gather_facts: false
+      roles:
+        - role: awx_notifier
+    ```
+
+1. In `roles/awx_notifier/defaults/main.yml`:
+    ```yaml
+    ---
+    # defaults file for awx_notifier
+    target_email: ""
+    report_path: "<logs_directory>"
+    log_type: ""
+    domain: "<example.com>"
+    group: "<group name>"
+    smtp_host: "smtp.<example.com>"
+    ```
+
+1. In `roles/awx_notifier/tasks/main.yml`:
+    ```yaml
+    ---
+    # tasks file for awx_notifier
+    - name: AWX Notifier | Process Select Reports
+      block:
+        - name: Filesystem | Find specific reports on NFS
+          ansible.builtin.find:
+            paths: "{{ report_path }}/{{ log_type | default('omit') }}"
+            patterns: "{{ selected_reports | default('*.csv') | split(',') | map('trim') | list }}"
+          register: found_reports
+          delegate_to: localhost
+
+        - name: Email | Send report to user via Port 25
+          community.general.mail:
+            host: "{{ smtp_host }}"
+            port: 25
+            from: "{{ group }}-ansible-awx@{{ domain }}"
+            to: "{{ target_email | replace(';', ',') | default(omit) }}"
+            subject: "Requested Reports - Job #{{ awx_job_id }}"
+            body: |
+              ALCON,
+
+              The AWX Job Notifier Job #{{ awx_job_id | default('0000')}} has completed. 
+
+              See the selected reports attached: {{ selected_reports | default('N/A') }}
+
+              Workflow Name: {{ awx_workflow_job_name | default('N/A') }}
+              Workflow ID:   {{ awx_workflow_job_id | default('N/A') }}
+              Status: {{ awx_job_status | default('Finished') }}
+
+            # Attach only the specific files that were successfully found
+            attach: "{{ found_reports.files | map(attribute='path') | list }}"
+          delegate_to: localhost
+          when: 
+            - target_email is defined 
+            - target_email | length > 0
+            - found_reports.matched > 0
+
+        - name: Logging | Notice if no files were found
+          ansible.builtin.debug:
+            msg: "WARNING: None of the selected reports ({{ selected_reports }}) were found in {{ report_path }}."
+          when: found_reports.matched == 0
+
+      rescue:
+        - name: Error Handling | Log failure
+          ansible.builtin.debug:
+            msg: "The mail module encountered an error. Check if the 'from' address is accepted by your relay."
+
+      ignore_errors: true
+    ```
+1. In AWX, create the Job Template `AWX Notifier` pointing it to the `awx_notifier` playbook.
+
+<br>
+
+---
