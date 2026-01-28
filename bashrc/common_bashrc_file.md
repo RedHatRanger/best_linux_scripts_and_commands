@@ -41,6 +41,9 @@ function mkcd() {
   fi
   mkdir -p -- "$1" && cd -- "$1"
 }
+function get_var () {
+    ansible localhost -m debug -a "var=$1" -e "@./inventory/group_vars/all.yml" -e ansible_connection=local
+}
 ```
 
 # For the root user:
