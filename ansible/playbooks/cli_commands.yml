@@ -1,20 +1,32 @@
 ---
 - name: CLI commands playbook
   hosts: "{{ target }}"
-  gather_facts: false
+  gather_facts: False
+  serial: 1
   vars:
-    ansible_connection: network_cli
-  
+    report_path: "</path/to/report.txt>"
+
   tasks:
     - name: Specified command is run
-      ansible.netcommon.cli_command:
-        command: "{{ survey_input | default('show version') }}"
-      when: ansible_network_os is defined
+      cisco.ios.ios_command:
+        commands: "{{ survey_input | default('show version') }}"
       register: output
+      ignore_errors: true
 
-    - name: Return results to terminal
-      ansible.builtin.debug:
-        msg:
-          - "The command {{ survey_input }} returned the following results: "
-          - "{{ output.stdout_lines }}"
-      when: ansible_network_os is defined
+    - name: Append results to single {{ report_path }}
+      ansible.builtin.blockinfile:
+        path: "{{ report_path }}"
+        create: yes
+        marker: "# {mark} {{ inventory_hostname }}"
+        block: |
+          ===================================================
+          DEVICE:    {{ inventory_hostname }}
+          TIMESTAMP: {{ now(fmt='%Y-%m-%d %H:%M:%S') }}
+          COMMAND:   {{ survey_input | default('show version') }}
+          ---------------------------------------------------
+          OUTPUT:
+          {{ output.stdout[0] }}
+          ---------------------------------------------------
+          ===================================================
+      delegate_to: localhost
+      throttle: 1
