@@ -2,6 +2,18 @@
 
 The `chmod` (change mode) command defines who can read, write, or execute a file or directory. Permissions are split into three categories: **User (u)**, **Group (g)**, and **Others (o)**.
 
+### BLUF:
+1. The Sticky Bit (Prevent Accidental Deletion)
+>The Rule: You can create/edit files, but you can only delete your own stuff.
+>Best for: Shared "Drop" folders or /tmp.
+
+Commands:
+```bash
+chmod +t /path/to/dir (Symbolic)
+## OR
+chmod 1777 /path/to/dir (Numeric)
+```
+
 ---
 
 ### 1. The Numeric Representation
