@@ -1,0 +1,1 @@
+pip download --only-binary=:all: --platform win_amd64 --python-version 313 --abi cp313 <package(s)>
