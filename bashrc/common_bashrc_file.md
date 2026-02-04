@@ -31,6 +31,7 @@ alias .2='cd ../..'
 alias .3='cd ../../..'
 alias play='ansible-playbook'
 alias vault='ansible-vault'
+alias which='type -all'
 
 # Functions:
 function mkcd() {
@@ -44,6 +45,7 @@ function mkcd() {
 function get_var () {
     ansible localhost -m debug -a "var=$1" -e "@./inventory/group_vars/all.yml" -e ansible_connection=local
 }
+
 ```
 
 # For the root user:
