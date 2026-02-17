@@ -1,0 +1,42 @@
+---
+- name: Freeze the report path for this run
+  set_fact:
+    health_check_report_path: "{{ health_check_report_path }}"
+  run_once: true
+  delegate_to: localhost
+
+- name: Collect all health check data
+  cisco.ios.ios_command:
+    commands: "{{ health_check_commands }}"
+  register: results
+
+- name: Append data to the Master Health Check Report
+  blockinfile:
+    path: "{{ health_check_report_path }}"
+    create: yes
+    marker: "# {mark} HOST: {{ inventory_hostname }}"
+    block: |
+      =========================================================
+      HOST: {{ inventory_hostname }} | TIME: {{ now(fmt='%Y-%m-%d %H:%M:%S') }}
+      =========================================================
+      {% for cmd in health_check_commands %}
+      --- COMMAND: {{ cmd }} ---
+      {{ results.stdout[loop.index0] }}
+
+      {% endfor %}
+  delegate_to: localhost
+  throttle: 1
+
+- name: Set permissions and group ownership for the report
+  file:
+    path: "{{ health_check_report_path }}"
+    group: "{{ group }}"
+    mode: '0664'
+    state: file
+  delegate_to: localhost
+  run_once: true
+
+- name: Export the report path for other roles
+  set_fact:
+    health_check_output_file: "{{ health_check_report_path }}"
+  run_once: true
