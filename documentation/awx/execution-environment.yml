@@ -1,0 +1,90 @@
+# ansible-builder build -v 3 --no-cache -t artifactory.example.com/awx-operator/ansible/network-ee:2.0
+version: 3
+
+images:
+  base_image:
+    name: registry.redhat.io/ubi8/python-312:latest
+
+dependencies:
+  ansible_core:
+    package_pip: ansible-core
+  galaxy: requirements.yml
+  python: requirements.txt
+  system:
+    - python3.12-devel
+    - findutils
+    - gcc
+    - gcc-c++
+    - iputils
+    - libcap
+    - libssh-devel
+    - libxml2-devel
+    - libxslt-devel
+    - openssl-devel
+    - krb5-devel
+
+additional_build_files:
+  - src: files/ansible.cfg
+    dest: configs
+  - src: files/redhat.repo
+    dest: yum.repos.d
+  - src: files/certs/
+    dest: certs
+  - src: files/rpms/
+    dest: rpms
+  - src: files/wheels/
+    dest: wheels
+
+additional_build_steps:
+  prepend_base:
+    - RUN groupadd -g 10018 <LOCAL_GROUP>
+    - RUN rm -f /etc/yum.repos.d/ubi.repo
+    - COPY _build/yum.repos.d/redhat.repo /etc/yum.repos.d/redhat.repo
+    - RUN dnf install -y findutils ansible-core libcap iputils
+    - RUN setcap cap_net_raw+ep /usr/bin/ping
+    - COPY _build/wheels/ /tmp/shared_wheels/
+
+    # STRICT OFFLINE BOOTSTRAP
+    - ENV PIP_NO_INDEX=1
+    - ENV PIP_FIND_LINKS=/tmp/shared_wheels
+    - ENV PIP_EXTRA_INDEX_URL=https://artifactory.example.com/artifactory/api/pypi/pypi-remote/simple
+    - RUN python3 -m pip config set global.trusted-host artifactory.example.com
+    - COPY _build/certs/ /etc/pki/ca-trust/source/anchors/
+    - RUN update-ca-trust
+
+  prepend_builder:
+    - COPY _build/rpms/ /opt/rpms/
+    - RUN rpm -Uvh --replacepkgs /opt/rpms/*.rpm || true
+
+  prepend_galaxy:
+    - RUN mkdir -p /etc/ansible
+    - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
+    - COPY _build/configs/ansible.cfg ansible.cfg
+    - ENV ANSIBLE_CONFIG=/build/ansible.cfg
+
+  prepend_final:
+    - RUN rm -f /etc/yum.repos.d/ubi*.repo
+    - RUN dnf clean all
+
+    # BAKE ANSIBLE.CFG & FIX PERMISSIONS
+    - RUN mkdir -p /etc/ansible
+    - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
+    # Change group to 0 (root group) and set permissions to 644 (Owner RW, Group/Global R)
+    - RUN chgrp 0 /etc/ansible/ansible.cfg && chmod 644 /etc/ansible/ansible.cfg
+
+    - RUN mkdir -p /opt/app-root/src/wheels
+    - COPY --from=builder /tmp/shared_wheels/ /opt/app-root/src/wheels/
+    - RUN /usr/bin/python3 -m pip install --no-index --find-links=/opt/app-root/src/wheels ansible-runner pexpect ptyprocess python-daemon
+    - RUN echo "/usr/bin/python3 -m pip install --no-index --find-links /opt/app-root/src/wheels 'dumb-init==1.2.5'" > /output/scripts/install-init
+
+  append_final:
+    - ENV PIP_NO_UNINSTALL=1
+    - ENV PIP_NO_INDEX=1
+    - ENV PIP_FIND_LINKS=/opt/app-root/src/wheels
+
+    # Point Ansible to the baked-in config globally
+    - ENV ANSIBLE_CONFIG=/etc/ansible/ansible.cfg
+
+    - RUN chmod +x /opt/builder/bin/entrypoint
+    - RUN chgrp -R 0 /opt/builder /runner && chmod -R g=u /opt/builder /runner
+    - RUN python3 -m pip install --find-links=/opt/app-root/src/wheels -r /output/requirements.txt
