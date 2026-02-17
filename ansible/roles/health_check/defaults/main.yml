@@ -1,0 +1,17 @@
+---
+# List of cisco commands
+health_check_commands:
+  - show ip int brief
+  - show int desc
+  - show ip route
+  - show run | sec router eigrp
+  - sh ip eigrp nei
+  - sh ver
+  - sh cdp nei
+  - show run | sec router bgp
+
+# Central report location
+health_check_report_path: "/tmp/health_check_report_{{ now(fmt='%Y%m%d_%H%M') }}.txt"
+
+# Permissions
+group: <LOCAL_GROUP>
