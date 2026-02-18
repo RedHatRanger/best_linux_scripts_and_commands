@@ -11,7 +11,8 @@ health_check_commands:
   - show run | sec router bgp
 
 # Central report location
-health_check_report_path: "/tmp/health_check_report_{{ now(fmt='%Y%m%d_%H%M') }}.txt"
+health_check_report_file: "health_check_report_{{ now(fmt='%Y%m%d_%H%M') }}.txt"
+health_check_report_path: "/<nfs_share>/tmp/{{ health_check_report_file }}"
 
 # Permissions
 group: <LOCAL_GROUP>
