@@ -37,6 +37,7 @@
   run_once: true
 
 - name: Export the report path for other roles
-  set_fact:
-    health_check_output_file: "{{ health_check_report_path }}"
+  set_stats:
+    data:
+      selected_reports: "{{ health_check_report_file }}"
   run_once: true
