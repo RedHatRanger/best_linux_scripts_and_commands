@@ -1,0 +1,8 @@
+---
+# defaults file for awx_notifier
+target_email: ""
+report_path: "/<nfs_share>/logs"
+log_type: ""
+domain: "example.com"
+group: "<my_group>"
+smtp_host: "smtp.example.com"
