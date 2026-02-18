@@ -1,0 +1,52 @@
+---
+# selected_reports variable is an extra variable
+# tasks file for awx_notifier
+- name: AWX Notifier | Process Select Reports
+  block:
+    - name: Filesystem | Find specific reports on NFS
+      ansible.builtin.find:
+        paths: "{{ report_path }}/{{ log_type | join('') | default('none') }}"
+        patterns: "{{ selected_reports | default('summary.md') | split(',') | map('trim') | list }}"
+      register: found_reports
+      delegate_to: localhost
+
+    - name: Email | Send report to user via Port 25
+      community.general.mail:
+        host: "{{ smtp_host }}"
+        port: 25
+        from: "{{ group }}-ansible-awx@{{ domain }}"
+        to: "{{ target_email | replace(';', ',') | default(omit) }}"
+        subject: "Requested Reports - Job #{{ awx_job_id }}"
+        body: |
+          ALCON,
+
+          The AWX Job Notifier Job #{{ awx_job_id | default('0000')}} has completed. 
+
+          See the selected reports attached: {{ selected_reports | default('N/A') }}
+          
+          Workflow Name: {{ awx_workflow_job_name | default('N/A') }}
+          Workflow ID:   {{ awx_workflow_job_id | default('N/A') }}
+          Status: {{ awx_job_status | default('Finished') }}
+
+        # Attach only the specific files that were successfully found
+        attach: "{{ found_reports.files | map(attribute='path') | list }}"
+      delegate_to: localhost
+      when: 
+        - target_email is defined 
+        - target_email | length > 0
+        - found_reports.matched > 0
+
+    - name: Logging | Notice if no files were found
+      ansible.builtin.debug:
+        msg: "WARNING: None of the selected reports ({{ selected_reports }}) were found in {{ report_path }}/{{ log_type | join('') }}."
+      when: 
+        - found_reports.matched is defined
+        - found_reports.matched == 0
+
+  rescue:
+    - name: Error Handling | Log failure
+      ansible.builtin.debug:
+        msg: "The mail module encountered an error. Check if the 'from' address is accepted by your relay."
+
+  ignore_errors: true
+  
