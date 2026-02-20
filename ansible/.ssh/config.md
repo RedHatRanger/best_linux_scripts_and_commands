@@ -1,8 +1,30 @@
 ## Paste this into your `~/.ssh/config` file:
 ```bash
-Host <my_server_alias>                         # Alias of the server
+host <alias1> <alias2>                   # Alias of the server
     Hostname 192.168.1.100
     User <my_username>
     Port 22
     IdentityFile ~/.ssh/id_rsa
+
+# Sample ~/.ssh/config
+host ahost3 agitlab
+        Hostname gitlaba.example.com
+        User redhatranger
+        Port 22
+        IdentityFile ~/.ssh/id_rsa
+
+# Other GitLab
+host bgitlab
+        Hostname gitlabb.example.com
+        User redhatranger
+        Port 22
+        IdentityFile ~/.ssh/id_rsa
+
+# ProxyJump from Windows -> GitLab JumpHost -> Other GitLab JumpHost -> Other Host1)
+host bhost1
+        Hostname host1.example.com
+        User redhatranger
+        Port 22
+        IdentityFile ~/.ssh/id_rsa
+        ProxyJump agitlab,bgitlab
 ```
