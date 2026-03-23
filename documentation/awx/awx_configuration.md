@@ -18,6 +18,7 @@
 1. [Misc Configuration](#misc-configuration)
     - [Optionally use the Project's Ansible.cfg](#optionally-configure-awx-to-use-the-projects-ansiblecfg-instead-of-the-container-one)
     - [Optionally create an AWX Notifier Role](#optionally-create-the-awx-notifier-role)
+    - [Instance Groups](#instance-groups---nfs-mapping-container-group)
 
 <br>
 
@@ -411,3 +412,26 @@
 <br>
 
 ---
+
+## Instance Groups - NFS Mapping Container Group
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: awx-operator
+spec:
+  containers:
+    - name: worker
+      image: artifactory.example.com/awx-operator/ansible/network-ee:2.0
+      securityContext:
+        runAsUser: 0
+        privileged: true
+      volumeMounts:
+        - name: nfs-volume
+          mountPath: /<share>
+  volumes:
+    - name: nfs-volume
+      nfs:
+        server: <nfs_server_ip>
+        path: /<share>
+```
