@@ -1,0 +1,36 @@
+---
+- name: Check if /share is mounted and notify if missing
+  hosts: linux
+  gather_facts: false
+  become: false
+
+  vars:
+    domain: "example.com"
+    mount_point: /share
+    mail_to:
+      - admin1@{{ domain }}
+      - admin2@{{ domain }}
+    mail_from: ALERTS@{{ domain }}
+    smtp_host: smtp.{{ domain }}
+    smtp_port: 25
+
+  tasks:
+    - name: Check if /share is mounted
+      ansible.builtin.command: "findmnt --mountpoint {{ mount_point }}"
+      register: share_mount_check
+      changed_when: false
+      failed_when: false
+
+    - name: Send email notification if /share is not mounted
+      community.general.mail:
+        host: "{{ smtp_host }}"
+        port: "{{ smtp_port }}"
+        to: "{{ mail_to }}"
+        from: "{{ mail_from }}"
+        subject: "ALERT: /share is not mounted on {{ inventory_hostname }}"
+        body: |
+          The mount point {{ mount_point }} is not mounted on {{ inventory_hostname }}.
+
+          Please investigate.
+      delegate_to: localhost
+      when: share_mount_check.rc != 0
