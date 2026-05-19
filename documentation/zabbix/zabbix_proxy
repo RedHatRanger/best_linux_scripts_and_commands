@@ -1,0 +1,326 @@
+---
+# tasks file for zabbix_proxy
+# 1. THE GATEKEEPER: Check if the PostgreSQL mount point exists; if not, then generate an alert
+- name: Mount Point Safety Check
+  block:
+    - name: Check if /var/lib/pgsql is mounted
+      ansible.builtin.command: findmnt --mountpoint /var/lib/pgsql
+      register: mount_check
+      changed_when: false
+
+  rescue:
+    - name: Alert for manual intervention
+      ansible.builtin.fail:
+        msg: |
+          CRITICAL: /var/lib/pgsql is NOT mounted.  Please contact the Server Team for assistance.
+
+# 2. Zabbix Proxy Configuration: Only runs if the check above passes
+- name: PostgreSQL Database and User Configuration
+  block:
+    - name: Proceeding with the deployment message
+      ansible.builtin.debug:
+        msg: |
+          Mount Point /var/lib/pgsql exists. Proceeding with Zabbix Proxy Deployment.
+    
+    - name: Temporarily Enable the EPEL Repo
+      aansible.builtin.command: subscription-manager repos --enable *EPEL*
+    
+    - name: Install 'fping' and 'htop' from the EPEL Repo
+      ansible.builtin.dnf:
+        name:
+          - fping
+          - htop
+        state: present
+      
+    - name: Disble the EPEL Repo
+      ansible.builtin.command: subscription-manager repos --disable *EPEL*
+    
+    - name: Temporarily Enable the EPEL Repo
+      aansible.builtin.command: subscription-manager repos --enable *Zabbix*
+    
+    - name: Install the Required Packages for the Zabbix Proxies
+      ansible.builtin.dnf:
+        name:
+          - postgresql-server
+          - zabbix-proxy-pgsql
+          - zabbix-sql-scripts
+          - python3-psycopg2
+          - zabbix-selinux-policy
+          - zabbix-agent2  # to communicate with the zabbix server
+          - zabbix-agent2-plugin-postgresql
+        state: present
+
+    - name: Open the TCP Firewall Port '10051' (firewalld)
+      ansible.posix.firewalld:
+        port: 10051/tcp
+        permanent: true
+        state: enabled
+        immediate: true
+    
+    - name: Permit trafic from 'zabbix-agent'
+      ansible.posix.firewalld:
+        service: zabbix-agent
+        permanent: true
+        state: enabled
+        immediate: true
+    
+    - name: Check if PostgreSQL Database is initialized
+      ansible.builtin.stat:
+        path: "{{ postgresql_data_dir }}/PG_VERSION"
+      register: pgdata_initialized
+
+    - name: Initialize the PG Database
+      ansible.builtin.command: postgresql-setup --initdb
+      when: not pgdata_initialized.stat.exists
+
+    - name: Enable and Start PostgreSQL
+      ansible.builtin.service:
+        name: postgresql
+        enabled: true
+        state: started
+      when: not pgdata_initialized.stat.exists
+
+    - name: Configure PostgreSQL 'pg_hba.conf' for the local Zabbix proxy DB access
+      ansible.builtin.template:
+        src: pg_hba.conf.j2
+        dest: "{{ postgresql_data_dir }}/pg_hba.conf"
+        owner: postgres
+        group: postgres
+        mode: '0600'
+        backup: true
+
+    - name: Configure PostgreSQL 'postgresql.conf' - 'password_encryption = scram-sha-256'
+      ansible.builtin.template:
+        src: postgresql.conf.j2
+        dest: "{{ postgresql_data_dir }}/postgresql.conf"
+        owner: postgres
+        group: postgres
+        mode: '0600'
+        backup: true
+      notify: Restart Postgres
+
+    - name: Configure Zabbix 'zabbix_agent2.conf' - Agent Communication to Server
+      ansible.builtin.template:
+        src: zabbix_agent2.conf.j2
+        dest: /etc/zabbix/zabbix_agent2.conf
+        owner: root
+        group: root
+        mode: '0644'
+        backup: true
+      notify: Restart Zabbix Agent
+
+    - name: Configure Zabbix 'zabbix_proxy.conf' - Agent Communication to Server
+      ansible.builtin.template:
+        src: zabbix_proxy.conf.j2
+        dest: /etc/zabbix/zabbix_proxy.conf
+        owner: root
+        group: zabbix
+        mode: '0640'
+        backup: true
+      notify: Restart Zabbix Proxy
+
+    # Booleans Existence Idempotency Check/Creation
+    - name: Check current state of the 'zabbix_can_network' Boolean
+      ansible.builtin.command: getsebool zabbix_can_network
+      register: zabbix_can_network_status
+      changed_when: false
+
+    - name: Configure SELinux Booleans for Zabbix Proxies
+      ansible.builtin.command: setsebool -P zabbix_can_network on
+      when: "'off' in zabbix_can_network_status.stdout"
+
+    # User Existence Idempotency Check/Creation
+    - name: Check if 'zabbix' user exists in Postgres
+      become_user: postgres
+      ansible.builtin.command: psql -tAc "SELECT rolname FROM pg_roles WHERE rolname='{{ zabbix_db_user }}'"
+      register: user_exists_check
+      changed_when: false
+
+    - name: Create 'zabbix' user in Postgres
+      become_user: postgres
+      ansible.builtin.command: "createuser {{ zabbix_db_user }}"
+      when: user_exists_check.stdout | length == 0
+
+    # Database Existence Idempotency Check/Creation
+    - name: Check if 'zabbix_proxy' database exists
+      ansible.builtin.command: >
+        psql -tAc "SELECT datname FROM pg_database WHERE datname='{{ zabbix_db_name }}';"
+      register: db_exists_check
+      changed_when: false
+
+    - name: Create 'zabbix_proxy' database if missing
+      become_user: postgres
+      ansible.builtin.command: "createdb -O {{ zabbix_db_user }} {{ zabbix_db_name }}"
+      when: db_exists_check.stdout | length == 0
+
+    # Zabbix Uer's Password Idempotency Check/Creation
+    - name: Check 'zabbix' user Postgres login with Password
+      become_user: postgres
+      ansible.builtin.shell: |
+        export PGPASSWORD='{{ zabbix_db_password }}'
+        psql -h localhost -U {{ zabbix_db_user }} -d {{ zabbix_db_name }} -c "SELECT 1"
+      register: login_check
+      failed_when: false
+      changed_when: false
+      no_log: true
+
+    - name: Set password for 'zabbix' database user in Postgres
+      become_user: postgres
+      ansible.builtin.command: >
+        psql -c "ALTER ROLE {{ zabbix_db_user }} WITH PASSWORD '{{ zabbix_db_password }}'"
+      when: login_check.rc != 0
+      no_log: true
+
+    # Zabbix Schema Idempotency Check/Creation
+    - name: Check if Zabbix schema is already present
+      become_user: postgres
+      ansible.builtin.command: >
+        psql -d {{ zabbix_db_name }} -tAc "SELECT 1 FROM information_schema.tables WHERE table_name='proxy_history';"
+      register: schema_check
+      changed_when: false
+
+    - name: Import Zabbix Proxy Schema
+      ansible.builtin.shell: |
+        cat /usr/share/zabbix/sql-scripts/postgresql/proxy.sql | sudo -u {{ zabbix_db_user }} psql {{ zabbix_db_name }}
+      # Run only if the result was NOT 1 (meaning the table was missing)
+      when: schema_check.stdout != "1"
+
+  rescue:
+    - name: Alert on Database Logic Failure
+      ansible.builtin.debug:
+        msg: "The mount is OK, but the Database Configuration failed. Check Postgres service status."
+  
+
+---
+# handlers file for zabbix_proxy
+- name: Restart Postgres
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted
+
+- name: Restart Zabbix Proxy
+  ansible.builtin.service:
+    name: zabbix-proxy
+    state: restarted
+
+- name: Restart Zabbix Agent
+  ansible.builtin.service:
+    name: zabbix-agent2
+    state: restarted
+
+---
+# defaults file for zabbix_proxy
+postgresql_data_dir: /var/lib/pgsql/data
+zabbix_server_ip: "<server_ip>"
+zabbix_server_fqdn: "<server_fqdn>"
+zabbix_db_name: "zabbix_proxy"
+zabbix_db_user: "zabbix"
+zabbix_db_password: "<zabbix_db_password>"
+
+
+# pg_hba.conf.j2
+# Managed by Ansible
+
+# TYPE  DATABASE          USER       CIDR-ADDRESS           METHOD
+local   all               postgres                          trust
+local   {{ zabbix_db_name }}      zabbix                            scram-sha-256
+host    all               all         127.0.0.1/32          scram-sha-256
+hostssl all               all         0.0.0.0/0             scram-sha-256
+hostssl all               all         ::/0                  scram-sha-256
+host    {{ zabbix_db_name }}      zabbix      ::1/128               scram-sha-256
+host    {{ zabbix_db_name }}      zabbix      127.0.0.1/32          scram-sha-256
+
+
+# postgresql.conf.j2
+# Managed by Ansible
+
+max_connections = 100
+
+password_encryption = scram-sha-256
+shared_buffers = 128MB
+
+dynamic_shared_memory_type = posix
+
+max_wal_size = 1GB
+min_wal_size = 80MB
+
+logging_collector = on
+
+log_filename = 'postgresql-%a.log'
+
+log_truncate_on_rotation = on
+
+log_rotation_age = 1d
+
+log_rotation_size = 0
+
+log_timezone = 'America/New_York'
+
+datestyle = 'iso, mdy'
+timezone = 'America/New_York'
+
+lc_messages = 'en_US.UTF-8'
+
+lc_monetary = 'en_US.UTF-8'
+lc_numeric = 'en_US.UTF-8'
+lc_time = 'en_US.UTF-8'
+default_text_search_config = 'pg_catalog.english'
+
+
+# zabbix_agent2.conf.j2
+# Managed by Ansible
+
+PidFile=/run/zabbix/zabbix_agent2.pid
+LogFile=/var/log/zabbix/zabbix_agent2.log
+LogFileSize=0
+Server=127.0.0.1,{{ zabbix_server_ip }},{{ zabbix_server_fqdn }}
+ServerActive=127.0.0.1
+Hostname=Zabbix server
+Include=/etc/zabbix/zabbix_agent2.d/*.conf
+PluginSocket=/run/zabbix/agent.plugin.sock
+ControlSocket=/run/zabbix/agent.sock
+Include=./zabbix_agent2.d/plugins.d/*.conf
+
+
+# zabbix_proxy.conf.j2
+# Managed by Ansible
+
+ProxyMode=0
+
+Server={{ zabbix_server_ip }}:10051
+Hostname={{ inventory_hostname }}
+
+ListenPort=10051
+LogFile=/var/log/zabbix/zabbix_proxy.log
+LogFileSize=0
+PidFile=/run/zabbix/zabbix_proxy.pid
+SocketDir=/run/zabbix
+
+DBHost=localhost
+DBName=zabbix_proxy
+DBUser=zabbix
+DBPassword={{ zabbix_db_password }}
+
+ProxyBufferMode=hybrid
+ProxyMemoryBufferSize=512M
+ProxyConfigFrequency=100
+
+StartPollers=100
+StartAgentPollers=5
+StartSNMPPollers=100
+
+StartPreprocessors=32
+StartPingers=100
+StartDiscoverers=30
+
+SNMPTrapperFile=/var/log/snmptrap/snmptrap.log
+CacheSize=1G
+HistoryCacheSize=512M
+HistoryIndexCacheSize=512M
+Timeout=4
+
+LogSlowQueries=3000
+
+StatsAllowedIP=127.0.0.1
+
+Include=/etc/zabbix/zabbix_proxy.d/*.conf
