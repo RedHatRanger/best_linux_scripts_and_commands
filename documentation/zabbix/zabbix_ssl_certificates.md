@@ -1,15 +1,17 @@
 # Zabbix Certificate Installation
 
-On the Target Linux Server:
-## Install the mod_ssl package:
+## Install the mod_ssl package on the Linux Server:
 ```bash
 sudo yum clean all
 sudo yum install mod_ssl dos2unix
 ```
-## Generate the CSR:
+## Generate the CSR on the Linux Server:
 ```bash
-cd /etc/pki/tls/private
+sudo chmod 777 /etc/pki/tls/private /etc/pki/tls/certs
+cd /etc/pki/tls/private 
 openssl req -new -newkey rsa:3072 -nodes -keyout {{ hostname }}.key -out newcsrrequest.csr
+
+# Answer the Questions
 ```
 
 ## CAT the contents of the newrrequest.csr output:
@@ -17,18 +19,21 @@ openssl req -new -newkey rsa:3072 -nodes -keyout {{ hostname }}.key -out newcsrr
 cat newcsrrequest.csr # copy this
 ```
 
-### You will then generate the certificate with your organization and download it to your Linux Server
+## Go to the Certificate Generating Site on your Windows Workstation:
+<Here is where you generate the certificate from your organization>
 
-On the Linux Server:
+# DO NOT SCP the certificate...COPY THE CONTENTS
+```
+
+## Save the Generated Certificate on the Linux Server:
 ```bash
-sudo chmod 777 /etc/pki/tls/certs
-sudo mv /tmp/{{ hostname }}.crt /etc/pki/tls/certs
 cd /etc/pki/tls/certs
-sudo dos2unix /etc/pki/tls/certs/{{ hostname }}.crt
+sudo vim {{ hostname }}.crt
+# (paste the contents of the .cer file from VSCode on your Windows Workstation), :wq to save
+
 sudo chown root: {{ hostname }}.crt
-sudo chmod 644 {{ hostname }}.crt
-cd /etc/pki/tls/private
-sudo chmod 644 /etc/pki/tls/private/{{ hostname }}.key
+sudo chmod 644 /etc/pki/tls/certs
+sudo chmod 600 /etc/pki/tls/private
 ```
 ```bash
 sudo vim /etc/httpd/conf.d/ssl.conf
