@@ -21,16 +21,6 @@
       loop: "{{ check_paths }}"
       register: common_path_check
 
-    - name: Build list of existing paths
-      ansible.builtin.set_fact:
-        existing_common_paths: >-
-          {{
-            common_path_check.results
-            | selectattr('stat.exists', 'equalto', true)
-            | map(attribute='item')
-            | list
-          }}
-
     - name: Send email notification only if both paths are missing
       community.general.mail:
         host: "{{ smtp_host }}"
@@ -48,4 +38,5 @@
 
           Please investigate.
       delegate_to: localhost
-      when: existing_common_paths | length == 0
+      # Maps out the 'exists' attribute safely, defaulting to false if 'stat' is missing
+      when: common_path_check.results | map(attribute='stat.exists', default=false) | select | list | length == 0
