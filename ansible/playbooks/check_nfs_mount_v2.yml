@@ -1,0 +1,51 @@
+---
+- name: Check if common paths exist and notify only if both are missing
+  hosts: linux_servers
+  gather_facts: false
+  become: false
+
+  vars:
+    check_paths:
+      - /share/common
+      - /data/common
+
+    mail_to: admin@example.com
+    mail_from: ansible-monitor@example.com
+    smtp_host: smtp.example.com
+    smtp_port: 25
+
+  tasks:
+    - name: Check if target paths exist
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      loop: "{{ check_paths }}"
+      register: common_path_check
+
+    - name: Build list of existing paths
+      ansible.builtin.set_fact:
+        existing_common_paths: >-
+          {{
+            common_path_check.results
+            | selectattr('stat.exists', 'equalto', true)
+            | map(attribute='item')
+            | list
+          }}
+
+    - name: Send email notification only if both paths are missing
+      community.general.mail:
+        host: "{{ smtp_host }}"
+        port: "{{ smtp_port }}"
+        to: "{{ mail_to }}"
+        from: "{{ mail_from }}"
+        subject: "ALERT: Common paths missing on {{ inventory_hostname }}"
+        body: |
+          Neither required common path exists on {{ inventory_hostname }}.
+
+          Checked paths:
+          {% for path in check_paths %}
+          - {{ path }}
+          {% endfor %}
+
+          Please investigate.
+      delegate_to: localhost
+      when: existing_common_paths | length == 0
