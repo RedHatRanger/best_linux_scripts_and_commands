@@ -3,35 +3,32 @@
 ## Install the mod_ssl package on the Linux Server:
 ```bash
 sudo yum clean all
-sudo yum install mod_ssl dos2unix
+sudo yum install mod_ssl
 ```
 ## Generate the CSR on the Linux Server:
 ```bash
 sudo chmod 777 /etc/pki/tls/private /etc/pki/tls/certs
 cd /etc/pki/tls/private 
-openssl req -new -newkey rsa:3072 -nodes -keyout {{ hostname }}.key -out newcsrrequest.csr
-
-# Answer the Questions
+openssl req -new -newkey rsa:3072 -nodes -keyout $(hostname).key -out newcsrrequest.csr
 ```
 
 ## CAT the contents of the newrrequest.csr output:
 ```bash
+sudo chown root: ./*  # change the owner and group to root of the `/etc/pki/tls/private` folder
 cat newcsrrequest.csr # copy this
 ```
 
-## Go to the Certificate Generating Site on your Windows Workstation:
-<Here is where you generate the certificate from your organization>
+## Here's the part where you paste the CSR to your company and download the .cer certificate...
 
-# DO NOT SCP the certificate...COPY THE CONTENTS
-```
+## DO NOT SCP the certificate...COPY THE CONTENTS
 
 ## Save the Generated Certificate on the Linux Server:
 ```bash
 cd /etc/pki/tls/certs
-sudo vim {{ hostname }}.crt
+vim $(hostname).crt
 # (paste the contents of the .cer file from VSCode on your Windows Workstation), :wq to save
 
-sudo chown root: {{ hostname }}.crt
+sudo chown root: $(hostname).crt
 sudo chmod 644 /etc/pki/tls/certs
 sudo chmod 600 /etc/pki/tls/private
 ```
