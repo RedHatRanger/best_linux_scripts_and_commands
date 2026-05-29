@@ -36,7 +36,7 @@ To run Pi-hole safely as an unprivileged, rootless user (highly recommended), lo
  2. Persist this setting across reboots by saving it to a system configuration file:
    ```bash
    echo "net.ipv4.ip_unprivileged_port_start=53" | sudo tee /etc/sysctl.d/99-podman-pihole.conf
-   
+sudo sysctl -p /etc/sysctl.d/99-podman-pihole.conf   
    ```
 ### 3. Install Podman Compose
 Ensure the compose orchestrator tool is installed on your CachyOS system:
