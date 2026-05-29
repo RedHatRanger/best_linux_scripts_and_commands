@@ -1,4 +1,5 @@
-# Pi-hole Deployment Guide for Podman on CachyOS
+# Pi-hole Deployment Guide for Podman on CachyOS / Arch Linux
+
 This comprehensive guide covers the end-to-end setup of the official Pi-hole container using **Podman** and **podman-compose** on **CachyOS** (Arch Linux base). It handles critical configurations including rootless networking, freeing up host port 53, timezone configuration, and persistent volumes.
 ## Technical Prerequisites & System Prep
 Before running the container, CachyOS needs specific adjustments. By default, standard Linux systems restrict rootless users from binding to ports below 1024, and network resolution services usually occupy DNS port 53.
