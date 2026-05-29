@@ -1,0 +1,42 @@
+# zabbix_proxy.conf.j2
+# Managed by Ansible
+
+ProxyMode=0
+
+Server={{ zabbix_server_ip }}:10051
+Hostname={{ inventory_hostname }}
+
+ListenPort=10051
+LogFile=/var/log/zabbix/zabbix_proxy.log
+LogFileSize=0
+PidFile=/run/zabbix/zabbix_proxy.pid
+SocketDir=/run/zabbix
+
+DBHost=localhost
+DBName=zabbix_proxy
+DBUser=zabbix
+DBPassword={{ zabbix_db_password }}
+
+ProxyBufferMode=hybrid
+ProxyMemoryBufferSize=512M
+ProxyConfigFrequency=100
+
+StartPollers=100
+StartAgentPollers=5
+StartSNMPPollers=100
+
+StartPreprocessors=32
+StartPingers=100
+StartDiscoverers=30
+
+SNMPTrapperFile=/var/log/snmptrap/snmptrap.log
+CacheSize=1G
+HistoryCacheSize=512M
+HistoryIndexCacheSize=512M
+Timeout=4
+
+LogSlowQueries=3000
+
+StatsAllowedIP=127.0.0.1
+
+Include=/etc/zabbix/zabbix_proxy.d/*.conf
