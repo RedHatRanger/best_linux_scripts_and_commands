@@ -190,6 +190,3 @@
       ansible.builtin.debug:
         msg: "The mount is OK, but the Database Configuration failed. Check Postgres service status."
 
-
-
-
