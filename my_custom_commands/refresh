@@ -1,0 +1,6 @@
+mybranch=$(whoami | cut -d "@" -f1 | cut -d "-" -f2)
+echo $mybranch
+git checkout main;
+git pull;
+git branch -D $mybranch;
+git checkout -b $mybranch
