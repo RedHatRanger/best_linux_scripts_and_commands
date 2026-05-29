@@ -1,0 +1,11 @@
+# pg_hba.conf.j2
+# Managed by Ansible
+
+# TYPE  DATABASE          USER       CIDR-ADDRESS           METHOD
+local   all               postgres                          trust
+local   {{ zabbix_db_name }}      zabbix                            scram-sha-256
+host    all               all         127.0.0.1/32          scram-sha-256
+hostssl all               all         0.0.0.0/0             scram-sha-256
+hostssl all               all         ::/0                  scram-sha-256
+host    {{ zabbix_db_name }}      zabbix      ::1/128               scram-sha-256
+host    {{ zabbix_db_name }}      zabbix      127.0.0.1/32          scram-sha-256
