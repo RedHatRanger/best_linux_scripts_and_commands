@@ -1,28 +1,27 @@
 ---
 - name: Check website certificate expiration dates
-  hosts: localhost
-  gather_facts: false
-  vars:
-    sites:
-      - gitlab.example.com
-      - another_site.example.com
+  hosts: localhost
+  gather_facts: false
+  vars:
+    sites:
+      - gitlab.example.com
+      - another_site.example.com
+    current_time: "{{ lookup('pipe', 'date -u +%Y%m%d%H%M%SZ') }}"
 
-  tasks:
-    - name: Get certificate details from websites
-      community.crypto.get_certificate:
-        host: "{{ item }}"
-        port: 443
-      loop: "{{ sites }}"
-      register: cert_output
+  tasks:
+    - name: Get certificate details from websites
+      community.crypto.get_certificate:
+        host: "{{ item }}"
+        port: 443
+      loop: "{{ sites }}"
+      register: cert_output
 
-    - name: Display certificate expiration dates
-      ansible.builtin.debug:
-        msg: >
-          Site: {{ item.item }} | 
-          Expires on: {{ (item.not_after | to_datetime('%Y%m%d%H%M%SZ')).strftime('%Y-%m-%d--%H:%M:%SZ') }} | 
-          Days remaining: {{ ((item.not_after | to_datetime('%Y%m%d%H%M%SZ')) - (current_time | to_datetime('%Y-%m-%dT%H:%M:%SZ'))).days }}
-      loop: "{{ cert_output.results }}"
-      loop_control:
-        label: "{{ item.item }}"
-      vars:
-        current_time: "{{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}"
+    - name: Display certificate expiration dates
+      ansible.builtin.debug:
+        msg: >
+          Site: {{ item.item }} | 
+          Expires on: {{ (item.not_after | to_datetime('%Y%m%d%H%M%SZ')).strftime('%Y-%m-%d %H:%M:%SZ') }} | 
+          Days remaining: {{ ((item.not_after | to_datetime('%Y%m%d%H%M%SZ')) - (current_time | to_datetime('%Y%m%d%H%M%SZ'))).days }}
+      loop: "{{ cert_output.results }}"
+      loop_control:
+        label: "{{ item.item }}"
