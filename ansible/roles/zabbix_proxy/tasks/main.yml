@@ -208,13 +208,5 @@
     name: zabbix-agent2
     state: restarted
 
----
-# defaults file for zabbix_proxy
-postgresql_data_dir: /var/lib/pgsql/data
-zabbix_server_ip: "<server_ip>"
-zabbix_server_fqdn: "<server_fqdn>"
-zabbix_db_name: "zabbix_proxy"
-zabbix_db_user: "zabbix"
-zabbix_db_password: "<zabbix_db_password>"
 
 
