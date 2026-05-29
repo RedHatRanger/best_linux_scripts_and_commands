@@ -189,24 +189,7 @@
     - name: Alert on Database Logic Failure
       ansible.builtin.debug:
         msg: "The mount is OK, but the Database Configuration failed. Check Postgres service status."
-  
 
----
-# handlers file for zabbix_proxy
-- name: Restart Postgres
-  ansible.builtin.service:
-    name: postgresql
-    state: restarted
-
-- name: Restart Zabbix Proxy
-  ansible.builtin.service:
-    name: zabbix-proxy
-    state: restarted
-
-- name: Restart Zabbix Agent
-  ansible.builtin.service:
-    name: zabbix-agent2
-    state: restarted
 
 
 
