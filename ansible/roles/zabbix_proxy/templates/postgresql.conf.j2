@@ -1,0 +1,34 @@
+# postgresql.conf.j2
+# Managed by Ansible
+
+max_connections = 100
+
+password_encryption = scram-sha-256
+shared_buffers = 128MB
+
+dynamic_shared_memory_type = posix
+
+max_wal_size = 1GB
+min_wal_size = 80MB
+
+logging_collector = on
+
+log_filename = 'postgresql-%a.log'
+
+log_truncate_on_rotation = on
+
+log_rotation_age = 1d
+
+log_rotation_size = 0
+
+log_timezone = 'America/New_York'
+
+datestyle = 'iso, mdy'
+timezone = 'America/New_York'
+
+lc_messages = 'en_US.UTF-8'
+
+lc_monetary = 'en_US.UTF-8'
+lc_numeric = 'en_US.UTF-8'
+lc_time = 'en_US.UTF-8'
+default_text_search_config = 'pg_catalog.english'
