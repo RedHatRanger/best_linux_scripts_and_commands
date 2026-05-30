@@ -3,7 +3,7 @@
 New-Item -ItemType File -Path $PROFILE -Force
 ```
 
-## Then, paste this into the .ps1 file that is created:
+## Then, type `ise $PROFILE`, press ENTER, and paste these contents:
 ```
 function ll { Get-ChildItem -Force }
 ```
