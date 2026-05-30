@@ -1,4 +1,4 @@
-## Open PowerShell and type:
+## Open PowerShell as Admin, and type:
 ```bash
 New-Item -ItemType File -Path $PROFILE -Force
 ```
