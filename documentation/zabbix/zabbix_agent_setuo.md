@@ -1,10 +1,17 @@
 ### Model
 To start monitoring your RHEL 8 host, you must configure Zabbix Agent 2 locally and add it to the Zabbix web interface.
 
+#### Firewall:
+```bash
+sudo firewall-cmd --add-port={10050,10051}/tcp --permanent
+sudo firewall-cmd --reload
+```
+
+
 #### Step 1: Configure Zabbix Agent 2 on RHEL 8
 Open the Zabbix Agent 2 configuration file:
 ```bash
-sudo vi /etc/zabbix/zabbix_agent2.conf
+sudo vim /etc/zabbix/zabbix_agent2.conf
 ```
 
 Update these three parameters to match your infrastructure:
