@@ -55,3 +55,8 @@ alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-ti
 
 PS1="\[\033[01;31m\][\u@RockyAdmin\[\033[01;31m\] [\[\033[01;31m\]\W]\\$ \[\033[00m\]"
 ```
+
+```bash
+df -h | awk 'NR==1 || +$6 >= 50'
+
+```
