@@ -1,0 +1,289 @@
+stages:
+  - backup
+
+variables:
+  WIKI_REPO_URL: "https://project_token:${GL_AUTOMATION_TOKEN}@gitlab.example.com/<team>-team/<project>.wiki.git"
+
+.git_sync_logic: &git_sync_logic
+  - cd ${TARGET_DIR}
+  - git config --global --add safe.directory ${TARGET_DIR}
+  - if [ ! -d ".git" ]; then git init; fi
+  - git config --local user.name "<TEAM> Log Automation"
+  - git config --local user.email "<team>-automation@example.com"
+  - git remote set-url origin "https://project_token:${GL_AUTOMATION_TOKEN}@gitlab.example.com/<team>-team/hard-noc-lyfe.git" || git remote add origin "https://project_token:${GL_AUTOMATION_TOKEN}@gitlab.example.com/<team>-team/hard-noc-lyfe.git"
+  - git fetch origin
+  - git checkout -B ${LOGS_BRANCH} origin/${LOGS_BRANCH} 2>/dev/null || git checkout -b ${LOGS_BRANCH}
+  - git add .
+  - |
+    if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+      echo "Initial workspace baseline setup. Creating first commit..."
+      git commit -m "Automated initial log archive [${LOGS_BRANCH}] - $(date +'%Y-%m-%d %H:%M:%S')"
+      git push origin ${LOGS_BRANCH}
+    elif git diff-index --quiet HEAD --; then
+      echo "No new updates detected to archive on branch ${LOGS_BRANCH}."
+    else
+      echo "Changes detected. Committing and pushing logs..."
+      git commit -m "Automated log archive [${LOGS_BRANCH}] - $(date +'%Y-%m-%d %H:%M:%S')"
+      git fetch origin ${LOGS_BRANCH}
+      git rebase origin/${LOGS_BRANCH} || (git rebase --abort && echo "Collision mitigated.")
+      git push origin ${LOGS_BRANCH}
+    fi
+
+.wiki_push_logic: &wiki_push_logic
+  - echo "Pushing updates to GitLab Wiki..."
+  - cd ${CI_PROJECT_DIR}
+  - rm -rf wiki_repo
+  - git clone ${WIKI_REPO_URL} wiki_repo || mkdir wiki_repo
+  - cd wiki_repo
+  - if [ ! -d ".git" ]; then git init && git remote add origin ${WIKI_REPO_URL}; fi
+  - git config --global --add safe.directory $(pwd)
+  - cp /tmp/${WIKI_PAGE_NAME} ./${WIKI_PAGE_NAME}
+  - git add ${WIKI_PAGE_NAME}
+  - |
+    if git diff-index --quiet HEAD --; then
+      echo "No changes to the Wiki dashboard table."
+    else
+      git config --local user.name "NCM Log Automation"
+      git config --local user.email "<team>-automation@example.com"
+      git commit -m "Automated Wiki Update [skip ci] - $(date +'%Y-%m-%d %H:%M:%S')"
+      git pull origin main --ff-only || true
+      git push origin main
+    fi
+
+.log_sync_template:
+  stage: backup
+  tags:
+    - ncm
+  image: gitlab.example.com:5050/<team>-team/<project>/<team>-ee:2.1
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#   JOB 1: SECURECRT HUMAN SESSION LOGS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+sync_securecrt_logs:
+  extends: .log_sync_template
+  variables:
+    TARGET_DIR: "/<team>/logs/SecureCRT/hard-noc-lyfe"
+    LOGS_BRANCH: "automated_securecrt_logs"
+    WIKI_PAGE_NAME: "SecureCRT-Audit.md"
+  script:
+    - *git_sync_logic
+    - echo "Parsing SecureCRT logs..."
+    - |
+      python3 - << 'EOF'
+      import os, re, csv
+      from datetime import datetime
+      target_dir, logs_branch = os.environ['TARGET_DIR'], os.environ['LOGS_BRANCH']
+      base_hyperlink_url = f"{os.environ['CI_PROJECT_URL']}/-/blob/{logs_branch}"
+      wiki_content = f"# SecureCRT Network Change Audit Log\n\nLast updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+      wiki_content += "| Change Date | Time (24h) | Hostname | IP Address | Admin User | Commands Executed | Log File |\n| --- | --- | --- | --- | --- | --- | --- |\n"
+      log_files = []
+      for root, _, files in os.walk(target_dir):
+          for f in files:
+              if f.endswith('.log') and '.git' not in root: log_files.append(os.path.relpath(os.path.join(root, f), target_dir))
+      if not log_files:
+          wiki_content += "| - | - | No logs found | - | - | - | - |\n"
+      else:
+          def get_dt(p):
+              f = os.path.basename(p)
+              m = re.search(r'(\d{2}[-_]\d{2}[-_]\d{4})_(\d{6})', f)
+              if m:
+                  try: return datetime.strptime(f"{m.group(1).replace('_','-')}_{m.group(2)}", "%m-%d-%Y_%H%M%S")
+                  except: pass
+              try: return datetime.fromtimestamp(os.path.getmtime(os.path.join(target_dir, p)))
+              except: return datetime.min
+          for rel_path in sorted(log_files, key=get_dt, reverse=True):
+              file = os.path.basename(rel_path)
+              d_disp, t_disp = "Unknown", "--:--:--"
+              m = re.search(r'(\d{2}[-_]\d{2}[-_]\d{4})_(\d{6})', file)
+              if m:
+                  try:
+                      dt = datetime.strptime(f"{m.group(1).replace('_','-')}_{m.group(2)}", "%m-%d-%Y_%H%M%S")
+                      d_disp, t_disp = dt.strftime("%Y-%m-%d"), dt.strftime("%H:%M:%S")
+                  except: pass
+              parts = file.strip().split('_')
+              ip = parts[0] if parts else "Unknown"
+              user = parts[-1].replace('.log', '').replace('adm-', '') if parts else "Unknown"
+              cmds, host = [], "Unknown"
+              try:
+                  with open(os.path.join(target_dir, rel_path), 'r', errors='ignore') as lf:
+                      for line in lf:
+                          if host == "Unknown":
+                              pm = re.search(r'([\w\.\-]+)\s*[#>]', line)
+                              if pm and not any(n in pm.group(1) for n in ["user@", "git:(", "dir)"]): host = pm.group(1).strip()
+                          m = re.search(r'[#>]\s*(.*)$', line)
+                          if m:
+                              c = m.group(1).strip().replace('\r', '').replace('\n', '').replace('|', '&#124;')
+                              if not c or len(c) <= 1 or any(n in c for n in ["git:(", "[user@", "dir)"]): continue
+                              if any(s in c for s in ["secret ", "password "]) or re.search(r'\b[0-9a-fA-F]{32,}\b', c): continue
+                              cmds.append(c)
+              except Exception as e: cmds = [f"Error: {str(e)}"]
+              cmd_str = "".join(f"• {x}<br>" for x in cmds[-5:])[:-4] if cmds else "*Session Idle*"
+              if len(cmds) > 5: cmd_str += "<br>*(truncated...)*"
+              wiki_content += f"| {d_disp} | `{t_disp}` | **{host}** | `{ip}` | **{user}** | {cmd_str} | [{file}]({base_hyperlink_url}/{rel_path}) |\n"
+      with open(f"/tmp/{os.environ['WIKI_PAGE_NAME']}", "w") as f: f.write(wiki_content)
+      EOF
+    - *wiki_push_logic
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#   JOB 2: AUTOMATED ANSIBLE RUN LOGS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+sync_ansible_automation_logs:
+  extends: .log_sync_template
+  variables:
+    TARGET_DIR: "/<team>/common/ansible/changes"
+    LOGS_BRANCH: "automated_ansible_logs"
+    WIKI_PAGE_NAME: "Ansible-Automation-Audit.md"
+  script:
+    - *git_sync_logic
+    - echo "Executing version-controlled CSV Herder logic..."
+    - python3 ${CI_PROJECT_DIR}/scripts/csv_herder.py
+    - echo "Processing log data into both HTML and CSV full-scale audit endpoints..."
+    - |
+      python3 - << 'EOF'
+      import os, csv, re, shutil
+      from datetime import datetime, timedelta
+      target_dir, logs_branch = os.environ['TARGET_DIR'], os.environ['LOGS_BRANCH']
+      base_hyperlink_url = f"{os.environ['CI_PROJECT_URL']}/-/blob/{logs_branch}"
+      
+      now = datetime.now()
+      seven_days_ago = now - timedelta(days=7)
+      
+      change_files = [f for f in os.listdir(target_dir) if f.startswith('main-change_') and f.endswith('.csv')]
+      
+      def get_filename_datetime(filename):
+          match = re.search(r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})', filename)
+          if match:
+              try: return datetime.fromisoformat(match.group(1))
+              except ValueError: pass
+          try: return datetime.fromtimestamp(os.path.getmtime(os.path.join(target_dir, filename)))
+          except Exception: return datetime.min
+
+      all_parsed_rows = []
+      
+      if change_files:
+          change_files.sort(key=get_filename_datetime, reverse=True)
+          target_file = change_files[0]
+          
+          try:
+              shutil.copyfile(os.path.join(target_dir, target_file), os.path.join(target_dir, "full_audit_log.csv"))
+          except Exception as e:
+              print(f"Error copying master CSV artifact: {str(e)}")
+          
+          for old_file in change_files[1:]:
+              try: os.remove(os.path.join(target_dir, old_file))
+              except Exception: pass
+              
+          try:
+              with open(os.path.join(target_dir, target_file), 'r', encoding='utf-8', errors='ignore') as f:
+                  reader = csv.reader(f)
+                  next(reader, None)
+                  
+                  for row in reader:
+                      if not row or len(row) < 6: continue
+                      ts = row[0].strip()
+                      if not ts or not ts[0].isdigit(): continue
+                          
+                      host = row[2].strip()
+                      if 'localhost' in host.lower(): continue
+                          
+                      row_dt = None
+                      ts_clean = ts.replace('Z', '').replace('T', ' ').strip()
+                      patterns = ["%Y-%m-%d %H:%M:%S", "%Y/%m/%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y/%m/%d %H:%M"]
+                      for fmt in patterns:
+                          try:
+                              row_dt = datetime.strptime(ts_clean, fmt)
+                              break
+                          except ValueError: continue
+                              
+                      if not row_dt:
+                          try: row_dt = datetime.fromisoformat(ts_clean)
+                          except ValueError: row_dt = None
+                      
+                      if row_dt and row_dt < seven_days_ago: continue
+                          
+                      sort_key = row_dt if row_dt else now
+                      all_parsed_rows.append((sort_key, row, target_file))
+          except Exception as e:
+              print(f"Error processing master file {target_file}: {str(e)}")
+              
+      wiki_content = f"# Ansible Automation Execution Audit Log\n\n"
+      wiki_content += f"Last updated: {now.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+      
+      if change_files:
+          wiki_content += f"➡️ **[Option 1: Open Full Searchable Web View ({len(all_parsed_rows)} rows)]({base_hyperlink_url}/full_audit_log.html)**\n\n"
+          wiki_content += f"📥 **[Option 2: Download Full Raw Data File (Excel CSV)]({base_hyperlink_url}/full_audit_log.csv)**\n\n"
+          
+      wiki_content += "### Recent 100 System Executions\n"
+      wiki_content += "| Execution Date/Time | Invoked By | Target Host | Playbook | Last Task | Changes / Summary | Log File |\n| --- | --- | --- | --- | --- | --- | --- |\n"
+      
+      if not all_parsed_rows:
+          wiki_content += "| - | - | No automation logs found within the last 7 days | - | - | - | - |\n"
+      else:
+          all_parsed_rows.sort(key=lambda x: x[0], reverse=True)
+          
+          for row_dt, row, file in all_parsed_rows[:100]:
+              ts, invoked, host, playbook, task, changes = row[0], row[1], row[2], row[3], row[4], row[5]
+              user = invoked.split('@')[0]
+              changes_clean = changes.replace('|', '&#124;').replace('\n', '<br>').replace('\r', '').strip()
+              try: date_str = row_dt.strftime('%Y-%m-%d `%H:%M:%S`') if row_dt else ts
+              except: date_str = ts
+              wiki_content += f"| {date_str} | **{user}** | `{host}` | `{playbook}` | *{task}* | {changes_clean} | [{file}]({base_hyperlink_url}/{file}) |\n"
+              
+          html_rows = ""
+          for row_dt, row, file in all_parsed_rows:
+              ts, invoked, host, playbook, task, changes = row[0], row[1], row[2], row[3], row[4], row[5]
+              changes_html = changes.replace('\n', '<br>').replace('\r', '').strip()
+              html_rows += f"<tr><td>{ts}</td><td>{invoked}</td><td>{host}</td><td>{playbook}</td><td>{task}</td><td>{changes_html}</td></tr>\n"
+              
+          html_template = f"""<!DOCTYPE html>
+          <html>
+          <head>
+              <title>Full Automation Audit Log</title>
+              <style>
+                  body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 30px; background: #f8f9fa; }}
+                  h2 {{ color: #2e2f3a; }}
+                  input {{ padding: 10px; width: 300px; margin-bottom: 20px; border: 1px solid #ccced1; border-radius: 4px; }}
+                  table {{ border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }}
+                  th, td {{ text-align: left; padding: 12px; border-bottom: 1px solid #e1e4e6; font-size: 14px; }}
+                  th {{ background-color: #4a4b57; color: white; }}
+                  tr:hover {{ background-color: #f1f2f5; }}
+              </style>
+              <script>
+                  function filterTable() {{
+                      let input = document.getElementById("search");
+                      let filter = input.value.toUpperCase();
+                      let rows = document.getElementById("audit-table").getElementsByTagName("tr");
+                      for (let i = 1; i < rows.length; i++) {{
+                          rows[i].style.display = rows[i].textContent.toUpperCase().includes(filter) ? "" : "none";
+                      }}
+                  }}
+              </script>
+          </head>
+          <body>
+              <h2>Full Execution Log Archive ({len(all_parsed_rows)} Rows)</h2>
+              <p>Generated on: {now.strftime('%Y-%m-%d %H:%M:%S')}</p>
+              <input type="text" id="search" onkeyup="filterTable()" placeholder="Search targets, playbooks, users...">
+              <table id="audit-table">
+                  <tr><th>Date/Time</th><th>Invoked By</th><th>Target Host</th><th>Playbook</th><th>Last Task</th><th>Changes Summary</th></tr>
+                  {html_rows}
+              </table>
+          </body>
+          </html>"""
+          
+          with open(os.path.join(target_dir, "full_audit_log.html"), "w", encoding="utf-8") as hf:
+              hf.write(html_template)
+              
+      with open(f"/tmp/{os.environ['WIKI_PAGE_NAME']}", "w") as f: f.write(wiki_content)
+      EOF
+    - |
+      cd ${TARGET_DIR}
+      git add -A
+      if ! git diff-index --quiet HEAD --; then
+        echo "Pruning changes, full log HTML, and CSV export caught. Updating branch archive..."
+        git commit -m "Automated log cleanup and dual-format output generation - $(date +'%Y-%m-%d %H:%M:%S')"
+        git push origin ${LOGS_BRANCH}
+      fi
+    - *wiki_push_logic
