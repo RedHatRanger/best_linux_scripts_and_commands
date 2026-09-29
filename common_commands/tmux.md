@@ -1,6 +1,14 @@
 # tmux Cheatsheet
+- For 4 split screens:
+```bash
+tmux new-session -t htop \; split-window -h "ssh server2" \; split-window -v "ssh server4" \; select-pane -t 0 \; split-window -v "ssh server3" \; select-pane -t 0
+```
+# To toggle pane synchronization:
+Enable sync: Press Ctrl+b, then type : and enter setw synchronize-panes
+Disable sync: Press Ctrl+b, then type : and enter setw synchronize-panes off
 
-tmux Session
+
+# tmux Session
 New Sessions
 ```
 tmux
