@@ -1,27 +1,16 @@
-# ansible-builder build -v 3 --no-cache -t artifactory.example.com/awx-operator/ansible/network-ee:2.0
+# ansible-builder build -v 3 --no-cache -t artifactory.example.com/awx-operator/ansible/team-ee:2.0
 version: 3
 
 images:
   base_image:
-    name: registry.redhat.io/ubi8/python-312:latest
+    name: registry.access.redhat.com/ubi8/python-312:latest
 
 dependencies:
   ansible_core:
     package_pip: ansible-core
   galaxy: requirements.yml
   python: requirements.txt
-  system:
-    - python3.12-devel
-    - findutils
-    - gcc
-    - gcc-c++
-    - iputils
-    - libcap
-    - libssh-devel
-    - libxml2-devel
-    - libxslt-devel
-    - openssl-devel
-    - krb5-devel
+  system: []
 
 additional_build_files:
   - src: files/ansible.cfg
@@ -37,18 +26,23 @@ additional_build_files:
 
 additional_build_steps:
   prepend_base:
-    - RUN groupadd -g 10018 <LOCAL_GROUP>
-    - RUN rm -f /etc/yum.repos.d/ubi.repo
-    - COPY _build/yum.repos.d/redhat.repo /etc/yum.repos.d/redhat.repo
-    - RUN dnf install -y findutils ansible-core libcap iputils
-    - RUN setcap cap_net_raw+ep /usr/bin/ping
-    - COPY _build/wheels/ /tmp/shared_wheels/
+    - RUN groupadd -g <group_id> <group_name>
 
-    # STRICT OFFLINE BOOTSTRAP
+    # Install system RPM from local rpms/ folder (NOT from repos)
+    - COPY _build/rpms/ /opt/rpms/
+    - RUN dnf install -y /opt/rpms/*.rpm
+
+    # Set ping permissions
+    - RUN setcap cap_net_raw+ep /usr/bin/ping
+
+    # Offline wheel support
+    - COPY _build/wheels/ /tmp/shared_wheels/
     - ENV PIP_NO_INDEX=1
     - ENV PIP_FIND_LINKS=/tmp/shared_wheels
-    - ENV PIP_EXTRA_INDEX_URL=https://artifactory.example.com/artifactory/api/pypi/pypi-remote/simple
+    - ENV PIP_EXTRA_INDEX_URL=https://artifactory.example.com/artifactory/api/pypi/pypi-authorized/simple
     - RUN python3 -m pip config set global.trusted-host artifactory.example.com
+
+    # Add CA certs
     - COPY _build/certs/ /etc/pki/ca-trust/source/anchors/
     - RUN update-ca-trust
 
@@ -63,18 +57,22 @@ additional_build_steps:
     - ENV ANSIBLE_CONFIG=/build/ansible.cfg
 
   prepend_final:
-    - RUN rm -f /etc/yum.repos.d/ubi*.repo
     - RUN dnf clean all
 
-    # BAKE ANSIBLE.CFG & FIX PERMISSIONS
+    # Install baked-in ansible.cfg
     - RUN mkdir -p /etc/ansible
     - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
     # Change group to 0 (root group) and set permissions to 644 (Owner RW, Group/Global R)
     - RUN chgrp 0 /etc/ansible/ansible.cfg && chmod 644 /etc/ansible/ansible.cfg
 
+    # Copy offline wheels into final image
     - RUN mkdir -p /opt/app-root/src/wheels
     - COPY --from=builder /tmp/shared_wheels/ /opt/app-root/src/wheels/
+
+    # Install runner dependencies
     - RUN /usr/bin/python3 -m pip install --no-index --find-links=/opt/app-root/src/wheels ansible-runner pexpect ptyprocess python-daemon
+
+    # Bake dumb-init install command
     - RUN echo "/usr/bin/python3 -m pip install --no-index --find-links /opt/app-root/src/wheels 'dumb-init==1.2.5'" > /output/scripts/install-init
 
   append_final:
@@ -87,4 +85,6 @@ additional_build_steps:
 
     - RUN chmod +x /opt/builder/bin/entrypoint
     - RUN chgrp -R 0 /opt/builder /runner && chmod -R g=u /opt/builder /runner
+
+    # Install python requirements
     - RUN python3 -m pip install --find-links=/opt/app-root/src/wheels -r /output/requirements.txt
